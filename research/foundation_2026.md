@@ -167,6 +167,65 @@ SPIVA (S&P Dow Jones Indices, 2024) 24 年数据：15 年区间内**任何主动
 
 ---
 
+### 调研 6：工具可用性 / 习惯形成 / 留存 — `notes/06_tool_design_retention.md`
+
+**起因**：用户 review v2 时指出 Phase 1 完全没调研"工具好不好用对实际效用的影响"。论点："实际效用 ≈ 证据强度 × 实际使用率"。该论点方向正确，但调研发现现实**比这个简单乘法更复杂**。
+
+**最重要的反直觉发现：**
+
+| 发现 | 证据等级 | 来源 |
+|---|---|---|
+| **Engagement-effectiveness paradox**：高使用率 ≠ 高效果，存在低使用就显著改善的用户和高使用却没改善的用户 | S | Linardon 2024 BMC Digital Health; Mohr 2023 Curr Treat Options Psychiatry |
+| **用户满意度与学习效果负相关** | S | Stanford SCALE 2024-2025; Karpicke & Roediger 2008 Science; arXiv 2604.07469; arXiv 2512.04630 "reflection-satisfaction tradeoff" |
+| **完全私密 ≠ 最诚实**：完全匿名让人更敷衍 | S | Lelkes 2012 *J Exp Soc Psych* |
+| **Streak 反而降低长期留存**：6 实验 3766 受试，streak 把"可选行为"扭曲为"避免损失"的焦虑性义务 | S | Hueller, Reimann, Warren 2023 *J. Assoc. Consumer Research* |
+| **Leaderboard / 积分 / 徽章在金融场景增加风险偏好** | S | FCA 2024（9000 人交易实验）；Hueller 2023 |
+
+**留存基线（mHealth 元分析）：**
+- Pooled dropout 43%（95% CI 29-57，Meherali 2020 *JMIR* 17 项研究）
+- 头 100 天 70% 用户掉队（Pratap 2020）
+- 营养 App 37% 因"时间投入高"放弃 → 头号弃用原因（Honary 2023）
+- 交易日志行业内部：80% 在 2 周内放弃，仅 18% 撑过 3 个月（W 级，TradingView 用户行为）
+
+**有强证据的设计原则（必须采用）：**
+
+| 设计 | 证据 | 来源 |
+|---|---|---|
+| **Implementation Intentions（if-then plans）** | d=.27-.66, **642 项研究 meta** | Sheeran, Listrom, Gollwitzer 2024 *European Review of Social Psychology* |
+| **Honesty oath（事前诚实承诺）** | 21,506 人 megastudy；税务作弊降低 4.5-8.5 个百分点 | Capraro et al. 2024 *Nature Human Behaviour* |
+| **"Wise feedback"（高标准 + 明确信任）** | 显著优于温暖 / 严厉 feedback | Yeager et al. 2014 *J Exp Psychol Gen*; Cohen, Steele, Ross 1999 |
+| **直接批判性 AI feedback** | 满意度低但学习效果优于鼓励性 feedback | Stanford SCALE 2024-2025 |
+| **字段砍到 ≤ 6 个** | HCI 11→4 字段砍掉提升完成率 120% | Sweller 认知负荷 + EMA 元分析 JMIR 2024 |
+| **"Future self"工具** | small-to-large 效应；Hershfield 经典 + 25 篇综述 | Hershfield 2011; Grekin et al. 2025 systematic review |
+
+**有强反向证据的设计（必须避免）：**
+
+| 设计 | 反向证据 |
+|---|---|
+| 长 streak 机制 | Hueller 2023 6 实验：长期留存反而**更低**；金融场景里把"该不交易的时候不交易"反向激励 |
+| Leaderboard / 积分 / 徽章 | FCA 2024 监管实证：低金融素养者交易频率↑、风险↑ |
+| AI 教练优化为"温暖共情" | Sharma 2023 Sycophancy + Cheng 2025 ELEPHANT：默认 LLM 谄媚直接伤害决策质量 |
+| 复杂个性化引擎 | Linardon 2024 PLOS Digital Health：文献证据 "scarce and inconclusive" |
+| 高 DAU/WAU 目标 | 在交易场景里"频繁打开 App"恰恰是有害的（Robinhood 案例 + FCA 证据） |
+
+**对项目的核心修正：**
+
+1. **决策链改 if-then 形式**：从开放问题（"你为什么入场？"）改为 implementation intention（"如果 X 则 Y"）。这把 d=.27-.66 强证据拉过来。
+2. **每笔交易记录前显示 honesty oath**：一句话成本，21,506 人证据。
+3. **字段砍到 ≤ 6**：扩展信息留给周复盘。
+4. **AI 教练采用 wise feedback 风格**（高标准 + 明确信任），而非温暖共情或严厉批评。
+5. **删除任何 streak / 积分 / 徽章 / 排行榜**——哪怕"个人 streak"。
+6. **不追求高 DAU/WAU**：明确把"周复盘 + 关键时刻决策链 + 每笔记录"定为目标使用率。
+7. **诚实 ↔ 留存矛盾的处理**：完全匿名（弱诚实）和完全公开（堵死承诺通道）都不是最优——AI 单方信任的自报告是 4 选项里证据基础**最弱**的一个。需要补充结构化诚实激励（oath + 周复盘的"未达标说明"机制）。
+
+**对用户论点的修正：**
+
+> 用户原论点："实际效用 ≈ 证据强度 × 实际使用率"
+>
+> **修正后**："实际效用 ≈ 证据强度 × min(使用率, critical_threshold)"——超过最低门槛后边际收益迅速衰减；甚至在某些情境下**用得越多反而越差**（engagement-effectiveness paradox + reflection-satisfaction tradeoff）。
+
+---
+
 ## 二、对当前系统的"哪些假设被证据支持/反驳"清单
 
 ### 强化（证据支持，应保留并强化）
@@ -235,8 +294,10 @@ SPIVA (S&P Dow Jones Indices, 2024) 24 年数据：15 年区间内**任何主动
 └────────────────────────────────────────────────────────┘
                           ↓
 ┌────────────────────────────────────────────────────────┐
-│ 第 2 层 · 方法堆栈(Method)— 9 个 S 级证据组件         │
-│ • 决策链 (implementation intentions, d=0.65)           │
+│ 第 2 层 · 方法堆栈(Method)— 12 个 S 级证据组件        │
+│                                                        │
+│ 核心训练组件:                                         │
+│ • 决策链做成 if-then(d=.27-.66, 642 项 meta)          │
 │ • Autocommitment 硬约束 (Fischbacher S 级)             │
 │ • 客观媒介复盘 (AAR, d=0.79; Keiser & Arthur 2021)     │
 │ • 单一 setup 聚焦                                      │
@@ -244,7 +305,13 @@ SPIVA (S&P Dow Jones Indices, 2024) 24 年数据：15 年区间内**任何主动
 │ • 校准训练 (Mellers et al. 2015)                       │
 │ • Debiasing 训练 (Morewedge 2015, 偏误降幅 19-32%)     │
 │ • HRV 趋势监测 (Bossaerts S 级)                        │
+│                                                        │
+│ 工具留存与诚实组件(调研 6 新增):                      │
+│ • Honesty oath (21506 人 megastudy, Capraro 2024)      │
+│ • Wise feedback (高标准 + 明确信任, Yeager 2014)       │
+│ • Future self 工具 (Hershfield 2011 + Grekin 2025)     │
 │ • 公开承诺 / 社会问责                                  │
+│                                                        │
 │ —— 这些是支持第 1 层目标的最强证据手段                 │
 └────────────────────────────────────────────────────────┘
                           ↓
@@ -339,6 +406,72 @@ Stage -2 强制：
 
 这把 EV 框架的批判中性化——你的长期财富不依赖训练成功。
 
+### 8. 复盘工具的设计原则（基于调研 6 + AAR 调节因子）
+
+调研 1 已确立 AAR 是证据强度最高的训练方法（Keiser & Arthur 2021, d=0.79）。调研 6 进一步指出工具可用性影响实际效用——**复盘工具是整个系统中证据最强的组件，必须做得既好用又诚实**。具体设计原则：
+
+**复盘的三个层级（频率与内容分层）：**
+
+| 层级 | 频率 | 内容 | 证据基础 |
+|---|---|---|---|
+| **逐笔即时复盘**（trade-level AAR） | 每次平仓 ≤ 30 分钟内 | 3 个固定字段（事前预设 / 实际发生 / 偏差归类） | AAR + 时间衰减原理 |
+| **每周模式复盘**（weekly review） | 周末固定时间 | 进度监控 + setup 一致性 | Harkin 2016 d=0.40；但需 ≥ 50 笔才有信号 |
+| **每月校准复盘**（calibration review） | 月末 | 预估胜率 vs 实际胜率偏差 | Mellers 2015 superforecaster |
+| **季度系统复盘**（meta-audit） | 每 3 月 | 检测复盘是否退化为仪式 | Beighton 2018 反向证据 |
+
+**逐笔复盘工具的硬性设计要求（不是可选）：**
+
+| 设计 | 证据 |
+|---|---|
+| **字段总数 ≤ 6 个**（不是 30 个） | Sweller 认知负荷 + EMA 元分析；HCI 11→4 砍掉提升完成率 120% |
+| **必须有客观证据字段**（K 线截图、订单簿快照） | Keiser & Arthur 2021：客观媒介是 AAR 显著调节因子 |
+| **必须用 What 类提问**（你做了什么？看到了什么？） | Watkins & Teasdale 2004：Why 触发反刍 |
+| **结构化模板而非自由书写** | Keiser & Arthur 2021：结构化 > 非结构化（军事场景） |
+| **事前预设 → 实际发生 → 偏差**三段式 | AAR 经典框架：必须有"intent vs reality"对照 |
+| **AI 限定为 3 类输出**（事实抽取 / 规则偏差标注 / 拒绝评判好坏） | Bastani 2024 + Hodge 2023：避免认知卸载和拟人化伤害 |
+| **Honesty oath 显示在记录开始**（"我承诺如实记录无论结果如何"） | Capraro 2024 *Nature Human Behaviour* 21506 人 |
+| **样本量 < 50 时 AI 拒绝下结论**，仅标"待观察信号" | 调研 5 样本量盲区 |
+
+**禁止的设计（有反向证据）：**
+- ❌ "今天感觉如何？" 类自由书写字段（Pennebaker 范式 d=0.12，与交易场景不匹配）
+- ❌ 任何 streak / 积分 / 徽章 / 完成率排行（Hueller 2023 反向证据 + FCA 2024）
+- ❌ AI 给"做得好/做得差"的总评（认知卸载 + 用户满意度↑学习效果↓）
+- ❌ "AI 推测你为什么这样做"（误导用户，Microsoft × CMU 2025：依赖 AI 解释会退化批判性思考）
+- ❌ 字段超过 10 个（Beighton 2018：reflection-as-task 退化）
+- ❌ 强制每天打开（追求高 DAU 在交易场景反向激励）
+
+### 9. 工具可用性 vs 诚实约束的权衡（核心矛盾的处理）
+
+调研 6 揭示一个**反直觉但坚硬的事实**：用户满意度与学习效果在 AI feedback 上**负相关**（Stanford SCALE 2024-2025；Karpicke & Roediger 2008）。这意味着"工具好用 → 用户喜欢 → 效果好"这个三段论**有 S 级证据反对**。
+
+但这不意味着应该故意做难用的工具——证据指向的是一个具体的**设计配方**：
+
+| 应做的 | 不应做的 |
+|---|---|
+| **Wise feedback**（高标准 + 明确信任） | 温暖共情语气 |
+| 字段砍到 ≤ 6（降低留存摩擦） | 字段做全（降低使用率） |
+| 直接批判性反馈 | 鼓励性 / sycophantic 反馈 |
+| 客观信息呈现（"完成 X / Y 笔"） | 奖励化（积分、徽章） |
+| 关键时刻摩擦（如开仓前强制 if-then） | 持续摩擦（每次打开都阻挠） |
+| 周复盘 + 关键时刻使用为目标 | 高 DAU/WAU 为目标 |
+| 拒绝评判好坏 + 数据呈现 | 道德评判 + 安慰 |
+
+**对用户原论点的修正：**
+
+> 用户原论点："实际效用 ≈ 证据强度 × 实际使用率"
+>
+> **正确表述**："实际效用 ≈ 证据强度 × min(使用率, critical_threshold) × 使用质量系数"
+>
+> 其中：
+> - 使用率超过最低门槛后**边际收益迅速衰减**（engagement-effectiveness paradox）
+> - 使用质量系数受"用户满意度"反向影响（reflection-satisfaction tradeoff）
+> - 在交易场景中，**高使用率甚至可能是负向信号**（频繁打开 = 行为偏误，FCA 2024）
+
+**这给我们一个清晰的设计指针：**
+- 不追求"用户每天打开 30 分钟"
+- 追求"在关键时刻（开仓前 / 平仓后 30 分钟内 / 周末 / 月末）必然出现，质量足够高就够用"
+- 关键时刻**该有摩擦时有摩擦**（开仓前 if-then + honesty oath），其他时候让路
+
 ---
 
 ## 四、本调研的局限和未覆盖
@@ -374,7 +507,8 @@ Stage -2 强制：
 |---|---|---|
 | 2026-05-05 v1 | 初版发布,目标定位采用"不骗自己 + 听得见停止信号"的二元对立表述 | — |
 | 2026-05-05 v2 | 将目标定位重写为 4 层结构(终极目标 / 方法堆栈 / 诚实约束 / 风险防火墙) | 用户 review 指出 v1 表述矫枉过正:既然有 9 个 S 级证据方法能让交易者变好,目标本身就应该承认是"成为长期盈利交易者";诚实约束和退出协议是护栏而非替代目标 |
+| 2026-05-05 v3 | 补充调研 6(工具可用性/习惯形成/留存);新增 §三.8 复盘工具设计原则 + §三.9 可用性 vs 诚实约束权衡;方法堆栈从 9 个 S 级组件扩到 12 个(新增 honesty oath / wise feedback / future self) | 用户 review 指出: (1) 复盘工具的具体设计内容未落入文档; (2) 完全没调研工具可用性如何影响实际效用。调研 6 发现一个反直觉证据——用户满意度与学习效果**负相关**(Stanford SCALE 2024-2025);engagement-effectiveness paradox 显示高使用率 ≠ 高效果。修正后用户原论点"效用=证据×使用率"为更精确的"效用=证据×min(使用率,阈值)×使用质量系数"。 |
 
 ---
 
-*完成日期：2026-05-05 | 修订日期：2026-05-05 v2 | 调研代号：sigma-redesign-bc89 | 引用与原始笔记见 [research/notes/](notes/)*
+*完成日期：2026-05-05 | 修订日期：2026-05-05 v3 | 调研代号：sigma-redesign-bc89 | 引用与原始笔记见 [research/notes/](notes/)*
