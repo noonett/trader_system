@@ -1,0 +1,60 @@
+# EditorConfig — 防止 IDE auto-format 副作用
+#
+# 触发动因：会话期间多次出现 IDE（推测 Cursor 内置 markdown formatter / 插件）自动重排
+# markdown 文件——表格 padding / 列对齐 / yaml frontmatter 误解析为 markdown header /
+# git HEAD 之外的版本"undo"恢复等。每次都需要手动 reset / stash 处理。
+#
+# 这份 .editorconfig 提供基础约束。**它不能阻止所有 markdown 美化插件**——
+# 如果发现某个特定插件仍在重排，需要在 IDE 设置中禁用该插件 / 该文件类型的 format-on-save。
+#
+# 参考：https://editorconfig.org/
+# 诚实标记：U 级——这是基于"editorconfig 业界标准能减少跨编辑器差异"的工程归纳，
+# 不是已被 RCT 验证的"完全消除 IDE 副作用"方案。
+
+root = true
+
+# ============================================
+# 全部文件的基础约束
+# ============================================
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# ============================================
+# Markdown — 最严格（这是 σ 系统主战场）
+# ============================================
+# 所有 research/ 调研笔记、knowledge/ 操作宪法、memory/ 状态文件、
+# trades/ 实战记录都是 markdown。trim_trailing_whitespace = false
+# 是因为 markdown 用"行尾两个空格"表示软换行——不能 trim。
+[*.md]
+trim_trailing_whitespace = false
+indent_size = 2
+# 不强制 max_line_length——σ 系统中文长段落 + 表格大量出现，强制换行会打散
+
+# ============================================
+# Python — σ 系统当前仅 tools/position_sizer.py
+# ============================================
+[*.py]
+indent_size = 4
+max_line_length = 100
+
+# ============================================
+# YAML / .gitignore / 其他配置
+# ============================================
+[*.{yml,yaml}]
+indent_size = 2
+
+[{.gitignore,.editorconfig,.gitattributes}]
+indent_style = space
+indent_size = 2
+
+# ============================================
+# Cursor rules — 与 markdown 同
+# ============================================
+[*.mdc]
+trim_trailing_whitespace = false
+indent_size = 2
