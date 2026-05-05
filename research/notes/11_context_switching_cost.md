@@ -12,36 +12,42 @@
 ## 摘要（先读这一页）
 
 **1. 上下文切换的认知成本是 S 级硬证据，但日常应用对单笔交易的"毫秒"成本并不致命；致命的是"事件间的注意力残留"和"已经在另一个心境里"。**【S】
+
 - Rogers & Monsell（1995, *J Exp Psychol Gen*）以及 Kiesel et al.（2010, *Psychol Bull* 综述 400+ 研究）证明：在受控实验中切换两类简单任务的反应时增加 100–500 ms（"switch cost"）；即使给到 1.2 秒准备时间也存在不可消去的 "residual switch cost"。
 - 但毫秒级切换成本不是日常争议焦点——真正在 σ 决策链场景里起作用的是 **Leroy（2009, *Organ Behav Hum Decis Process*）的 attention residue**：注意力从任务 A 转到任务 B 后，A 的认知活动仍在持续干扰 B；即便完成了 A 也不能完全消除残留。
 - **暗示**：把 σ 入口放在"用户从下单工作台切出去到独立 App 写字"这条路径上，付出的不只是切换时间，还有从"交易工作台心境"切到"反思心境"再切回去时的注意力残留 —— 这一段的总成本远高于教科书引用的"23 分钟"标语。
 
 **2. 知识工作者每天 1,200 次应用切换是 M-W 级数据，"23/25 分钟恢复全焦点"是引用层级混乱的常见标语，原始证据较薄。**【M / W 标语溯源】
-- HBR 2022 / 工业咨询数据（Qatalog & Cornell, 2022, M 级灰色文献 / Meister Co. 二次引用）：知识工作者平均每天 ~1,200 次应用切换，~9% 工作时间用于切换重定向；典型注意停留 ~3 分钟。
+
+- HBR 2022 / 工业咨询数据（Qatalog & Cornell, 2022, M 级灰色文献 / Meister Co. 二次引用）：知识工作者平均每天 ~~1,200 次应用切换，~~9% 工作时间用于切换重定向；典型注意停留 ~3 分钟。
 - Mark, González & Harris（2005, CHI *No Task Left Behind?*, S 级）：信息工作者平均每个"工作球体"持续 12 分钟、然后被中断；57% 的工作球体被中断，多数中断当日恢复但需经过 2 个以上中间活动。
 - Mark et al.（2008, CHI *The Cost of Interrupted Work*, S 级）：被中断者完成任务的速度其实**更快**（与同侪压力一致），代价是更高的压力、挫折和工作量感。
 - "中断后 23 分钟恢复全焦点"在 Mark 的原文中**未直接出现**——这是后期媒体对 Mark 系列研究的二次包装（W 级标语）。原始研究中给出的更接近"任务多被打断、当日内可恢复但伴随注意残留"。
 - **暗示**：用"23 分钟"做设计依据是不诚实的；但用 Mark 工作球体 / 中断频率 + Leroy attention residue 这一组 S 级证据做设计依据是稳妥的。
 
 **3. 即时记录（EMA）vs 事后回忆的数据质量差距是 S 级证据：偏差是系统性的、不是均值噪声。**【S】
+
 - Shiffman, Stone & Hufford（2008, *Annu Rev Clin Psychol*）以及 Maes 等 EMA validity systematic review（2022, *Perspect Behav Sci*）：EMA 减小回忆偏差、提升生态效度；retrospective 评分相比 EMA 均值通常**偏高**，被解释为对"显著时刻"的过度加权（peak / end bias）。
 - 一项 person-oriented 分析（Cain et al., 2024, *J Person-Oriented Res*）显示约 50% 个体的 retrospective 评分与 EMA 均值无显著差异——也就是说**偏差非均匀，对一部分人很严重，对另一部分人不显著**。在交易场景里，这恰好意味着**最容易出问题的那部分用户最容易回忆失真**（U 级推论，等下展开）。
 - EMA 总体依从率：~79%（Williams et al., 2024 EMA meta-analysis），有金钱激励时显著更高（M-S 级）。
 - **暗示**：让交易者"事后写日志"对低风险交易者数据质量影响小，但对高风险 / 冲动型交易者影响大——而后者恰好是系统最需要数据的人群。
 
 **4. 下单冲动的可拦截窗口在神经经济学层面已有量化：核心拦截点是"想到 → 下单"之间的几秒到几十秒。**【M / S】
+
 - Bossaerts 等（EPFL Infoscience）：极端时间压力（1 秒决策窗口）下交易者表现为**冲动性高价买入**、对预期奖赏极度敏感、对方差/偏度反而不敏感；3–5 秒窗口下冲动性消失（S 级，但样本受限）。
 - Decision Neuroscience 综述：subthalamic nucleus 在风险决策**任务开始前**就已经显现"是否将做高风险决策"的神经活动模式（Zaghloul et al., 2018, *eNeuro*）；这意味着冲动倾向在显意识"按下买入"之前已经存在。
 - Loewenstein 系列 hot-cold empathy gap（Loewenstein, 2005, *Health Psychol*；Read & van Leeuwen, 1998）：身处"hot state"的人**系统性低估**自己当下情绪对决策的影响；即"我现在不是被情绪驱动的"这个判断本身就是被情绪驱动的。
 - **暗示**：拦截必须发生在**进入 hot state 之前或刚进入之时**——一旦订单页打开、手指悬停在按钮上，干预的有效性急剧下降。这给"σ 入口位置"画了一条很硬的边界。
 
 **5. 浏览器扩展 / 系统级干预的有效性是有的，但**仅对"被高风险刺激暴露的子集"显著**；普通用户中影响接近 0。**【S】
+
 - NewsGuard NYU 实验（Aslett et al., 2022, *Sci Adv* — "News credibility labels have limited average effects on news diet quality and fail to reduce misperceptions"）：在 3,000+ 受试中，平均效应近 0；**对最重度的虚假新闻消费者**有显著改善。
 - StayFocusd / Freedom 类阻断软件的 Microsoft Research 32 人 field study（Mark et al., 2018）：阻断显著提高自评专注度，**对最受社交媒体干扰的人收益最大**；但对低自控用户阻断**反而提高压力**（不休息、过劳）。
 - Patterson et al.（Cornell MOOC, 2020）：commitment device（预先设定时间限制）**有效**（+24% 学习时间、+0.29 SD 成绩、+40% 完成率）；reminder 和 site-blocker **无显著效果**。
 - **暗示**：扩展 / 浮窗类介入对"最该被介入的子集"是有效的——这跟交易里"最该被拦截的冲动交易"完美对应。但对普通日子的普通交易，扩展的边际效应是 0 甚至负的（增加压力）。**这是一个高方差工具：好用是真的好用，没用是真的没用。**
 
 **6. "好摩擦" vs "坏摩擦"的边界是有清晰判据的，并不是含糊的"看场景"——核心判据是：摩擦阻挡的是用户当下未来都会后悔的行为，还是用户深思熟虑也想做的行为。**【S / M】
+
 - Sunstein "Sludge"（2019, *Duke Law Journal*；2021, *Behav Public Policy*）：sludge = 阻挡用户去做对自己有利的事的摩擦；nudge / good friction = 阻挡用户去做未来会后悔的行为的摩擦。
 - Lukoff, Lyngs et al.（CHI 2022）的 DSCT 自决理论框架：**强制力 vs 易绕过**是连续谱，强制力高 → 用户达成目标但触发心理反弹弃用；强制力低 → 不达成目标。**最优解是"用户已经将动机内化"时使用中等强制力**——对仍处于动机外化的用户，强制摩擦反而提高弃用率。
 - Buzinski & Price（2015, "Don't Tell Me What to Do"）+ 心理反弹（reactance）综述：**对自由感的威胁会触发反向行为**——这是设计强制摩擦时的硬约束。
@@ -49,6 +55,7 @@
 - **暗示**：σ 决策链如果短到 30 秒（轻量），缺乏改变冲动的力量；如果长到 25 小时（重量），交易机会消失、用户必然弃用。**真正可工作的 zone 是 1–5 分钟的"在场强制思考"**——并且这必须以"用户已部分认同"为前提，否则触发反弹。
 
 **7. EHR 临床决策支持是一个反向警示：alert override 率 46–96%、其中 72.5% 在 3 秒内被点掉（自动化驳回）。**【S】
+
 - Bryan et al.（2022, *JAMIA*）+ 系统综述（Page et al., 2017）：临床医生对决策支持弹窗的关闭已经**形成习惯**——不是看完再决定，而是手指自动点掉。
 - **暗示**：σ 决策链如果以"打断式弹窗"形式介入交易工作台，**几次重复后会形成"自动驳回"习惯**。决策链的形式本身决定了它会不会变成 alert fatigue 的下一例。
 
@@ -73,29 +80,35 @@
 ### 1.1 经典 task switching 文献（毫秒级）
 
 **Rogers, R. D., & Monsell, S. (1995). "Costs of a predictable switch between simple cognitive tasks." *Journal of Experimental Psychology: General*, 124(2), 207-231.**【S】
+
 - 受试者交替分类字符对的"奇偶"或"辅元"——切换 trial 反应时显著高于重复 trial。
 - 给到 0.6 秒准备时间，switch cost 部分降低；给到 1.2 秒，仍存在 "residual switch cost"。
 - 残留代价被归因于"由刺激触发的外源性 task-set 重构"——即**只有在新刺激出现时，新的任务规则才被激活**。
 - 结论：人无法预先全部"想好换任务"——总有一部分必须等到刺激出现才能完成切换。
 
 **Monsell, S. (2003). "Task switching." *Trends in Cognitive Sciences*, 7(3), 134-140.**【S】
+
 - 综述。switch cost 经 400+ 研究复现。
 - 切换成本由多个机制叠加：task-set inertia（前一个任务的激活/抑制残留）、stimulus-response 干涉、proactive interference。
 - 最近 stimulus-response 经验、prior trial 比例都显著影响 switch cost 大小。
 
 **Kiesel, A., Steinhauser, M., Wendt, M., Falkenstein, M., Jost, K., Philipp, A. M., & Koch, I. (2010). "Control and interference in task switching—A review." *Psychological Bulletin*, 136(5), 849-874.**【S】
+
 - 系统综述，含 4 个部分：实验范式、准备机制、干扰现象、未来方向。
 - 关键结论：n-2 task-repetition cost（连续 ABA 比 CBA 慢）证明**抑制刚做完的任务会留下持续 1+ trial 的痕迹**——这是 attention residue 的实验室证据基础。
 
 **Wylie, G. & Allport, A. (2000). *Psychological Research*, 63 — "Task switching and the measurement of switch costs"**【S】
+
 - 开始系统刻画 residual switch cost 的来源；区分"自上而下重构"vs"自下而上由刺激触发的重构"。
 
 **Strobach, T. et al.（2024 update meta；Springer *Psychological Research*）"The effect of age on task switching."**【S】
+
 - 切换成本随年龄上升而增加，但不是简单线性。这与"老练交易者切换成本更小"的常识一致，但要小心 selection bias。
 
 ### 1.2 attention residue（这是真正在 σ 场景里起作用的层级）
 
 **Leroy, S. (2009). "Why is it so hard to do my work? The challenge of attention residue when switching between work tasks." *Organizational Behavior and Human Decision Processes*, 109(2), 168-181.**【S】
+
 - 两个实验，n ≈ 200。
 - 核心定义：attention residue = "持续中的认知活动，关于刚刚停下的任务 A，即便已经在做任务 B"。
 - 关键反直觉：**仅仅完成任务 A 不能消除残留**——需要在完成 A 时存在时间压力，才能"切干净"。
@@ -105,6 +118,7 @@
 **Leroy & Glomb (2018, OBHDP)**：anticipation of time pressure on resumption 也产生 attention residue ——**预期未完成任务会被恢复，本身就是认知负担**。
 
 **Masicampo & Baumeister (2011, *Journal of Personality and Social Psychology*) — "Consider it done! Plan making can eliminate the cognitive effects of unfulfilled goals"**【S】
+
 - Zeigarnik 效应的现代延伸。
 - 实验：未完成目标干扰执行功能任务（不影响一般知识任务）。
 - **关键发现**：仅仅写下"什么时候、用什么步骤完成"——**不需要真正完成**——就能消除干扰。
@@ -113,6 +127,7 @@
 ### 1.3 中断与恢复（Mark / Czerwinski / Iqbal 等 HCI 工业研究）
 
 **Mark, G., González, V. M., & Harris, J. (2005). "No task left behind? Examining the nature of fragmented work." *CHI 2005*.**【S】
+
 - 24 名信息工作者，约 1,000 hours 观察。
 - 平均每个"工作球体"（连续做某件事）= **12 分钟**，之后被切换。
 - **57% 的工作球体被中断**。
@@ -120,32 +135,38 @@
 - **"23/25 分钟"这个数字 Mark 原文没有给出**——查阅原 PDF 确认。
 
 **Mark, G., Gudith, D., & Klocke, U. (2008). "The cost of interrupted work: More speed and stress." *CHI 2008*.**【S】
+
 - 被中断者完成任务的速度反而**更快**（被 deadline 压力补偿）。
 - 代价是**更高的压力、更高的挫折、更高的工作量感**——身体/情绪代价 > 时间代价。
 
 **Czerwinski, M., Horvitz, E., & Wilhite, S. (2004). "A diary study of task switching and interruptions." *CHI 2004*.**【S】
+
 - 11 名信息工作者，连续观察 + 日记。
 - 平均每天 **50 个不同任务/项目**。
 - **40% 的中断任务永远没有恢复**。
 - 直接含义：如果交易者打开了 σ 决策链表单但在中途被市场行情打断，按 40% 的概率这个表单永远不会被填完——除非 σ 设计把"未完成的决策链"硬性绑到下单流程上。
 
 **Cutrell, E., Czerwinski, M., & Horvitz, E. (2001). "Notification, disruption, and memory." *Interact 2001*.**【S】
+
 - IM 中断对搜索任务的影响。
 - 早期中断 > 晚期中断对主任务目标遗忘的影响。
 - 高相关性消息中断的 disruptiveness 显著降低。
 - 直接含义：σ 决策链如果在用户**早期**（看盘阶段）打断，更容易让用户"忘了自己原本要干嘛"——这恰好是想要的"打断冲动"效果。
 
 **Iqbal, S. T., & Horvitz, E. (2007). "Disruption and recovery of computing tasks." *CHI 2007*.**【S】
+
 - 27 名 Microsoft 员工，软件应用使用 + 报警追踪。
 - 中断后从应用切换到处理报警再回到原任务的"resumption lag"实测数据。
 - 与 Altmann & Trafton (2002, *Cognitive Science*) "memory for goals" 模型一致——8 秒预警可以让恢复显著加快。
 
 **Trafton, J. G. et al. (2003). "Preparing to resume an interrupted task: Effects of prompts and goal rehearsal." *Int J Human-Computer Studies*.**【S】
+
 - "ready-to-resume plan" 显著降低 attention residue。
 
 **Parnin, C. & Rugaber, S. (2009). *ICPC 2009*：编程任务被中断后**只有 10% 的会话在 1 分钟内恢复 coding**；典型恢复需 15 分钟。**【S】
 
 **关于"23/25 分钟恢复"标语的溯源**【W 级标语】：
+
 - HBR 2022 "How Much Time and Energy Do We Waste Toggling Between Applications?"（Qatalog & Cornell 灰色文献，Meister 二次引用）写到"the average time to fully return to work following an interruption is 25 minutes 26 seconds"。
 - 原始数据来源是 Mark 团队的某次工业项目，但同行评审发表的版本中**未给出这个具体数字**——它出现在媒体采访和咨询报告里。
 - **诚实标记**：我未能在 Mark 的同行评审论文中直接找到"23 分钟"或"25 分 26 秒"作为正式发表的统计量；这是流传广但溯源弱的标语。在 σ 设计中**不应作为依据引用**。
@@ -153,31 +174,36 @@
 ### 1.4 应用切换次数的工业数据
 
 **Qatalog & Cornell University Ellis Idea Lab (2022)** — 数据被 HBR 2022 报道【M / W】：
+
 - 知识工作者每天 **~1,200 次应用切换**（toggling）。
 - 累计每周 ≈ 4 小时用于"切换重定向"——约 **9% 工作时间**。
 - 一个 Fortune 500 例子：执行单笔供应链 transaction 需要切换 22 个应用约 350 次；某员工日均 3,600+ toggles。
 
 **Pratap et al. (2017) IMWUT** — 大规模手机使用研究【S】：
+
 - 5,811 年累计使用数据（29,279 设备）。
 - 平均 **60 次/天 phone interactions**；每次 session < 7 分钟，单 app 使用 < 2 分钟。
 - 设备解锁仅占 46%（其他 54% 是"看一眼锁屏"）。
 
 **Mewayz Blog 综合 W 级（注意层级低）**：
+
 - 多工具用户 vs 一体化平台用户对比：1,121 vs 283 daily app switches；多工具用户每天损失 ~98 分钟在切换上。
 
 ### 1.5 这一节的硬结论（写到 σ 设计里时可引用）
 
-| 维度 | 数值 / 范围 | 等级 |
-|---|---|---|
-| 受控实验 task switch cost | +100–500 ms | S |
-| 残留 task-set 干扰（n-2 cost） | 持续 1+ trial | S |
-| Attention residue 持续时间 | 至少几分钟，未量化 | S |
-| 信息工作者 working sphere 长度 | ~12 分钟 | S |
-| 工作球体被中断比例 | 57% | S |
-| 被中断任务永不恢复比例 | 40% | S |
-| 软件 alert 关闭习惯化（< 3 秒驳回） | 72.5% | S |
-| 知识工作者每天应用切换次数 | ~1,200（Qatalog） | M-W |
-| "23/25 分钟恢复"标语 | 标语，原文无 | 不可信引用 |
+
+| 维度                       | 数值 / 范围         | 等级    |
+| ------------------------ | --------------- | ----- |
+| 受控实验 task switch cost    | +100–500 ms     | S     |
+| 残留 task-set 干扰（n-2 cost） | 持续 1+ trial     | S     |
+| Attention residue 持续时间   | 至少几分钟，未量化       | S     |
+| 信息工作者 working sphere 长度  | ~12 分钟          | S     |
+| 工作球体被中断比例                | 57%             | S     |
+| 被中断任务永不恢复比例              | 40%             | S     |
+| 软件 alert 关闭习惯化（< 3 秒驳回）  | 72.5%           | S     |
+| 知识工作者每天应用切换次数            | ~1,200（Qatalog） | M-W   |
+| "23/25 分钟恢复"标语           | 标语，原文无          | 不可信引用 |
+
 
 ---
 
@@ -188,6 +214,7 @@
 按用户给出的五类做调查：
 
 **(A) TradingView**【M-W】
+
 - 前端图表 + 多浏览器 / 桌面应用。Layout 系统支持多 chart workflow。
 - 直接整合 Tradovate（期货）、ByBit/OKX/BingX/BitGet（加密）等 brokers。
 - 用户分两类：
@@ -196,24 +223,28 @@
 - 浏览器扩展生态丰富（Leader.Trade, TradingView Magical Keyboard Shortcuts, Remix AI Copilot 等）——**有可介入空间**。
 
 **(B) 中国 A 股券商终端 / 同花顺 / 东方财富**【M / W】
-- 同花顺：~21M MAU；东方财富：~19M MAU；涨乐财富通：~11M MAU；大智慧：~6M MAU（2025 数据）。
+
+- 同花顺 App：MAU 在 2024-2025 区间约 **21-37M**（具体口径不同：R03 fact-check 认为 ~~21M 准确；R05 援引 2025 艾瑞/月狐数据为 35-37M）；东方财富：~~19M MAU（2024）；涨乐财富通：~~11M MAU；大智慧：~~6M MAU。**v2 修正**：v1 写"~21M MAU"是单一口径数字，实际公开统计因口径年份而异。**通达信无独立 MAU 公开数据**——多通过券商集成（华泰、广发、银河等）分发。架构事实（PC 客户端 Windows native + 浏览器扩展不可达）不受 MAU 精度影响，仍为 S 级硬约束。
 - 形态：PC 桌面客户端 + 移动 App，前者主要用于看盘 / 技术分析，后者用于下单和资讯。
 - 东方财富的"股吧"（社区）日均发帖 100w+——这是强力的"羊群"环境，FCA 9000 人实验显示 leaderboard / 社区 +12% 交易频率（FCA 2024, M-S 级）。
 - **关键事实**：在 A 股场景，看盘（同花顺/东财 PC）和下单（券商客户端 / 同花顺手机版）通常**不在同一软件**——很多用户在 PC 看 + 手机下。
 - **暗示**：A 股场景的"必经之路"问题更严重——下单这个动作可能发生在用户**已经离开桌面**的状态，桌面端的浏览器扩展类干预**完全无法触达**。
 
 **(C) 期货 / 国际经纪终端**【M】
+
 - IBKR Trader Workstation (TWS) Mosaic：多 panel workspace，可拖拽。
 - Bloomberg Terminal（高端）：图表 + 新闻 + 即时通讯 + 下单一体。
 - 这一类是"一站式"——下单前的所有信息都在同一个软件里，**意味着 σ 浏览器扩展无法触达，独立 App / 浮窗反而更可能**。
 
 **(D) 移动 App（Robinhood / 同花顺 / 雪球 / 富途 / 老虎等）**【M-S】
+
 - Robinhood 用户平均 **12 分钟/天**（2025 Q4，DAU 2.6M，时间被认为"中等"，Apptopia 数据）【M】。
 - Smartphone 投资行为：Kalda et al. (2021, NBER w28363, S 级)——同一投资者在 smartphone 上比 desktop 上**更倾向于买高风险/lottery-type 资产、追涨杀跌**；smartphone 引发的购买 Sharpe 比率显著低于 desktop。
 - Barber, Huang, Odean & Schwarz (2022, *Journal of Finance*) "Attention-Induced Trading and Returns: Evidence from Robinhood Users"——retail attention 集中在 attention-grabbing 个股，随后跑输市场。
 - **暗示**：移动 App 是冲动行为最严重、又最难介入的场景。系统级浮窗在 iOS 上几乎不可能（沙盒），Android 略好但仍受限。
 
 **(E) 微信群 / Telegram / 雪球评论 / Twitter**【M】
+
 - WeChat 推荐对个股 abnormal returns 显著（Yang et al., 2021, *Physica A*, M）。
 - 社交平台沟通增加跟随者交易频率（Liu et al., 2022, *Journal of Financial Innovation*）——但增加的交易**对未来表现负面**。
 - Internet posting → 羊群效应在中国 fund 市场被记录（Wei et al., 2022, *Humanities and Social Sciences Communications*）。
@@ -237,20 +268,23 @@
 ```
 
 **关键观察**（U 级）：
+
 1. **"决定要交易"的种子可能出现在五个完全不同的物理位置**：微信群、新闻 App、TradingView 图表、同花顺看盘、券商 App 下单页。**任何一个单点拦截都会漏掉至少 60% 的入口**。
 2. **冲动交易的特征是从"种子"到"下单"的时间窗口短**——可能短到 5–30 秒（看到群里推荐 → 立即跳到 App 下单）。在这个窗口里能介入的形态**只有：系统级浮窗 / 浏览器扩展 / 设备级 / 必经之路嵌入券商页面**。独立 App 是来不及的。
 3. **"事后复盘"为什么会漏掉冲动交易**：因为冲动交易**在用户的叙事里不存在**。事后回忆时，用户会重构出"我看到了 XX 信号所以买了"——而真实的因果是"我在群里看到 X 哥又赚了 → 我心里痒 → 我打开 App → 我找了个看起来合理的理由 → 我买了"。EMA 即时记录 vs 事后回忆的偏差研究（§3）正好命中这个失真。
 
 ### 2.3 这一节的硬结论
 
-| 命题 | 证据等级 |
-|---|---|
-| 散户每天接触至少 5 类信息源 | U（推论） |
-| TradingView 用户分两类（仅分析 / 整合下单） | M |
-| 中国 A 股 PC 看盘 / 移动下单分离常见 | M-W |
-| Smartphone 加剧冲动交易 | S（NBER w28363） |
-| 微信群 / 社交内容是冲动种子的常见来源 | M |
-| 冲动交易种子→下单可短至 5–30 秒 | U（合成自神经研究 §4 + Robinhood 行为研究） |
+
+| 命题                            | 证据等级                           |
+| ----------------------------- | ------------------------------ |
+| 散户每天接触至少 5 类信息源               | U（推论）                          |
+| TradingView 用户分两类（仅分析 / 整合下单） | M                              |
+| 中国 A 股 PC 看盘 / 移动下单分离常见       | M-W                            |
+| Smartphone 加剧冲动交易             | S（NBER w28363）                 |
+| 微信群 / 社交内容是冲动种子的常见来源          | M                              |
+| 冲动交易种子→下单可短至 5–30 秒           | U（合成自神经研究 §4 + Robinhood 行为研究） |
+
 
 ---
 
@@ -259,6 +293,7 @@
 ### 3.1 EMA 与 retrospective 的标准对比
 
 **Shiffman, S., Stone, A. A., & Hufford, M. R. (2008). "Ecological momentary assessment." *Annual Review of Clinical Psychology*, 4, 1-32.**【S】
+
 - 经典综述。EMA = "在自然环境中、对当下行为/经验的多次抽样"。
 - 设计目标即"减小回忆偏差、提高生态效度"。
 - 直接对比 retrospective 评估时，EMA 在多数构念上显示**系统性差异**（不只是噪声）。
@@ -266,11 +301,13 @@
 **Stone, A. A., et al. (1998 起多篇)** ：retrospective recall 高估强度 + peak/end bias（与 Kahneman 1993 一致）——人们对体验的记忆受最强时刻 + 终点的不成比例加权。
 
 **Maes, I. et al. (2022, *Perspectives on Behavior Science*) — "Ecological Momentary Assessment: A Systematic Review of Validity Research"**【S】
+
 - EMA 与"金标准"客观测量的相关性中等到高，显著高于 retrospective。
 
 **Wenze, S. J. & Miller, I. W. (2010, *Clinical Psychology Review*)** ：EMA 在精神病学领域已成为效度参照——情绪障碍的 retrospective 评估与 EMA 的差异有时 > 1 SD。
 
 **Cain, A. et al. (2024, *Journal for Person-Oriented Research*) — "Are retrospective assessments means of people's experiences?"**【S】
+
 - **关键的反直觉发现**：约 50% 个体的 retrospective 评分与 EMA 均值**无显著差异**——也就是说"EMA 总比 retrospective 好"是过度泛化。
 - 但另外约 50% 个体存在显著差异——这意味着**偏差非均匀**。
 - 在交易场景里，**最高情绪化、最高冲动倾向的人往往是 retrospective 偏差最大的人**（U 级推论，但与 EMA 文献一致）。
@@ -284,40 +321,47 @@
 **JMIR Research Protocols 2026** ：14 天 EMA + smartwatch 生理监测的赌博预测协议——这是**最接近 σ 系统设想的设计**：把"决策前的状态"作为可观察信号。
 
 **直接含义**：
+
 - 在赌博 / 冲动决策研究里，**"决策前的状态"已被证实是可被 EMA 捕捉的可信信号**——前提是抓住"决策前"那个窗口。
 - 反过来说：**事后回忆"我当时是不是冲动"完全不可信**——这是为什么散户事后写交易日志几乎没用的核心机制证据。
 
 ### 3.3 即时干预 vs 延迟干预的效果差
 
 **JITAI 综述（Hardeman et al., 2019, *Health Psychology Review* / Wang & Miller 2020, *Annual Review of Psychology*）**【S】：
+
 - JITAI = 在"用户最需要支持的那个时刻"提供干预。
 - 数学要求：(a) 状态可被传感器/EMA 捕捉，(b) 干预可在合适窗口送达，(c) 用户当时可接收。
 
 **Mental health JITAI meta-analysis (BMJ Mental Health, 2025)**【S】：
+
 - 23 项研究，pooled g = 0.15（small），但 6 个月后效果保留。
 - 短干预（< 6 周）的效果保留更好（g = 0.71）。
 - 主要挑战：低依从、用户在最需要时反而最难接受。
 
 **Klasnja et al.（2018, *JMIR mHealth*, 微随机化 RCT, n=1,255）**：
+
 - push notification +3.9% engagement，但效果随天/时段变化巨大。
 - 周末 12:30 PM 效果最好（+11.8%）。
 
 **直接含义**：
+
 - "即时记录"如果只是记录、没有反馈，效果≈普通 EMA。
 - "即时干预"（即记录 + 当场反馈）效果更大但极其依赖时机。
 - **σ 决策链如果只是"在交易前问 5 个问题"——这是 EMA。如果是"问问题 + 给出 if-then 强制规则 + 仓位计算"——这是 JITAI。后者证据基础更强。**
 
 ### 3.4 这一节的硬结论
 
-| 命题 | 等级 |
-|---|---|
-| EMA 比 retrospective 在均值上偏差小、生态效度高 | S |
-| retrospective 偏差**不是均匀**——对约 50% 人很严重 | S |
-| 冲动 / 高情绪倾向者的 retrospective 偏差最大 | S+U（合成） |
-| EMA 对冲动决策研究是金标准 | S |
-| JITAI（EMA + 干预）效果 g ≈ 0.15，短干预保留更好 | S |
-| 决策前状态是可捕捉的可信信号 | S |
-| 事后回忆"我是不是冲动"不可信 | S+U |
+
+| 命题                                    | 等级      |
+| ------------------------------------- | ------- |
+| EMA 比 retrospective 在均值上偏差小、生态效度高     | S       |
+| retrospective 偏差**不是均匀**——对约 50% 人很严重 | S       |
+| 冲动 / 高情绪倾向者的 retrospective 偏差最大       | S+U（合成） |
+| EMA 对冲动决策研究是金标准                       | S       |
+| JITAI（EMA + 干预）效果 g ≈ 0.15，短干预保留更好    | S       |
+| 决策前状态是可捕捉的可信信号                        | S       |
+| 事后回忆"我是不是冲动"不可信                       | S+U     |
+
 
 ---
 
@@ -326,12 +370,14 @@
 ### 4.1 决策时间窗口的神经经济学证据
 
 **Bossaerts, P. et al. — EPFL Infoscience: "Neurophysiological evidence on perception of reward and risk: Implications for trading under time pressure"**【S】
+
 - 受试者在 1 秒、3 秒、5 秒决策窗口下做交易选择。
 - 1 秒：表现为"buying impulsiveness"——倾向于以更高价买入；对 expected reward 极敏感；对 variance/skewness 反而钝化（"风险盲"）。
 - 3–5 秒：冲动消失，variance 钝化也消失，对 skewness 敏感升高。
 - **关键含义**：人脑处理 reward 和 risk 是**分开**的，且 risk 处理需要更长的神经时间。1 秒的决策完全跳过了 risk 评估神经回路。
 
 **Lo, A., Repin, D. — "Direct access trading" fMRI study (2017, *Frontiers in Neuroscience*)**【S】
+
 - 真实交易者 fMRI。
 - **expertise 与 PFC 激活负相关**——老练交易者的 PFC 激活反而**更低**（自动化处理）。
 - 自信交易者 strategic decision-making 区域激活更弱。
@@ -339,23 +385,27 @@
 - 对 σ 系统的意义：**老手不需要的不是更长的思考时间，而是 if-then 决策链来锁住正确的自动化路径**。新手需要的是**强制 PFC 介入**——也就是真正的"思考冷却期"。
 
 **Zaghloul, K. A. et al. (2018, *eNeuro*) — "Subthalamic Neural Activity Patterns Anticipate Economic Risk Decisions"**【S】
+
 - subthalamic nucleus 在**任务开始前**就显示了"将要做高风险决策"的活动模式。
 - 这意味着：**冲动倾向比显意识更早**——你"决定要冒险"在你"觉得自己决定要冒险"之前。
 - 直接含义：拦截冲动如果只在"按下买入按钮前"，已经太晚了——决策已经在大脑里完成了。**有效拦截必须更早**。
 
 **Frontotemporal regulation of subjective value (2020, *J Neurosci*)**【S】
+
 - DLPFC 通过下调主观价值来抑制 intertemporal choice 中的冲动。
 - 直接含义：**让 DLPFC 介入是抑制冲动的核心生物学机制**。"看 5 秒钟图表 + 写下入场理由"恰好是激活 DLPFC 的标准方式。
 
 ### 4.2 hot-cold empathy gap
 
 **Loewenstein, G. (2005). "Hot-cold empathy gaps and medical decision making." *Health Psychology*.**【S】
+
 - 处于 hot state（情绪化）的人**系统性低估**当下情绪对决策的影响。
 - "我现在不是被情绪驱动的"是被情绪驱动的人的典型自评。
 - 反向同理：处于 cold state 的人也**低估** hot state 将如何影响自己。
 - 直接含义：在 cold state 写好的"决策链"是 hot state 的真正约束——**只有在 cold state 写下 + 在 hot state 强制执行**这一组合才能跨越 empathy gap。
 
 **Read, D. & van Leeuwen, B. (1998). "Predicting hunger: The effects of appetite and delay on choice." *OBHDP*.**【S】
+
 - 经典示范：饥饿状态下的人对未来选择的预测**完全不像**自己未来在饱腹下做的选择。
 
 **直接含义**：交易者"明天我一定不冲动"在 cold state 下说的话——hot state 的他不会执行——除非有 commitment device 锁住。
@@ -363,11 +413,13 @@
 ### 4.3 冷却期长度的经验证据
 
 **Moser, C. et al. (2019, CHI) — "Impulse buying: Designing for self-control with e-commerce"**【S，但样本小】
+
 - **25 小时延迟**：显著降低冲动消费的 felt urge 和 purchase intent。
 - **10 分钟延迟**：100% 的人仍在购物，无显著效果。
 - 中间区段未充分研究。
 
 **消费者保护文献 / cooling-off period 法律评估（St. John's Law Review, 2024）**【M】
+
 - 三天 rescission period 在多数场景下使用率极低（<1%）；只有当 oral + written 都给出时才显著提高使用率。
 - "illusory consumer protection"的批评。
 - 直接含义：**单纯有冷却期 ≠ 用户真的会冷静**——冷却期 + 主动提醒 + 重新评估流程 才有效。
@@ -392,15 +444,17 @@
 最不可靠的拦截发生在 **t = -10s 到 0**（hot state 已经形成）；
 事后干预（t > 0）只能改善 next 笔交易，**不能挽救当前**。
 
-| 命题 | 等级 |
-|---|---|
-| 1 秒决策下 risk 评估神经回路被跳过 | S |
-| 老练交易者的决策 PFC 介入更少 | S |
-| subthalamic nucleus 在显意识前就预测风险偏好 | S |
-| hot state 中人系统性低估自身情绪影响 | S |
-| 25 小时延迟显著降低冲动；10 分钟无效 | S（小样本） |
-| 冷却期 + 主动提醒 比单纯冷却期有效 | M |
+
+| 命题                               | 等级      |
+| -------------------------------- | ------- |
+| 1 秒决策下 risk 评估神经回路被跳过            | S       |
+| 老练交易者的决策 PFC 介入更少                | S       |
+| subthalamic nucleus 在显意识前就预测风险偏好 | S       |
+| hot state 中人系统性低估自身情绪影响          | S       |
+| 25 小时延迟显著降低冲动；10 分钟无效            | S（小样本）  |
+| 冷却期 + 主动提醒 比单纯冷却期有效              | M       |
 | 拦截窗口的"sweet spot"在 hot state 形成前 | S+U（合成） |
+
 
 ---
 
@@ -411,6 +465,7 @@
 **可达性 = (a) 能否在用户的物理路径上出现 + (b) 能否在 hot state 形成前介入 + (c) 能否被绕过的难度 + (d) 能否避免触发 alert fatigue / reactance**
 
 四类介入形态：
+
 - **(I) 浏览器扩展**：跑在 Chrome / Edge 内，能注入页面元素，能拦截/延迟跳转，但只能在浏览器内有效。
 - **(II) 系统级浮窗**：操作系统层面的悬浮窗口（macOS Floaty 类、Android System Alert Window、iOS 完全不可能）。
 - **(III) 独立 App**：用户主动打开的应用。
@@ -418,44 +473,51 @@
 
 ### 5.2 矩阵
 
-| 工具 / 介入形态 | (I) 浏览器扩展 | (II) 系统浮窗 | (III) 独立 App | (IV) 文档 |
-|---|---|---|---|---|
-| **TradingView Web** | ✓✓ 可注入图表/订单页面 | ✓ macOS/Windows OK | ✗ 隔离 | ✗ 完全隔离 |
-| **TradingView 桌面 App** | ✗ 不能注入 native | ✓ 可悬浮 | ✗ 隔离 | ✗ 隔离 |
-| **TradingView 移动 App** | ✗ 不能注入 | ✗ iOS 沙盒；Android 受限 | ✗ 切换出去 | ✗ 切换出去 |
-| **A 股券商 PC 客户端**（同花顺、通达信） | ✗ 桌面 native | △ Windows 可悬浮 | ✗ 切换 | ✗ 切换 |
-| **A 股券商移动 App** | ✗ | ✗ iOS / Android 受限 | ✗ 切换 | ✗ 切换 |
-| **国际 broker 桌面**（IBKR TWS） | ✗ native | △ 可悬浮但小窗 | ✗ 切换 | ✗ 切换 |
-| **国际 broker 移动**（Robinhood, IBKR Mobile） | ✗ | ✗ | ✗ | ✗ |
-| **微信群**（PC 微信 / 手机微信） | ✗ 桌面 native | △ 可悬浮 | ✗ 切换 | ✗ 切换 |
-| **新闻 App / 雪球 / 财经类 App** | △ Web 端 OK | △ 桌面悬浮 | ✗ 切换 | ✗ 切换 |
-| **桌面浏览器内查看 A 股相关网页** | ✓✓ | ✓ | ✗ | ✗ |
+
+| 工具 / 介入形态                                | (I) 浏览器扩展     | (II) 系统浮窗           | (III) 独立 App | (IV) 文档 |
+| ---------------------------------------- | ------------- | ------------------- | ------------ | ------- |
+| **TradingView Web**                      | ✓✓ 可注入图表/订单页面 | ✓ macOS/Windows OK  | ✗ 隔离         | ✗ 完全隔离  |
+| **TradingView 桌面 App**                   | ✗ 不能注入 native | ✓ 可悬浮               | ✗ 隔离         | ✗ 隔离    |
+| **TradingView 移动 App**                   | ✗ 不能注入        | ✗ iOS 沙盒；Android 受限 | ✗ 切换出去       | ✗ 切换出去  |
+| **A 股券商 PC 客户端**（同花顺、通达信）                | ✗ 桌面 native   | △ Windows 可悬浮       | ✗ 切换         | ✗ 切换    |
+| **A 股券商移动 App**                          | ✗             | ✗ iOS / Android 受限  | ✗ 切换         | ✗ 切换    |
+| **国际 broker 桌面**（IBKR TWS）               | ✗ native      | △ 可悬浮但小窗            | ✗ 切换         | ✗ 切换    |
+| **国际 broker 移动**（Robinhood, IBKR Mobile） | ✗             | ✗                   | ✗            | ✗       |
+| **微信群**（PC 微信 / 手机微信）                    | ✗ 桌面 native   | △ 可悬浮               | ✗ 切换         | ✗ 切换    |
+| **新闻 App / 雪球 / 财经类 App**                | △ Web 端 OK    | △ 桌面悬浮              | ✗ 切换         | ✗ 切换    |
+| **桌面浏览器内查看 A 股相关网页**                     | ✓✓            | ✓                   | ✗            | ✗       |
+
 
 **符号**：✓✓ = 强可达；✓ = 可达；△ = 部分可达；✗ = 不可达
 
 ### 5.3 关键观察
 
 **观察 1：移动场景几乎所有形态都不可达。**
+
 - iOS 沙盒禁止 system overlay（除非 PiP / Live Activity，但都不是介入用途）。
 - Android 的 System Alert Window 权限越来越被收紧（Android 12+ 需要用户手动开启 + 应用商店审查严格）。
 - **后果**：σ 系统对移动端冲动交易**没有任何技术手段做强制介入**——这是设计阶段必须接受的物理边界。
 - 唯一可工作的方案：让用户**主动**在 hot state 之前打开 σ App + 写下规则；hot state 形成时只能依赖**用户已经内化的规则**（Gollwitzer's implementation intention）。
 
 **观察 2：A 股桌面客户端是 native 应用，浏览器扩展完全不可达。**
+
 - 同花顺 PC 客户端 / 通达信 PC 客户端 / 多数券商客户端都是 Windows native（Win32 / Electron 包装）。
 - 浏览器扩展**仅对在浏览器中查看 A 股网页（如东方财富 web）的用户有效**。
 - 实际场景：A 股重度散户**通常用 PC 客户端而非浏览器**——浏览器扩展形态对 A 股用户**覆盖率低**。
 
 **观察 3：浏览器扩展对 TradingView Web 用户高度可达，对其他场景覆盖低。**
+
 - TradingView 的 web 版用户群是浏览器扩展形态的**核心受众**。
 - 跨工具一致性（一个扩展对所有 broker 都生效）很难达成——每个 broker 页面结构不同。
 
 **观察 4：文档形态在所有场景都不可达，只能依赖用户主动打开。**
+
 - 这就是当前 σ Stage 0 的形态——一个 Markdown 模板。
 - 留存率证据（§01 笔记 + tradingjournal.com 综述）：**80% 用户在 2 周内放弃**。
 - **不是文档形态本身不行，而是文档形态的"可达性"= 用户主动意愿，这个意愿在 hot state 下为零。**
 
 **观察 5：系统浮窗在桌面端有效，移动端基本不可达。**
+
 - Floaty / WindowTop / DeskPins 类工具证明 macOS / Windows 浮窗技术成熟。
 - 浮窗作为"提醒"形态有 EHR 类比警示——alert fatigue 风险（§7）。
 - 浮窗作为"必经之路"（强制点击才能继续）会触发 reactance。
@@ -463,24 +525,28 @@
 
 ### 5.4 综合可达性评分（U 级综合）
 
-| 形态 | 可达性 | hot state 前介入能力 | 难绕过 | 不触发 fatigue/reactance | 综合 |
-|---|---|---|---|---|---|
-| 浏览器扩展（仅 Web 用户） | 高（仅子集） | 高 | 中 | 中 | 中-高 |
-| 桌面浮窗 | 中 | 中 | 高（强制版） | 低（fatigue 风险） | 中 |
-| 独立 App | 用户意愿 | 低（hot state 用户不打开） | N/A | 高（不打扰） | 低 |
-| 文档 | 用户意愿 | 极低 | N/A | 高 | 极低 |
+
+| 形态              | 可达性    | hot state 前介入能力    | 难绕过    | 不触发 fatigue/reactance | 综合  |
+| --------------- | ------ | ------------------ | ------ | --------------------- | --- |
+| 浏览器扩展（仅 Web 用户） | 高（仅子集） | 高                  | 中      | 中                     | 中-高 |
+| 桌面浮窗            | 中      | 中                  | 高（强制版） | 低（fatigue 风险）         | 中   |
+| 独立 App          | 用户意愿   | 低（hot state 用户不打开） | N/A    | 高（不打扰）                | 低   |
+| 文档              | 用户意愿   | 极低                 | N/A    | 高                     | 极低  |
+
 
 **没有任何单一形态在所有四个维度上都过关。**
 
 ### 5.5 这一节的硬结论
 
-| 命题 | 等级 |
-|---|---|
-| iOS 移动端不可能做系统级强制介入 | S（OS 限制） |
-| A 股 PC 客户端不被浏览器扩展触达 | S（架构事实） |
-| 文档形态可达性=用户意愿，在 hot state 下为 0 | M-S |
-| 没有单一形态覆盖所有 5 类工具场景 | S（矩阵分析） |
-| 任何方案都需要**多形态组合 + 接受边界** | S+U（合成） |
+
+| 命题                            | 等级       |
+| ----------------------------- | -------- |
+| iOS 移动端不可能做系统级强制介入            | S（OS 限制） |
+| A 股 PC 客户端不被浏览器扩展触达           | S（架构事实）  |
+| 文档形态可达性=用户意愿，在 hot state 下为 0 | M-S      |
+| 没有单一形态覆盖所有 5 类工具场景            | S（矩阵分析）  |
+| 任何方案都需要**多形态组合 + 接受边界**       | S+U（合成）  |
+
 
 ---
 
@@ -489,21 +555,25 @@
 ### 6.1 sludge / good friction 的判据
 
 **Sunstein, C. R. (2019). "Sludge and ordeals." *Duke Law Journal*, 68, 1843-1883.**【S】
+
 - sludge = 阻挡用户做对自己有利之事的摩擦。
 - good friction = 阻挡用户做未来会后悔之事的摩擦。
 - 判据本身依赖**用户未来偏好**——但 hot-cold empathy gap (§4) 告诉我们这个"未来偏好"很难直接测量。
 - Sunstein 提出 "sludge audit" 方法：定期审查机构施加的摩擦是否真有正当理由。
 
 **Sunstein, C. R. (2021). *Sludge: What stops us from getting things done and what to do about it.* MIT Press.**【M】
+
 - 把 sludge 概念扩展到一切让"该完成的事"难完成的摩擦。
 - 9.78 billion hours 美国年度纸面工作 ≈ $264 billion——sludge 的规模化代价。
 
 **Behavioural Public Policy 2022 — "Sludge audits"**【S】
+
 - 系统化审查方法：(1) 列出所有摩擦点 (2) 估算成本 (3) 评估必要性 (4) 重设计。
 
 ### 6.2 self-control tool / 强制力梯度
 
 **Lukoff, K., Lyngs, U., Alberts, L., Hiniker, A. (2022). "How the design of digital self-control tools can support psychological autonomy." *CHI 2022*.**【S】
+
 - 数字自控工具按强制力分类。
 - 强制力 vs 易绕过 是连续谱：
   - 弱：易绕过 → 不达成目标
@@ -512,16 +582,19 @@
 - 关键洞察：**自决理论（Deci & Ryan, 2000）**——内化动机的用户对中等强制力反应良好；外化动机的用户被强制力激起反弹。
 
 **Buzinski, S. & Price, M. (2015). "Don't tell me what to do." *Personality and Social Psychology Bulletin*.**【S】
+
 - 自由感被威胁 → 反向行为（boomerang effect）。
 - 直接对 σ 决策链的硬约束：**任何"必须填"的字段都会触发部分用户的反弹**——填假数据、敷衍应付、最终弃用。
 
 **Mark, G. et al. (2018, Microsoft Research) — "How blocking distractions affects workplace focus and productivity."**【S】
+
 - 32 名信息工作者 RCT。
 - 阻断软件提高自评专注度。
 - **反直觉发现**：低自控用户在阻断下**压力更高**——他们继续工作不休息（"被强制专注"反而失去自我调节）。
 - 含义：强摩擦对**已有部分自控的用户**有用；对**完全没有自控的用户**反而伤害。
 
 **Patterson, R. (2020, Cornell, MOOC RCT)**【S】
+
 - 三种工具对比：commitment device（预先承诺时间限制）、reminder、site-blocker。
 - commitment device：+24% 学习时间、+0.29 SD 成绩、+40% 完成率。
 - reminder 和 site-blocker：**无显著效果**。
@@ -530,10 +603,12 @@
 ### 6.3 alert fatigue 的反例（坏摩擦的临床警示）
 
 **Phansalkar, S. et al. (2014, *JAMIA*)**【S】 / **Page, N. et al. (2017, *JMIR Med Inform*) 系统综述**【S】
+
 - EHR 临床决策支持系统的 alert override 率：46.2%–96.2%（drug-drug interaction：95.1%）。
 - 即使知道 alert 重要，临床医生仍 override 大多数。
 
 **Bryan, M. et al. (2022, *JAMIA*) — "Habit and Automaticity in Medical Alert Override"**【S】
+
 - **72.5% 的 alerts 在 3 秒内被 dismiss**；13.2% 在 1 秒内。
 - 这是 automaticity，不是审议。
 - 直接含义：**任何弹窗式干预，重复几次后都会变成"手指自动点掉"的反射**——σ 决策链如果是弹窗形式，几周后就会被驯化为自动驳回。
@@ -541,16 +616,19 @@
 ### 6.4 commitment device 的回旋镖
 
 **John, A. (2020, *Management Science*) — "When commitment fails: Evidence from a regular saver product in the Philippines"**【S】
+
 - 55% 的低收入储蓄客户**净亏损**于"承诺储蓄"产品（罚金 > 收益）。
 - commitment device 在用户**不能准确预测自己未来行为**时**伤害**用户。
 
 **Carrera, M. et al. (2022, *Review of Economic Studies*) — "Who chooses commitment? Evidence and welfare implications"**【S】
+
 - 约 **50% 的人同时为"提高 gym 出勤"和"降低 gym 出勤"两个相反目标买单**——他们不知道自己真正想要什么。
 - 直接含义：**对自我认知不清的新手交易者，强 commitment device 反而可能锁住错误的目标**。
 
 ### 6.5 这一节的硬结论：好摩擦的判据
 
 **摩擦是"好"的，当且仅当**：
+
 1. 它阻挡的行为是用户**预先主动承诺要避免**的（Patterson 2020 + Lukoff 2022）。
 2. 它的强度与用户当前**动机内化程度**匹配（Lukoff 2022）。
 3. 它**不重复到形成驳回习惯**（Bryan 2022）。
@@ -558,20 +636,23 @@
 5. 它**不锁住用户认知错误的目标**（Carrera 2022）。
 
 **摩擦是"坏"的，当**：
+
 1. 它在用户没有承诺时被强加。
 2. 它强度高于用户动机内化程度。
 3. 它频繁出现以至于成为反射点击。
 4. 它没有可理解的理由。
 5. 它锁住了用户后悔的目标。
 
-| 命题 | 等级 |
-|---|---|
-| good friction 与 sludge 的核心差异是"用户未来偏好" | S |
-| 用户预先承诺的强制力 > 系统单方强制力 | S（Patterson） |
-| 强制力必须匹配动机内化程度 | S（Lukoff） |
-| 重复弹窗 → automaticity 驳回 | S（Bryan） |
-| 50% 用户对自我认知不清 → commitment 反伤 | S（Carrera） |
-| **中度强制力 + 用户预先承诺 + 不重复**是 sweet spot | S+U（综合） |
+
+| 命题                                    | 等级           |
+| ------------------------------------- | ------------ |
+| good friction 与 sludge 的核心差异是"用户未来偏好" | S            |
+| 用户预先承诺的强制力 > 系统单方强制力                  | S（Patterson） |
+| 强制力必须匹配动机内化程度                         | S（Lukoff）    |
+| 重复弹窗 → automaticity 驳回                | S（Bryan）     |
+| 50% 用户对自我认知不清 → commitment 反伤         | S（Carrera）   |
+| **中度强制力 + 用户预先承诺 + 不重复**是 sweet spot  | S+U（综合）      |
+
 
 ---
 
@@ -584,29 +665,34 @@
 ### 7.1 哪些组合显然不工作（淘汰）
 
 **(a) "事后回忆 + 文档形态"**
+
 - 数据质量低（§3 retrospective bias）。
 - 漏掉冲动交易（用户的叙事不包含冲动）。
 - 留存率低（§01 笔记 + 行业 80%/2 周）。
 - **淘汰理由**：在所有维度上都是最弱的组合。
 
 **(b) "强制弹窗 + 高频重复"**
+
 - 几周后形成 alert fatigue 自动驳回（§6.3）。
 - 触发 reactance（§6.2）。
 - 不解决 hot state 的核心问题（用户驳回后心境已经定型）。
 - **淘汰理由**：复制 EHR 的失败。
 
 **(c) "纯靠系统单方施加摩擦"**
+
 - Patterson 2020 显示 site-blocker / reminder 单方施加 = 无效。
 - 用户没有 internalize 时强制力会反弹。
 - **淘汰理由**：证据基础几乎为 0。
 
 **(d) "事后日志 + 长字段表单"**
+
 - §06 笔记已经证明 11→4 字段砍掉提升完成率 120%。
 - 时间投入是 mHealth 弃用的头号原因（§01）。
 - 与 retrospective bias 叠加。
 - **淘汰理由**：当前 σ Stage 0 的隐含设计，已知不工作。
 
 **(e) "依赖移动端系统级强制介入"**
+
 - iOS 物理上不可能（沙盒）；Android 可能但权限收紧。
 - 即使技术可行，移动端 hot state 的拦截窗口太短（5–30 秒）。
 - **淘汰理由**：物理边界。
@@ -659,21 +745,19 @@
 > **入口不是单一位置，而是三个位置的组合**——其中两个是**必经之路**，一个是**用户主动**：
 >
 > 1. **早晨开盘前的"规则书写"**（必经之路 + 用户主动）—— 最关键的入口。
->    - 物理上：σ 系统 = 早晨打开交易工作台之前必须经过的一道门。
->    - 形态上：可以是浏览器主页 / 桌面 dashboard / 启动脚本 / 手机锁屏待办——只要是用户**已经会做的动作**（如打开浏览器、解锁手机）就**自然必经**这道门。
->    - 内容上：今天的 if-then 决策链（不是开放问题，是结构化承诺）。
->    - 这一步落地的位置应当**最小依赖技术栈选择**——文档、网页、App 都可以，关键是"必经"。
->
+>   - 物理上：σ 系统 = 早晨打开交易工作台之前必须经过的一道门。
+>   - 形态上：可以是浏览器主页 / 桌面 dashboard / 启动脚本 / 手机锁屏待办——只要是用户**已经会做的动作**（如打开浏览器、解锁手机）就**自然必经**这道门。
+>   - 内容上：今天的 if-then 决策链（不是开放问题，是结构化承诺）。
+>   - 这一步落地的位置应当**最小依赖技术栈选择**——文档、网页、App 都可以，关键是"必经"。
 > 2. **交易工作台旁边的"规则提醒浮窗"**（必经之路，但被动触发）—— 第二关键。
->    - 物理上：桌面浮窗 / 浏览器扩展，**仅在用户即将违反自己今早写的规则时**触发。
->    - 形态上：必须**轻量、可无损跳过**（避免 reactance），但**信息够刺痛**（cold-state 的你写给 hot-state 的你）。
->    - 移动端**不强求**——接受物理边界。
->
+>   - 物理上：桌面浮窗 / 浏览器扩展，**仅在用户即将违反自己今早写的规则时**触发。
+>   - 形态上：必须**轻量、可无损跳过**（避免 reactance），但**信息够刺痛**（cold-state 的你写给 hot-state 的你）。
+>   - 移动端**不强求**——接受物理边界。
 > 3. **下单后 30 秒的"即时记录"**（用户主动，但极短）—— 第三关键。
->    - 物理上：独立 App / 网页表单 / 浮窗。
->    - 形态上：≤ 4 字段，30 秒可填完。
->    - 不追求"必经"——只追求"足够近、足够快"，让 EMA 而非 retrospective。
->    - 当用户没填时，**不强制**——不填本身是数据（"这一笔可能就是冲动交易"）。
+>   - 物理上：独立 App / 网页表单 / 浮窗。
+>   - 形态上：≤ 4 字段，30 秒可填完。
+>   - 不追求"必经"——只追求"足够近、足够快"，让 EMA 而非 retrospective。
+>   - 当用户没填时，**不强制**——不填本身是数据（"这一笔可能就是冲动交易"）。
 >
 > **不放在工作流里的位置**：
 >
@@ -705,6 +789,7 @@
 ### 8.2 直接证据的缺口
 
 **完全缺失或证据极弱的命题**（U 级，需要谨慎）：
+
 - "在 σ 决策链场景下"具体的 switch cost / attention residue 量化数据——没有交易场景的实验。
 - 浏览器扩展类工具在**交易**场景的 RCT——没有公开的此类研究。
 - "强制规则书写"对**单一交易者**的长期行为改变——n=1 设计，本质上是案例研究。
@@ -834,3 +919,4 @@
 > 所有 S 级引用都尽量给到作者-年份-期刊；所有 M 级数据给到机构或研究项目；W 级数据明确标为行业灰色；U 级合成在每节末或附录 A.U 集中标识。
 >
 > 本笔记**不修改** `foundation_2026.md`，**不修改**其他 notes，**不 commit / push**——按用户指令，唯一动作是创建 `research/notes/11_context_switching_cost.md`。
+

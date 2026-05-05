@@ -13,7 +13,7 @@
 
 **核心发现（5 条）：**
 
-1. 【**S**】**"多端 ≠ 高依从"**：mEMA 元分析中 mobile-only（77.4%）vs mobile+wearable（73.0%）依从率**无显著差异**（Heron, Everhart, McHale, Smyth, 2017, *J Pediatr Psychol*，p=.36）。新增设备类别没有依从收益，反而轻微下降。
+1. 【**S**】**"多端 ≠ 高依从"**：mEMA 元分析中 mobile-only（77.4%）vs mobile+wearable（73.0%）依从率**无显著差异**（**Wen, Schneider, Stone, Spruijt-Metz, 2017, *JMIR* 19(4):e132**，p=.36）。新增设备类别没有依从收益，反而轻微下降。**v1 此处曾误归为 Heron et al. 2017 *J Pediatr Psychol* — 后者是 mEMA 在儿童青少年群体的依从性 systematic review，主题相关但不是这组数字的来源。v2 引用更正。**
 2. 【**S**】**部署形态决定留存的是"该端的设计"，不是"端的数量"**：在 Jiang et al. (2025, *J Particip Med*) 的 4 臂 RCT（N=284）中，相同内容下同一公司的 ePRO 移动 App vs 同公司网页 vs 第三方网页 vs 纸质，移动 App 依从率显著高于其他 3 臂（Cohen's t=2.42 至 4.53，p≤.02）。原因是行为设计（reward / identity / 推送），不是"端多端少"。
 3. 【**S**】**移动端在长文本与精确反思上有结构性劣势**：Revilla et al. (2016) 跨平台实验中，开放式问题在 PC 上比未优化智能手机平均**多输入 10.9-22.4 字符**（p=.00）；移动端中位完成时间显著更长，且第三方在场率高 ~10pp（27% vs 19.8%）。Mizrachi 等（Nature Sci Rep 2022）：手机阅读 → 前额叶过度激活 + 理解力下降。
 4. 【**S/M**】**移动端在"交易"场景中是已被证伪的"训练端"**：Kalda, Loos, Previtero, Hackethal (2024 *Rev Finance*) + FCA (2024) 一致显示，移动端会显著推高交易频率、推高风险偏好、降低投资组合 Sharpe。**这是迁移到 σ 系统的最严重红灯——任何把"训练系统"放进与交易 App 同一台手机的设计，都会受到这种"把决策日志手机化 → 决策也被手机化"的污染。**
@@ -34,7 +34,7 @@
 
 | 维度 | 单端起步 | 多端起步 | 证据净结论 |
 |---|---|---|---|
-| **完成率** | mEMA 元分析单端 mobile 依从 77.4%（Heron 2017，S）；single-device minimal app（one sec, MinimalistPhone）有效（PNAS 2023, S）→ 利好 | mEMA mobile+wearable 依从 73.0%（同元分析），下降 4.4pp 且 p=.36 → 不利 | **S 级证据：单端无劣势，可能微小利好**。增设备无依从增益。 |
+| **完成率** | mEMA 元分析单端 mobile 依从 77.4%（Wen 2017 *JMIR*，S）；single-device minimal app（one sec, MinimalistPhone）有效（PNAS 2023, S）→ 利好 | mEMA mobile+wearable 依从 73.0%（同元分析），下降 4.4pp 且 p=.36 → 不利 | **S 级证据：单端无劣势，可能微小利好**。增设备无依从增益。 |
 | **留存** | 在 Jiang 2025 RCT 中，"移动 App 单端 + 行为设计"留存最高（与同公司网页 t=−1.75, 与第三方网页 t=0.49 相当或更优）→ 利好 | 没有任何研究证明多端比单端留存高（搜索后未发现） → 中性偏负 | **S 级：单端 + 良好设计 ≥ 多端**。"多端"本身不是留存因素。 |
 | **数据一致性** | 单端无同步问题，只有备份问题 → 强利好 | LWW 协议导致 Fitbit ↔ Apple Health 删除水分摄入（W-M 级证据，已确认 bug）；CRDT 99.7% vs LWW 76% 一致性（M 级）；Habitica 多端 GitHub bugs（M-W 级） | **M 级：多端引入新的失败模式**。除非投入大量同步工程，否则数据完整性下降。 |
 | **认知碎片化** | "哪里方便用哪里"无法发生 → 强制深度记录 | Microsoft Research Devices@Home (CHI 2022)：用户跨设备产生 5 种碎片化模式（partition/integrate/clone/expand/migrate），任务继续性是已知 HCI 难题 → 中性偏负 | **M 级：多端默认导致工作流碎片化**。除非显式设计任务继续性。 |
@@ -54,7 +54,7 @@
 **Heron, K. E., Everhart, R. S., McHale, S. M., & Smyth, J. M. (2017). "Compliance With Mobile Ecological Momentary Assessment Protocols in Children and Adolescents: A Systematic Review and Meta-Analysis." *Journal of Pediatric Psychology*, 42(10).** 【S】
 
 - 加权平均依从率 78.3%（青少年 EMA）
-- 关键对比：**仅手机平台依从率 77.4% vs 手机+穿戴 73.0%，p=.36**
+- 关键对比：**仅手机平台依从率 77.4% vs 手机+穿戴 73.0%，p=.36**（**v2 修正引用**：来自 Wen et al. 2017 *JMIR* 19(4):e132，**不是** Heron et al. 2017 *J Pediatr Psychol*；后者是 mEMA 在儿童青少年群体依从性的 systematic review）
 - 解读：增加设备类别**没有依从增益**，且方向是轻微下降。
 - 方法学限制：是元分析层面的非随机分组（不是 RCT 比较），所以"无差异"≠"等效"。但这是这个领域里能找到的最直接的对照。
 
@@ -96,7 +96,7 @@
 **Meherali, S., et al. (2020). *J Med Internet Res*, 22(9):e20283** 【S】
 
 - pooled dropout 43%（95% CI 29-57）
-- 100 天内 70% 用户离开（Pratap et al., 2020）
+- mHealth 远程研究 median retention 5.5 天 (range 2-26)（Pratap et al., 2020 *npj Digital Medicine*；**v2 修正**：原写"100 天 70%"是邻近表述非 Pratap 2020 直接 quote；且样本是临床受试者，消费者市场实际 retention 应更低）
 - **该领域留存 ceiling 极低，与端数无关**
 
 #### 2.2.2 Linardon & Fuller-Tyszkiewicz（2019）
@@ -392,7 +392,7 @@
 
 ### 5.2 证据强度不对称
 
-**支撑"不要多端"的 S 级证据较多**（Heron 2017、Jiang 2025、Revilla 2016、Kalda 2024、PNAS one sec、npj Digital Medicine 2025 factorial）。
+**支撑"不要多端"的 S 级证据较多**（Wen 2017 *JMIR* mEMA 元分析、Jiang 2025、Revilla 2016、Kalda 2024、PNAS one sec、npj Digital Medicine 2025 factorial）。
 
 **支撑"应该单端"的 S 级证据较少**——更多是"多端没显示出收益 + 单端没显示出劣势"的**默认逻辑**。这是经典的"缺乏证据 ≠ 证明无效"问题。
 
@@ -441,7 +441,7 @@
 
 ### S 级（同行评审 RCT / 元分析）
 
-1. **Heron, K. E., Everhart, R. S., McHale, S. M., & Smyth, J. M. (2017).** "Compliance With Mobile Ecological Momentary Assessment Protocols in Children and Adolescents: A Systematic Review and Meta-Analysis." *J Pediatr Psychol*, 42(10). PubMed 28446418.
+1. **Wen, C. K. F., Schneider, S., Stone, A. A., & Spruijt-Metz, D. (2017).** "Compliance With Mobile Ecological Momentary Assessment Protocol in Children and Adolescents: A Systematic Review and Meta-Analysis." *Journal of Medical Internet Research*, 19(4):e132. （**v2 引用更正**：v1 误归为 Heron et al. 2017 *J Pediatr Psychol*——77.4% vs 73.0% (p=.36) 的 mobile-only vs mobile+wearable 元分析数据来自 Wen 2017 *JMIR*，不是 Heron 2017。Heron 2017 是另一篇相关综述，主题相邻但不是这组数字来源。）
 2. **Jiang, X., Timmons, M., Boroda, E., & Onakomaiya, M. (2025).** "Impact of Platform Design and Usability on Adherence and Retention." *J Particip Med*, 17:e50225.
 3. **Sahandi Far, M., et al. (2025).** "Cross-Platform Ecological Momentary Assessment App (JTrack-EMA+)." *J Med Internet Res*, 27:e51689.
 4. **Revilla, M., Toninelli, D., & Ochoa, C. (2016).** "PCs versus Smartphones in Answering Web Surveys." *Survey Practice*, 9(4). DOI: 10.29115/SP-2016-0021.
