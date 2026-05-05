@@ -1,6 +1,6 @@
 # 风控规则
 
-> 最后更新：2026-05-03
+> 最后更新：2026-05-05（**仅 Level A sync — 头日期更新**；Phase 1 v5 §三.10 产品过滤器分级 + §三.11 临床安全约束 + §三.12 黑天鹅事件期 binding 锁仓 + §三.7 修订后的"被动默认基线 + 主动偏离需辩护"caveat **未同步进风控规则** — 推到 Level B 同步范围。具体见 [research/foundation_2026.md](../research/foundation_2026.md) 与 [research/entry_form_research_2026.md §六](../research/entry_form_research_2026.md)）
 > 这些规则是你的"不做清单"。它们会随你的交易经验增长而更新——每错一次，加一条。
 
 ## 一、仓位规则

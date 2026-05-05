@@ -1,6 +1,6 @@
 # 术语词典
 
-> 最后更新：2026-05-03
+> 最后更新：2026-05-05（**仅 Level A sync — 头日期更新**；Phase 1 v5 + Phase 2 v2 引入的新术语 implementation intention / autocommitment / AAR / JITAI / BCT Taxonomy / Mental Accounting / engagement-effectiveness paradox / wise feedback / honesty oath / Future self / 集合竞价 binding pre-commitment 等**未入库** — 推到 Level B 同步范围）
 > 每一个术语标注：定义、实际用途、与 σ/α 引擎的关联。
 
 ## 一、估值与基本面
