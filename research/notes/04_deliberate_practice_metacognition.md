@@ -1,5 +1,7 @@
 # 刻意练习与元认知训练在交易领域适用性调研
 
+> ⚠️ **状态标注（v5 新增）**：本笔记反映**调研当时的中间结论**。最终系统约束以 [`foundation_2026.md`](../foundation_2026.md) **最新版本（v5+）** 为准。本笔记内容不再修改，作为历史可追溯档案保留。
+>
 > 调研日期：2026-05-05
 > 调研方法：Web 检索（Psychological Science、Perspectives on Psychological Science、Frontiers in Psychology、Springer/Wiley、Nature Human Behaviour、PNAS、Journal of Finance、SSRN、NBER、Journal of Sports Sciences、JMIR、Sci. Rep. 等）
 > 证据等级：S（同行评审、可复现/方法学透明）/ M（专业出版物、可信数据、工作论文）/ W（行业博客、营销材料、未独立验证）/ U（基于已知文献的逻辑推演）

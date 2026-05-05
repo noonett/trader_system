@@ -1,5 +1,9 @@
 # AI 辅助/AI 教练在专业训练中的效果调研
 
+> ⚠️ **状态标注（v5 新增）**：本笔记反映**调研当时的中间结论**。最终系统约束以 [`foundation_2026.md`](../foundation_2026.md) **最新版本（v5+）** 为准。本笔记内容不再修改，作为历史可追溯档案保留。
+>
+> **重大冲突警示**：本笔记 §D（"具体修正建议"，约第 482-510 行）中"AI 是 Socratic 提问者 + 行为日志记录者 + 模式识别建议者"+ "入场前 5 个开放问题"的中间建议，**已被 foundation v4+ 推翻**。foundation v4 §三.2 / v5 §三.2（含反馈时机分层 + 重大回撤例外 + 打破完全私密通道）改为：(a) 反馈/规则验证组件不预设是 AI；(b) 决策链改 if-then 实施意图，而非开放问题；(c) AI 不主动归因 / 不 Socratic 引导，避免认知卸载（Bastani 2024 / Microsoft × CMU 2025）。
+>
 > 调研日期：2026-05-05
 > 调研方法：Web 检索（Nature/Springer/Wiley/PNAS、JAMA Network Open、Educational Psychology Review、SSRN、arXiv、MIT Media Lab、METR、Microsoft Research、ERIC 等）
 > 证据等级：S（同行评审、可复现/方法学透明）/ M（专业出版/可信数据/工作论文）/ W（行业博客、营销材料、未独立验证）/ U（基于已知文献的逻辑推演）
@@ -481,13 +485,17 @@
 
 ### D. 给本训练系统的具体修正建议（U + 推断）
 
+> 🚨 **本节（§D）的设计建议已被 foundation v4+ 部分推翻，详情见本文件顶部状态标注**。下文保留原内容作为历史轨迹。涉及 AI 角色与决策链 5 问形态的设计，请以 foundation 最新版本为准（核心变化：开放问题 → if-then 实施意图；Socratic 提问 → 不主动归因；AI 为前台 → 不预设技术形态）。
+
 基于上述证据，**σ 引擎（管住自己）** 部分如果继续以 AI 为核心组件，应做以下修正：
 
 1. **AI 不是裁判，是 Socratic 提问者 + 行为日志记录者 + 模式识别建议者**——不是"AI 说不行就不行"的最终决策者。最终决策权与责任明确归交易者。
    - 证据：Bastani 2024、Lee et al. 2025、CACM 2025
+   - **⚠️ v4+ 修正**：foundation v4 §三.2 已明确禁止反馈组件主动归因 / Socratic 引导（避开 Microsoft × CMU 2025 的 anchoring 证据）；AI 角色应限定为"对照镜 + 偏差标注"，而非提问者。
 
 2. **关键的"硬约束"必须 binding，不能依赖 AI 提醒或用户意志**——日损锁屏、止损在执行层、单笔风险硬上限。AI 只在 binding 之上做软层。
    - 证据：Fischbacher 2017、在线赌博 RCT 2021
+   - ✅ 此条与 foundation v4+ §三.3 一致（已升级为"binding pre-commitment / enforced friction"原则）。
 
 3. **入场前 5 个问题** 的设计要：
    - 开放式而非选择题（self-explanation literature）
@@ -495,6 +503,7 @@
    - 1-3 秒最低 pause 强制
    - 答完后允许 override，但 override 本身被记录
    - 证据：Bisra 2018、自我解释 g = 0.55；Auer & Griffiths 2014
+   - **⚠️ v4+ 修正**：foundation v3+ §三.1 第 2 层已将决策链改为 **if-then 实施意图**（Sheeran/Listrom/Gollwitzer 2024，d=0.27-0.66，642 项 meta），而非开放问题；同时禁止反馈组件主动判断好坏。具体形态留 Phase 2。
 
 4. **AI 反馈应明确其错误率与不确定性**，不要呈现为"AI 说……所以……"。降低 automation bias 的关键设计。
    - 证据：Pathology 7% 翻判、Trust & Reliance 实验
