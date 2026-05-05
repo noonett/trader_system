@@ -1,6 +1,8 @@
 # 元规则：论据来源与诚实标记
 
 > 这不是方法论，是方法论的前提。所有其他知识条目、系统输出、分析判断，都必须遵守此规则。
+>
+> **最后更新：2026-05-05（仅 Level A sync — 头日期更新）**；Phase 1 v5 在历史中曾出现 `S+` 等级（v1-v3）、后在 v5 中取消统一回 S；Phase 2 v2 §六.1 引入"N=1 自用 vs productization 路径"的语境分层——**这两点未反映到本元规则正文** — 推到 Level B 同步范围。具体见 [research/foundation_2026.md §四.2](../research/foundation_2026.md) 与 [research/entry_form_research_2026.md §六.1](../research/entry_form_research_2026.md)。当前元规则正文对这两个语境**仍同等适用**（4 级体系不变，诚实标记要求不变）；Level B 同步将加分层条款。
 
 ## 规则正文
 
