@@ -1,0 +1,104 @@
+---
+description: σ system honesty-marker meta-rule takes precedence over karpathy §3 'Surgical Changes' for evidence-level violations. When you find citation errors, encoding errors, evidence-level (S/M/W/U) misclassifications, or broken honesty markers in any file, you MUST fix them on sight even if outside the originally-scoped request.
+alwaysApply: true
+---
+
+# σ 系统元规则与 karpathy §3 的优先级仲裁
+
+本仓库装了两类 cursor rules：
+- 上游导入的 `karpathy-guidelines.mdc`（行为约束）
+- 项目层的 `CLAUDE.md` + foundation_2026.md 元规则（诚实标记体系）
+
+两者大多兼容。少数张力点由本规则仲裁。
+
+---
+
+## 仲裁规则
+
+### σ 元规则优先（"看见就改"）的范围
+
+以下情况**必须显式修正，即使超出当轮请求的原始范围**：
+
+1. **引用错误**——作者归属错误 / 期刊错误 / 样本量错误 / 效应量错误。
+   *示例*：v2 修订把 "Heron 2017 *J Pediatr Psychol*" 修正为 "Wen 2017 *JMIR* 19(4):e132"，跨 entry_form_research + notes/10 + notes/11 三个文件统一更新——这是元规则要求的，不是"超范围改动"。
+
+2. **编码错误 / 损坏字符**——`���` / 乱码 / Unicode 误转换。
+
+3. **证据等级（S/M/W/U）误分类**——把 preprint 标 S，把同行评审标 W 之类。
+
+4. **诚实标记体系本身的违例**——未定义的等级（如 v1 出现过 `S+`）/ 未标 U 级的逻辑推演 / 编造的"研究表明"无具体来源。
+
+5. **跨域迁移夸大或方向错误**——v2 在 Pratap 2020 上发现"临床受试者 ≠ 消费者市场迁移方向反转"是这一类。
+
+**理由**：σ 系统的合法性建立在诚实标记体系上。错误引用一旦留存，会污染下游所有 review / Design / Action。这些必须被当场修正——这是诚实标记元规则的应用，不是"未被请求的改动"。
+
+### karpathy §3 优先（"小手术"）的范围
+
+以下情况遵守 karpathy §3，**不要顺手改**：
+
+1. **不被请求的代码重构**——不要"顺手优化"相邻函数。
+2. **格式美化**——不要重新排版别人的代码 / markdown / 列表风格。
+3. **删除既有的 dead code**——除非明确被要求。
+4. **风格改写**——保持现有 style，即使你觉得另一种更好。
+5. **超出请求范围的功能添加**——"我做了 X，顺便加了 Y" 是反模式。
+
+**理由**：这些改动的"必要性"全部基于个人偏好，不是证据级硬约束。它们应当作为单独的提议交给用户拍板，而不是默认行为。
+
+---
+
+## 工作流要求
+
+### 每轮显式声明范围
+
+不论遵循哪一边，每轮工作开始时**显式声明本轮的改动范围**，避免暗中铺开：
+
+> **本轮范围**：v2 引用错误修复（A1-A5）+ 方法学瑕疵（A10-A13）。**不改**：notes/01 的 markdown 格式（IDE 自动重排，与本轮无关，已 reset）。
+
+这一句话同时满足：
+- karpathy §1 "Think Before Coding"（Surface tradeoffs）
+- karpathy §3 "Surgical Changes"（声明范围 = 范围之外不动）
+- σ 元规则诚实标记（说明哪些没改 + 为什么）
+
+### 元规则触发的扩散修正必须分类描述
+
+如果当前请求触发了元规则的"看见就改"扩散（如修一个引用错误，发现它在 6 个文件里都有），**在 commit message 里分类描述**：
+
+> Fixed Heron 2017 → Wen 2017 across:
+> - research/entry_form_research_2026.md (1 occurrence)
+> - research/notes/10_multi_vs_single_end.md (3 occurrences)
+> - research/notes/11_context_switching_cost.md (1 occurrence)
+> Triggered by: σ 元规则诚实标记体系（引用错误必须当场修正）。
+> Not karpathy §3 violation: these all trace to one evidence-level error,
+> not 'unrelated improvements'.
+
+这让 reviewer 能立刻分辨"必要扩散"vs"超范围 scope creep"。
+
+---
+
+## 优先级冲突的边缘情况
+
+少数情况两者都不直接覆盖。判断原则：
+
+| 情况 | 判断 |
+|---|---|
+| 发现一个**事实错误**但不在引用层（如代码注释写错了 API 行为）| karpathy §3 优先——记下来通知用户，不要默改 |
+| 发现一个**逻辑漏洞**在论述里（如 4 层 vs paradox 张力没处理）| 这是元规则的方法学瑕疵 → σ 优先，可改但要在 commit 里分段说明触发动因 |
+| 发现一个**typo** | karpathy §3 优先——typo 不影响诚实标记体系 |
+| 发现**编码错误 / 损坏字符** | σ 优先——这影响文档可信度 |
+
+**原则**：σ 优先的边界 = "这一处错误如果不修，会污染下游论证或 review 决策"。其他都遵循 karpathy §3。
+
+---
+
+## 不在本规则范围
+
+- 涉及代码（vs 调研文档）的修改：σ 系统目前代码很少（`tools/position_sizer.py`），karpathy §3 直接适用，本规则不引入特例
+- 涉及 trades/ 下的实战记录：保持原始记录不动是元规则要求（trader-profile / bias-patterns 的输入），karpathy §3 在此层一致——两规则吻合，无须仲裁
+
+---
+
+## 修订记录
+
+| 日期 | 修订内容 | 触发动因 |
+|---|---|---|
+| 2026-05-05 v1 | 初版仲裁规则。澄清 σ 优先范围（5 类）+ karpathy §3 优先范围（5 类）+ 工作流要求 + 边缘情况判断原则。 | 用户反馈："Karpathy §3 'Surgical Changes' 与 σ 系统元规则的张力：这改动的部分还是沿用 发现引用错误必须显式修正" — 把这条优先级显式落到 cursor rule 文件，避免靠记忆维持。 |
