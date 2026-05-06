@@ -6,8 +6,13 @@
 trades/
 ├── README.md          ← 本文件
 ├── TEMPLATE.md        ← v0 交易记录模板（复制到 YYYY/MM/ 下使用）
+├── SCREENSHOTS.md     ← 截图命名约定与工作流
 └── YYYY/MM/
-    └── YYYY-MM-DD-<symbol>-<dir>.md  ← 每笔交易一文聚合
+    ├── YYYY-MM-DD-<symbol>-<dir>.md  ← 每笔交易一文聚合
+    └── screenshots/                   ← 交易截图（入场/出场/过程）
+        ├── YYYY-MM-DD-<symbol>-<dir>-entry-1.png
+        ├── YYYY-MM-DD-<symbol>-<dir>-exit-1.png
+        └── YYYY-MM-DD-<symbol>-<dir>-context-1.png  (可选)
 ```
 
 ## 使用方法
@@ -15,10 +20,14 @@ trades/
 1. 每次开仓前，复制 `TEMPLATE.md` 到 `YYYY/MM/YYYY-MM-DD-<symbol>-<dir>.md`
 2. 填写 frontmatter（日期 / 标的 / 方向 / **product_class** / 市场 / 价格 / 仓位 / 止损）
 3. 填写 §二 决策链 5 项 if-then
-4. `git add + commit "open <symbol>"`
-5. 实际下单
-6. 平仓后 30 分钟内填写 §四 盘后 EMA
-7. `git add + commit "close <symbol>"`
+4. **截图：K 线 + 标注入场位/止损位** → 保存到 `YYYY/MM/screenshots/`（命名见 [SCREENSHOTS.md](SCREENSHOTS.md)）
+5. 在 §五 截图证据区填入文件名
+6. `git add . && git commit -m "open <symbol>"`
+7. 实际下单
+8. 平仓后 30 分钟内填写 §四 盘后 EMA
+9. **截图：平仓时 K 线 + 实际出场位** → 保存到 `screenshots/`
+10. 在 §五 截图证据区填入文件名
+11. `git add . && git commit -m "close <symbol>"`
 
 ## product_class 枚举（产品分级，foundation §三.10）
 
