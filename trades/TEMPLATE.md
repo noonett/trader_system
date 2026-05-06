@@ -1,5 +1,7 @@
 ---
-date: YYYY-MM-DD
+
+## date: YYYY-MM-DD
+
 symbol: 
 direction: # long / short
 product_class: # green-passive-etf / green-cash-stock / yellow-small-future / red
@@ -11,9 +13,8 @@ stop_loss_price:
 pnl_gross: 
 pnl_net: # 毛盈亏 - 手续费 - 滑点 - 融资/隔夜成本
 fees: 
----
 
-# YYYY-MM-DD <symbol> <long/short>
+# YYYY-MM-DD  <long/short>
 
 ## 一、盘前 if-then 参考
 
@@ -58,18 +59,19 @@ fees:
 EV = n × G − (10−n) × L =
 
 Q5a 估计来源：
-- [ ] 过去类似交易的实际数据
-- [ ] 回测结果
-- [ ] 我的直觉 / 感觉
-- [ ] 别人的建议
+
+- 过去类似交易的实际数据
+- 回测结果
+- 我的直觉 / 感觉
+- 别人的建议
 
 ## 三、决策前检查清单
 
-- [ ] If 1-5 全部填完且足够可检验
-- [ ] P_stop 已定义
-- [ ] 仓位不超过 risk_rules.md 单笔上限
-- [ ] 情绪不属于 {兴奋, 愤怒, 报复, 翻本, 恐惧}
-- [ ] reviews/alerts/ 无未 acknowledge 的 alert
+- If 1-5 全部填完且足够可检验
+- P_stop 已定义
+- 仓位不超过 risk_rules.md 单笔上限
+- 情绪不属于 {兴奋, 愤怒, 报复, 翻本, 恐惧}
+- reviews/alerts/ 无未 acknowledge 的 alert
 
 ## 四、盘后 EMA（平仓后 30 分钟内填写，≤4 字段）
 

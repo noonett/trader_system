@@ -10,7 +10,7 @@
 
 ## 使用方法
 
-每次开仓前，在 trades/YYYY/MM/YYYY-MM-DD-\<symbol\>-\<dir\>.md 的决策链章节填写以下 5 项 if-then。全部填完 → git add + commit "open \<symbol\>" → 然后才实际下单。
+每次开仓前，在 trades/YYYY/MM/YYYY-MM-DD-symbol-dir.md 的决策链章节填写以下 5 项 if-then。全部填完 → git add + commit "open symbol" → 然后才实际下单。
 
 ---
 
@@ -66,11 +66,11 @@ If 5（期望值）:
 
 ## 决策前检查清单
 
-- [ ] 我已经诚实地完成了 If 1-5 的每一项（这条记录是否足够可检验？）
-- [ ] 我的止损已经明确（If 2 的 P_stop 已定义）
-- [ ] 我的仓位不超过 risk_rules.md 允许的单笔上限（If 3 已验证）
-- [ ] 我没有处于高风险情绪状态（If 4 已排除 {兴奋, 愤怒, 报复, 翻本, 恐惧}）
-- [ ] reviews/alerts/ 没有未 acknowledge 的 alert
+- 我已经诚实地完成了 If 1-5 的每一项（这条记录是否足够可检验？）
+- 我的止损已经明确（If 2 的 P_stop 已定义）
+- 我的仓位不超过 risk_rules.md 允许的单笔上限（If 3 已验证）
+- 我没有处于高风险情绪状态（If 4 已排除 {兴奋, 愤怒, 报复, 翻本, 恐惧}）
+- reviews/alerts/ 没有未 acknowledge 的 alert
 
 ---
 

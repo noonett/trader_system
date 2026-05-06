@@ -1,6 +1,7 @@
 ---
 
 ## description: σ 系统 N=1 自用临床安全自检模板（不 lockout）
+
 last_updated: 2026-05-06
 version: v0
 source: research/entry_form_research_2026.md §六（v3）+ design_proposal_2026.md D12

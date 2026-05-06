@@ -1,8 +1,8 @@
 # σ 盘后 30 秒 EMA 模板（≤4 字段）
 
-> **平仓后 30 分钟内填写**——在对应的 trades/YYYY/MM/YYYY-MM-DD-\<symbol\>-\<dir\>.md 文件的 EMA 章节。
+> **平仓后 30 分钟内填写**——在对应的 trades/YYYY/MM/YYYY-MM-DD-symbol-dir.md 文件的 EMA 章节。
 > 不填本身也是数据（后台违规扫描会记录"已平仓未填 EMA"）。
-> 填完后 git add + commit "close \<symbol\>"。
+> 填完后 git add + commit "close symbol"。
 
 ---
 
