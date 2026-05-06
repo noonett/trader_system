@@ -10,7 +10,7 @@ last_updated: 2026-05-06
 | 项目 | 内容 |
 |---|---|
 | 首次记录日期 | 2026-05-03 |
-| 当前阶段 | Phase 2 Design 完成（v0 全新设计已落地；旧 Stage 0 已 deprecated）；等用户拍板进入 Phase 3 Action |
+| 当前阶段 | Phase 2 Design v0.1 完成（A+ 按优先级分阶段修订；后台强制风控 + WebUI 渲染层 + Mobile 提醒按 P0/P1/P2/P3 分 Phase 3a/b/c/d）；等用户拍板进入 Phase 3 Action |
 | 交易经验 | 小白起步 |
 | 主要市场 | A 股 / 港股 / 期货（已记录第 1 笔 MGC 期货实战 2026-05-04，v0 KPI 不回溯）|
 | 交易风格 | 尚未确定（v0 σ 系统启动后 4 周节点判定 P0 KPI；统计显著仍需 ≥380 笔，详见 design_proposal §四 / foundation §三.5）|
