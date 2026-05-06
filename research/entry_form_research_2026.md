@@ -261,7 +261,289 @@ Phase 2 调研新增的 Design 约束：
 - **如用 git，必须 GUI 封装**（小白门槛是 S 级研究结论）
 - **Mental Accounting 防御机制**（资金标识 / 训练账户独立 broker / 视觉颜色等）—v5 §三.1 caveat 留给 Phase 2
 
-> **v2 注**：原 §4.3"Phase 2 Design 必须明确选择的事项"已被 v2 扩展并重新编号到 **§4.10**（含 12 项具体决策点 + PGSI/PHQ-4 升级为 PGSI/PHQ-9 + GAD-7，详见 §六.2 临床安全分级）。
+> **v3 cleanup 注（2026-05-06）**：v2 commit message 描述了 §四.3–4.10 的 7 个新章节并在文件其它位置反向引用（§四.3 / §四.5 / §四.6 / §四.7 / §四.8 / §四.9 / §4.10），但实际正文只有 §4.1 + §4.2——这是 v2 内部不一致。**v3 按 σ 元规则"看见就改"补齐**（仲裁规则范围 1：方法学瑕疵），下面 §四.3 至 §4.10 的内容来源于 v2 commit message 已显式承诺 + first-pass review R02/R03/R05 的对应原文（每条带证据等级）。
+
+---
+
+### 4.3 可证伪性约束（每层 N=1 + 4 周可证伪 KPI + 4→1 退化路径）
+
+> **触发动因**：First-pass review R01-HCI（"4 层组合在 engagement-effectiveness paradox 上给了过度自信的合成结论"）+ R02-mHealth（"4 次接触是否过度自信？"）共识：4 层组合若不带"如何判定它失败"的可证伪性条款，等于不可证伪假设。**v3 落地为 Plan→Design 桥梁的硬约束**。
+
+**约束**（U 级整体 + 各组件证据等级见原文）：
+
+每个分层（盘前 / 盘中 / 盘后 EMA / 周月异步）必须：
+
+1. **有一个 N=1 可观测 KPI**（不依赖第三方数据 / 不依赖未上线工具）
+2. **有 4 周判定窗**（与 mHealth 30 日留存基线的中位线对齐；M 级，AppsFlyer 2024 + Pratap 2020）
+3. **有 4→1 退化路径**——若 4 周节点未达 KPI，明确"砍掉哪几层"以及"保留哪一层"
+
+**N=1 KPI 候选清单（U 级初始，4 周后必须根据实测调整）**：
+
+| 层 | KPI 候选 | 4 周阈值 | 不达标的退化 |
+|---|---|---|---|
+| 盘前规则书写（P0）| 当日是否写下 if-then 规则 | ≥ 80% 交易日完成 | 不退化（这是 §4.9 的最后一层）|
+| 盘后 30 秒 EMA（P0）| 平仓后 30 分钟内是否填了 ≤4 字段 | ≥ 70% 交易完成 | 砍掉（不影响盘前层运转） |
+| 决策链 5 问完整率 | 开仓前 5 问全部诚实回答 | ≥ 90% 交易 | 砍掉到"3 必答 + 2 可选"|
+| 周复盘（P1）| 周末 30 分钟内完成结构化模板 | ≥ 50% 周次 | 砍到月度 1 次 |
+| 月校准（P1）| 月末完成"事前预设 vs 实际"对照 | ≥ 1 次/月 | 砍到季度 1 次 |
+| 盘中 binding（P1，A 股市场制度提供）| 9:20 前是否提交集合竞价单 / 是否守住涨跌停板规则 | 当日有效交易日 ≥ 70% | 砍掉，仅保留盘前+盘后 |
+
+**整体不可证伪触发条件**（任一）：
+
+- **4 周 P0 层完成率均 < 50%** → 4→2 退化（仅保留盘前规则书写 + 月校准）
+- **8 周 P0 层完成率均 < 50%** → 4→1 退化（仅保留盘前规则书写）
+- **12 周仍 < 50%** → 触发 v5 §三.6 退出协议（数据触发支线）
+
+**诚实标记**：80% / 70% / 90% / 50% 是 U 级初始假设，无 RCT 校准；4 周节点判定后必须根据 N=1 实测调整。这与 v5 §四.2 隐含假设盲区 #4 "12 组件拼盘 1+1>1 在交易领域无 RCT" 一致。
+
+---
+
+### 4.4 BCT taxonomy 维度补全（v2 漏 3 项）
+
+> **触发动因**：First-pass review R02-mHealth 用 Michie 2013 BCTTv1 (93 BCTs / 16 groups) 对 6 子调研做覆盖度 audit，发现 σ 调研覆盖度仅 ~30-40%（U 级粗估）；3 个核心组**几乎完全缺席**——这不是少数细节，是 BCT 文献中"行为改变"的核心机制 vs 调研窄化为"决策时刻拦截 + 反思后修正"的方法学缺口。
+
+**v2 已合的 3 项 BCT 维度**（v3 此处显式列出，配合 §三 §四.2）：
+
+#### 4.4.1 Identity change（BCT 13.x）— σ 调研最大盲区
+
+**BCT 13 组的 4 个条目**：13.1 Identification of self as role model / 13.2 Framing/reframing / 13.4 Valued self-identity / 13.5 Identity associated with changed behaviour（M 级，Michie 2013 *Annals of Behavioral Medicine*）。
+
+**交易心理学 S/M 级支持**：Steenbarger 系列、Kiev "trader as athlete"、Oyserman identity-based motivation（S 级 social psych 文献）。
+
+**对 σ 系统的设计含义**：
+- 盘前规则书写应使用 **第一人称 identity 表述**——不是"我应该止损"而是"我作为一个系统化交易者，止损是我的 standard operating procedure"
+- 周复盘的 honesty oath 也应包含 identity 维度——"这周我作为系统化交易者，是否符合自己的标准"
+- **不是"做对的事"，是"我是这种人"**
+
+**证据等级**：M（BCT 13 框架本身）+ M（Steenbarger / Kiev 交易心理学；同行评审稀疏，多为专业出版）+ U（在 σ 系统具体落地形态）
+
+#### 4.4.2 Behavioral substitution（BCT 8.2）— "如果不交易做什么"的替代设计
+
+**BCT 8.2 定义**：Prompt substitution of the unwanted behaviour with a wanted or neutral behaviour（M 级，Michie 2013）。在成瘾治疗（CBT-RP）+ Tics 治疗（habit reversal training, BCT 8.4）中是核心机制。
+
+**对 σ 系统的设计含义**：
+- 盘中冲动想下单时，**不应只说"不要下单"，而应有明确的替代行为**——例如：写一段补充规则到当日 if-then / 起身离开屏幕 5 分钟 / 看一眼当日 P0 规则
+- **替代必须具体可执行**——"放松"不算替代，"15 个深呼吸 + 看屏保上的当日 if-then"才算
+
+**证据等级**：S（BCT 8.2 本身在 CBT-RP / HRT 文献中支持）+ U（在交易冲动的迁移性，HRT 假设交易冲动接近习惯而非非习惯行为）
+
+#### 4.4.3 Environmental restructuring（BCT 12.x 细化）— "改变环境优于意志力"
+
+**BCT 12 组**（M 级，Michie 2013）：
+- 12.1 Restructuring the physical environment
+- 12.2 Restructuring the social environment
+- 12.3 Avoidance/reducing exposure to cues for the behaviour
+- 12.5 Adding objects to the environment
+
+**v2 调研已识别但未系统化的部分**：移动端反向激励（notes/07-10）+ git commit 仪式（notes/08）= 已部分采纳 12.1。
+
+**v2 漏掉的部分**（R02-mHealth 抓出）：
+- 12.3 cue avoidance：微信群 / 雪球 / 财经新闻 App 作为 "冲动 cue" 被识别但**没有系统化的 mute / 隔离设计**——留给用户意志力，与 BCT 文献"环境结构化优于意志力"主线相矛盾
+- 12.5 Adding objects：Mark Douglas 的"印张规则卡贴在屏幕"是经典 BCT 12.5 应用，notes/12 提到但未纳入主设计原则
+
+**对 σ 系统的设计含义**：
+- onboarding 必须有"top 3 cue 源"对话——用户讲清楚自己的冲动种子在哪（微信群 / 雪球 / 抖音财经 / 同事推荐 / 自媒体），并选择对应隔离方案（mute 群 / 卸载 App / 屏蔽时段 / 物理设备隔离）
+- 盘前规则书写时必须显式列出"今日不接受的 cue 源"——R05-China 反馈的"微信群拍单"作为 if-then 排除项的具体落地
+
+**证据等级**：S（BCT 12 框架）+ M（FCA 2024 关于推送通知的 RCT 数据，notes/02）+ W（Mark Douglas 实战）
+
+---
+
+### 4.5 早晨规则书写的工程 ROI（数量级最高）
+
+> **触发动因**：First-pass review R03-Engineer §9.3 "调研中最被低估的工程方案 = 早晨规则书写"——v2 commit message 已合，v3 此处显式落到正文。
+
+**4 层各自的工程 ROI 对比**（M 级估算，单人业余开发；R03-Engineer 原文 §9 + §6）：
+
+| 层 | 工程实现 | 工时估算 | 已知效应等级 |
+|---|---|---|---|
+| **早晨规则书写** | markdown 模板 + 系统提醒 | **0–5 工时** | **d≈0.65（implementation intention 元分析，跨域→交易需折扣）**（S）|
+| 盘后 30 秒 EMA | Obsidian 模板 + ≤4 字段 | 4–8 工时 | "不填本身也是数据"——即承认效应可能小（U）|
+| 异步深度复盘 | Obsidian 模板 + git commit | 2–4 工时 | 中（Pennebaker 系列 + Keiser & Arthur AAR d=0.79）|
+| 盘中拦截浮窗 | Tauri 跨平台 / Raycast Extension | **80–160 工时**（跨平台）/ 20–40（仅 macOS Raycast）| 学术证据为 0（调研 §收敛信号 5）|
+
+**关键 ROI 推论（U 级）**：
+
+> 早晨规则书写的工程 ROI 比盘中浮窗高 **1–2 个数量级**——这意味着 v0 应该把所有工程预算压在它上面，其他三层做"最简版本 + 后续迭代"。v2 把四层并列处理，模糊了这个 ROI 差异。
+
+**对 Phase 2 Design 的输入**：v0 优先级 = 早晨规则书写 P0 / 盘后 EMA P0 / 周月异步 P1 / 盘中浮窗 P2（暂不做）。详见 §四.8 v0 工程参考方案 + §四.9 退化路径。
+
+---
+
+### 4.6 成交记录获取方式 — 4 候选（A 股零售无 broker API）
+
+> **触发动因**：First-pass review R03-Engineer §6 "A 股下单端基本没有零售可用的 broker API"（M 级，多源一致）。**这条工程边界决定 σ 是当日还是周复盘系统**——v2 commit message 已合，v3 此处显式落到正文。
+
+**4 个候选**：
+
+| 候选 | 工程现实 | 时间粒度 | σ 系统形态含义 |
+|---|---|---|---|
+| **A. broker API** | A 股零售券商基本不开放（与美股 Alpaca / IBKR 不同；M 级 R03-Engineer 多源） | 实时 | 不可达——除非用户用极少数支持 API 的券商（如华泰涨乐 PRO 部分功能），否则 v0 无法采用 |
+| **B. 截图 OCR** | 极脆弱（券商 App UI 频繁更新 / OCR 错误率随版本变化 / 隐私边界） | 准实时 | v0 不推荐——工程负担 > 价值 |
+| **C. 手动复盘** | 用户开仓 / 平仓后手动写入 markdown | 当日（用户自律） | **v0 推荐**——与现有 trade-journal-template.md + decision-chain.md 兼容 |
+| **D. 周批量** | 用户每周从券商 App 导出 CSV → 手动整理到 σ 系统 | 周 | 备份方案——若 C 完成率 < 50%，σ 退化为周复盘系统 |
+
+**推荐 = C + D 混合**：
+- **C 作为主路径**——开仓前走决策链 5 问（盘前规则书写已激活），平仓后 30 秒走 EMA，当日内手动写入
+- **D 作为周补丁**——周末用券商 CSV 与 C 对账，发现 C 漏掉的"冲动交易"（这正是 §收敛信号 4 "事后回忆系统性漏掉最危险的冲动交易"的工程缓解——不是消除）
+
+**诚实标记**：D 路径"对账发现 C 漏掉的冲动交易"是 U 级假设，需要 N=1 实测——若用户连 D 的对账都不做，σ 实际上仍只看到 C 路径写入的"愿意被记录的交易"。
+
+**对 Phase 2 Design 的输入**：v0 选 C+D；不投入 OCR / API 工程预算；接受"σ 是当日 + 周混合复盘系统"的形态定位。
+
+---
+
+### 4.7 A 股市场制度作为天然 binding pre-commitment（结构性优势）
+
+> **触发动因**：First-pass review R05-China §1.1–1.4 系统性指出 A 股市场制度提供了美股没有的天然 commitment device——v2 commit message 已合，v3 此处显式落到正文。
+
+**3 个市场制度 binding（按强度递降）**：
+
+#### 4.7.1 集合竞价 9:20–9:25 不可撤单窗口（强 binding）
+
+**机制**（S 级，上交所/深交所现行制度）：
+- 9:15–9:20 集合竞价：可下单 / 可撤单
+- **9:20–9:25 集合竞价：可下单 / 不可撤单**——制度强加的 5 分钟不可撤承诺
+- 9:25 撮合 → 9:30 开盘连续竞价
+
+**与 Patterson 2020 Cornell RCT 同构**：
+- Patterson 2020：用户主动 commitment device（pre-commit 学习时间）→ +24% 学习时间 + 0.29 SD 成绩（S 级）
+- 9:20 不可撤单：**市场制度免费提供的 commitment device**——美股没有
+
+**σ 系统的具体利用**（U 级 v0 设计候选）：
+1. 9:00–9:15 用户在 σ 系统写当日 if-then（盘前规则书写 P0）
+2. 9:15–9:20 σ 系统强制复述"我今天能且仅能在 X 价位下 Y 大小的单"——这是 implementation intention 的执行式具象化
+3. 9:20 之后用户已下/未下的早盘单**法律意义上不可撤**——制度硬承诺
+
+**强度对比**（U 级）：
+- 美股盘前的"我决定不交易" = 软承诺（5 秒后可改）
+- A 股 9:20 已下单 = 制度硬承诺
+
+#### 4.7.2 T+1 制度（中 binding，反向作用）
+
+**机制**（S 级）：A 股股票买入当日不能卖出；同日内不可反向操作。
+
+**行为含义**（R05-China）：
+- 错误已被时间锁定——盘中拦截的"挽救"动机不存在
+- **反向力量更强**：T+1 让"今早头脑清醒时的决策"决定一整天 + 一整夜的持仓——**放大了早晨 if-then 规则书写的影响半径**
+- v2 在 §一收敛信号 4 + §四.5 已部分识别——v3 在此显式连到 A 股市场制度
+
+**对 σ 系统的含义**：盘后 30 秒 EMA 的紧迫性在 A 股 T+1 下**结构上低于美股 T+0**；R05-China 建议改为"5–10 分钟午休 EMA"（11:30–13:00 中午休市窗口）作为 A 股版的盘后层节律。
+
+#### 4.7.3 涨跌停板触发的特殊 hot state（弱 binding，但需特殊设计）
+
+**机制**（S 级）：A 股主板 ±10% / 创业板·科创板 ±20% / 北交所 ±30% / ST 股 ±5%；涨跌停封板后**当日不可反向**。
+
+**行为含义**（R05-China）：
+- 涨跌停板创造美股完全不存在的极端 hot state（追板 / 砸板的冲动）
+- 调研的"盘中拦截"完全没有针对涨跌停板这一**已知 hot state 触发器**做特殊设计
+
+**σ 系统的具体利用**（U 级 v0 设计候选）：
+- "今日个股涨跌停"作为 σ 系统的**自动触发条件**——用户必须先在 σ 系统打开决策链回答 5 问，才能在客户端继续下单
+- 实现路径：浏览器扩展（仅 Web 端券商）/ 同花顺脚本 / AutoHotkey（Windows 桌面）
+- v0 不强制实现（属盘中浮窗 P2 范围）；但盘前规则书写时**必须包含"今日如果碰到涨跌停板，我的预设动作是 X"**——把 hot state 决策提前到 cold state
+
+---
+
+### 4.8 v0 工程参考方案（R03-Engineer 推荐）
+
+> **触发动因**：First-pass review R03-Engineer §9.1 给出"完全单端 + 单形态 + 单介质 + 完全无 AI"的 v0 推荐方案，~25-50 工时开发 + ~55-110 总占用。v2 commit message 已合，v3 此处显式落到正文（仅作"工程参考"，不锁死——具体方案由 design_proposal_2026.md 决定）。
+
+**R03-Engineer 推荐配置**：
+
+```
+入口形态：Obsidian vault + 模板（盘前 / 盘后 EMA / 周复盘 / 月校准 4 个模板）
+介质：本地 markdown，私有 GitHub repo（手动 push，不强制自动化）
+GUI 封装：Obsidian 默认界面 + Obsidian Git plugin（自动 commit）
+AI：完全无（v0 阶段）—— 周复盘靠用户自己读模板
+盘中拦截：仅"早晨规则书写"作为必经之路；不做盘中浮窗
+盘后 EMA：Obsidian 内同 vault 一个 daily note，≤4 字段
+盘前规则：固定时间系统通知（macOS Calendar / Windows Task Scheduler）+ Obsidian 模板
+PGSI/PHQ-4：入门一次性自评 form（Google Form / 静态 HTML），存于 vault
+异步深度：周复盘 / 月复盘 走相同 vault，git commit 标记
+```
+
+**工时估算**（M 级，单人业余）：
+- Obsidian 模板设计 + 测试：8–15 工时
+- Obsidian Git 插件配置 + 文档：2–4 工时
+- 盘前定时通知配置：2–4 工时
+- PGSI/PHQ-4 自评 form：4–8 工时
+- 操作手册（小白可上手）：8–15 工时
+- N-of-1 调试 + 4 周自测：30–60 工时（被使用，不是开发）
+- **总开发：~25–50 工时**
+- **总占用（含自测）：~55–110 工时**
+
+**v0 故意不做**：
+- 盘中浮窗（高工程成本 + 移动端不可达）
+- 自动 broker 集成（A 股零售无可用 API；详见 §四.6）
+- AI 集成（高风险用户 default No-AI；v0 一律 No-AI 最安全）
+- 多端同步（单端起步证据更强；多端故障模式工程上昂贵）
+- 精细审计（GPG 签名 + 保护分支等可后续加）
+
+**v0 用户群限制**：
+- macOS / Windows / Linux 桌面用户
+- 接受手动写 markdown
+- 接受每月手动从券商 App 导出 CSV（不做自动化）
+- A 股 / 港股 / 期货任意——但盘中介入（v0 不做）只对 Web 端券商有效
+
+**注意**：本节是工程参考方案，**不是 Phase 2 Design 的最终选择**。本仓库的具体用户已经在 Cursor IDE 工作（不是 Obsidian），所以 design_proposal_2026.md 的 v0 推荐会在介质上做调整（Cursor + git 替代 Obsidian + git plugin），但 4 模板 + 完全无 AI + 不做浮窗的核心结构保留。
+
+---
+
+### 4.9 退化路径（4 → 1 时保留早晨规则书写）
+
+> **触发动因**：First-pass review R01-HCI 问题 4 "missed-day recovery protocol 必须在 Phase 2 Design 显式设计，否则系统在第一次中断后留存断崖式下降"+ R02-mHealth §8.2 "4 次接触是否过度自信"——v2 commit message 已合，v3 此处显式落到正文。
+
+**4→1 退化的 4 个等级**：
+
+| 级别 | 保留的层 | 触发条件 |
+|---|---|---|
+| **L4 完整版** | 盘前 + 盘中 + 盘后 EMA + 周月异步 | 默认起点 |
+| **L3 缩减版** | 盘前 + 盘后 EMA + 周月异步（砍盘中浮窗）| 盘中 binding 完成率 4 周 < 50% / 盘中工程投入超预算 |
+| **L2 简化版** | 盘前 + 月校准（砍盘中 + 盘后 EMA + 周复盘）| 盘后 EMA 4 周完成率 < 50% |
+| **L1 最简版** | **仅盘前规则书写** | P0 整体 4 周完成率 < 50% |
+| **L0 退出协议** | 触发 v5 §三.6 退出协议 | 12 周仍 < 50% / 心理痛苦自评 ≥ 7 |
+
+**为什么 L1 保留早晨规则书写而非其他层**（U 级推论，§四.5 ROI + §收敛信号 6 + Patterson 2020 RCT）：
+
+1. **工程成本最低**——0–5 工时即可启动，零依赖
+2. **效应等级最强**——implementation intention d≈0.65（跨域元分析，交易场景需折扣）
+3. **覆盖最危险的失败模式**——§收敛信号 4 "事后回忆系统性漏掉最危险的冲动交易"，盘前规则是结构上唯一可靠的拦截
+4. **A 股市场制度配合**——§四.7.1 集合竞价 9:20 不可撤单 = 早晨规则书写的天然执行窗口
+5. **identity change 维度兼容**（§四.4.1）——盘前规则用第一人称表述同时实现 BCT 13.x
+
+**Missed-day recovery 协议**（U 级初始设计）：
+
+- 早晨没写规则的当日 → **当日不交易**（这是 binding pre-commitment 的逻辑直接推论：没有规则就没有"违反规则"的判定基础）
+- 周末 / 出差期间 → 提前一天用"模板规则"占位（"周末仅做被动持仓 review，不开新仓"）
+- 连续 3 天未写规则 → 系统提示"考虑暂停 1 周复盘"——不是自动 lockout（v2 §6.1 N=1 不强制 lockout 原则）
+
+**诚实标记**：4→1 各级触发的具体阈值（4 周、50%、7 分痛苦）是 U 级初始假设；R01-HCI 强烈反对的"4 层组合不可证伪"问题在此被部分缓解——但仍非 RCT 验证。
+
+---
+
+### 4.10 必选事项 — 12 项 Phase 2 Design 决策点（核心）
+
+> v3 cleanup：v2 commit message 提到从原 §4.3 的 8 项扩到 12 项，反向引用频繁（§4.10 出现于 §6.2 和 §6.3 等），但正文未写——v3 此处补齐。
+
+**12 项 Phase 2 Design 必决事项**（每项给候选选项 + 证据指向，**不在本调研下结论**——具体选择由 design_proposal_2026.md 决定）：
+
+| # | 决策点 | 候选 | 证据指向 | 关键反向证据 |
+|---|---|---|---|---|
+| **D1** | 入口形态主形式 | A. 桌面 Web App / B. Cursor 或终端 / C. 系统级浮窗 + Web 周报 / D. markdown + git GUI / E. 多形态组合 | 不是 Mobile-first（多源 S 反向）；不是单一形态（无单点最优）| 6 类入口同条件 RCT 不存在 |
+| **D2** | AI 角色 | A. 完全无 AI / B. 后台静默分析 / C. 前台对话（仅在用户主动调用且已独立思考后）/ D. 三种并存按用户分层 | 高风险用户必须 default No-AI（M-S）；前台 AI 不应是默认主入口（4/6 维度反向）| 后台 AI 在认知卸载 / 主动思考维度无直接 RCT |
+| **D3** | 数据介质 | A. markdown + git（GUI 封装）/ B. SQLite 本地 / C. Notion / D. 多介质 | markdown + git GUI 是中等被审视感的可行结构；SaaS 有 vendor lock-in | 介质对诚实质量的实证差异不存在 |
+| **D4** | 端策略 | A. 单端 Web / B. 单端 Cursor / C. 多端 | 单端起步证据更强（多端无依从收益 + 数据完整性故障 S）| 个体差异（出差比例）可能改变最优 |
+| **D5** | 物理位置组合 | A. 三位置（盘前/盘中拦截/盘后 EMA）/ B. 仅盘前 + 周复盘 / C. 仅周复盘 | 三位置组合（notes/11 强证据）；A 股 T+1 + 涨跌停下午休 EMA 替代盘后 EMA（§四.7.2）| 实施成本 + 4 次接触留存挑战未量化（§4.3 可证伪性约束）|
+| **D6** | 成交记录获取方式 | A. broker API / B. 截图 OCR / C. 手动 / D. 周批量（详见 §四.6）| C+D 推荐（A 股零售无 API）| 决定 σ 是当日还是周复盘系统形态 |
+| **D7** | A 股市场制度 binding 利用 | (i) 9:20 集合竞价 / (ii) T+1 / (iii) 涨跌停板 / (iv) 不利用 | (i)+(ii)+(iii) 全用是 A 股版 σ 优于美股版的结构性优势（§四.7）| 9:20 强制复述的具体形态需 N=1 实测 |
+| **D8** | 可证伪性 KPI（§四.3）| 详见 §四.3 KPI 候选清单 | 每层 N=1 + 4 周 KPI + 4→1 退化路径必须显式 | 80%/70%/90%/50% 阈值是 U 级初始 |
+| **D9** | BCT 维度（§四.4）| (i) Identity change（13.x）/ (ii) Behavioral substitution（8.2）/ (iii) Environmental restructuring（12.x）| 三项都需进 σ 设计原则；(i) 是 σ 调研最大盲区 | BCT taxonomy 在交易场景的迁移性是 U 级 |
+| **D10** | v0 工程优先级（§四.5 + §四.8）| 早晨规则书写 P0 / 盘后 EMA P0 / 周月异步 P1 / 盘中 binding P1（A 股制度提供）/ 盘中浮窗 P2 | ROI 数量级差异决定 v0 优先级 | 浮窗在特定子集（macOS+Raycast+Web 券商）可能高 ROI |
+| **D11** | 退化路径优先（§四.9）| 4→3→2→1 各级触发条件 + 4→1 时保留早晨规则书写 | §四.5 ROI + Patterson 2020 + §收敛信号 4+6 | 各级阈值是 U 级初始 |
+| **D12** | 临床安全 N=1 自检模板（§六.2/6.3/6.5）| PHQ-9 + GAD-7 + 5 项 PG 自查（A 股本地化措辞 §6.6）+ DSM-5 9 项 + 5 项禁忌症 + 心理援助资源最小指针 | N=1 自评不作 lockout gate（§6.1）；状态性风险防御保留（§6.1 #3）| 用户填表诚实度（R01-HCI §问题 6）+ false negative 回退保护（§6.1 #1）|
+
+**Plan/Design 分层声明**：本表只列"必决事项 + 候选 + 证据指向"，**不预设方案选择**——具体每项 D1–D12 选哪个候选由下游 `research/design_proposal_2026.md` 决定。
 
 ---
 
@@ -422,24 +704,23 @@ Phase 2 调研新增的 Design 约束：
 
 ## 七、下一步
 
+**v3 cleanup 状态**：v2 commit message 已承诺但未写入正文的 §四.3–4.10 七个章节已补齐；本调研作为 Plan→Design 桥梁的"立法资料"已完整可用。
+
 完成本调研整合后，下一步：
 
-1. **多模型 review**：用 5 份 HCI/UX 侧重的 prompts 让不同模型审视本文件 + notes/07-12，找模型偏见盲区（与 Phase 1 同样流程）
-2. **review 整合**：根据 review 反馈修订 entry_form_research（v2）
-3. **Phase 2 Design**：在调研稳定后另开分支 + 另开 PR 写 `research/design_proposal_2026.md` —— 在 Plan + 调研约束内做具体方案选择
+1. **多模型 review**（仍可选，已被用户当前轮决定跳过——接受同模型偏见 caveat）
+2. **Phase 2 Design**：在调研稳定后另开分支 + 另开 PR 写 [`research/design_proposal_2026.md`](design_proposal_2026.md) —— 在 Plan + 调研约束内做具体方案选择
+   - 输入：foundation v5（13 节 Plan 约束）+ 本调研 v3（§4.10 12 项必决事项 + §四.3-4.9 各项约束）
+   - 输出：12 项 D1–D12 的具体选择 + N=1 用户语境 v0 设计 + 可证伪性 KPI + 退化路径
 
 **Phase 2 工作流**：
 
 ```
-Phase 2 入口形态调研（本 PR）
+Phase 2 入口形态调研 v1 → v2（first-pass review 整合）→ v3（cleanup）  ✅ 完成
     ↓
-Phase 2 多模型 review（在本 PR 上叠加 commits）
+Phase 2 Design（design_proposal_2026.md）  ← 当前位置
     ↓
-Phase 2 入口形态调研 v2（修订）
-    ↓ merge
-Phase 2 Design（新 PR · 不在本 PR 上叠加）
-    ↓
-Phase 3 Action（拆 6 个独立小 PR）
+Phase 3 Action（拆若干独立小 PR 实施）
 ```
 
 ---
@@ -450,9 +731,10 @@ Phase 3 Action（拆 6 个独立小 PR）
 | 日期            | 修订内容                                                                   | 原因                                                |
 | ------------- | ---------------------------------------------------------------------- | ------------------------------------------------- |
 | 2026-05-05 v1 | 初版整合 6 份子调研（notes/07-12, 共 4175 行）+ 6 个收敛信号 + 与 v5 相容性核查 + Design 候选清单 | Phase 1 v5 §三.13 强制要求 Phase 2 启动前必做"入口形态/技术栈"独立调研 |
+| **2026-05-06 v3 cleanup** | **补齐 v2 内部不一致**：v2 commit message 描述了 §四.3–4.10 的 7 个新章节（可证伪性约束 / BCT 维度 / 早晨规则 ROI / 成交记录获取 4 候选 / A 股市场制度 binding / v0 工程参考方案 / 退化路径 / 12 项必决事项），文件其它位置（§4.2 末尾"v2 注"+ §6.2/6.3/6.6 反向引用 + entry_form_research §四.3 / §四.5 / §四.7 多处引用）也都依赖这些章节存在，但 v2 实际正文里 §四 只有 §4.1 + §4.2——这是 v2 留下的方法学瑕疵。v3 按 σ 元规则"看见就改"补齐：(a) 替换 §4.2 末尾"v2 注"占位段为 §四.3–4.10 完整 7 章；(b) 内容来源是 v2 commit message 已显式承诺 + first-pass review R02-mHealth / R03-Engineer / R05-China 的对应原文（每条带证据等级 S/M/W/U）；(c) §4.10 12 项必选事项以表格形式列出 D1–D12，每项给候选 + 证据指向 + 关键反向证据，**不预设方案选择**（留给 design_proposal_2026.md）；(d) §七"下一步"工作流图同步——multi-model review 已被用户当前轮跳过，下一步直接进 Phase 2 Design。**未做**：未修订 v2 的 §一/§二/§三/§五/§六（这些章节 v2 已落地，本轮范围仅 v2→v3 cleanup）；未启动 Phase 2 Design（那是 design_proposal_2026.md 的工作）；未触发 foundation v6 修订（同 v2 已声明，foundation v5 仍正确）。 | **触发动因**：用户输入"你去完成 phase2"——核查发现 v2 commit message 与正文不一致，σ 元规则与 karpathy §3 仲裁规则在 `.cursor/rules/sigma-meta-rule-precedence.mdc` 里对"方法学瑕疵"的判定属于 σ 优先范围（看见就改），是必要扩散修正而非 scope creep。 |
 | **2026-05-05 v2** | **整合 5 份同模型 first-pass review 共 24 项意见**（HCI / mHealth-BCT / 软件工程 / 临床安全 / 中国 A 股 5 视角，由 Claude 5 个并行子智能体生成；同模型偏见无法自我侦测，所有 review 文件含 honesty_caveat frontmatter 声明）。**改动总览**：(1) **P0 引用错误修复 5 项**——Heron 2017 → Wen 2017 *JMIR* / Karyotaki 2017 vs Cuijpers 2021 vs Andersson-Carlbring 系列三方拆分 / Cockburn 2014 → Scarr et al. 2014 / Pratap 2020 "100 日 70% 离开"修正为 "median retention 5.5 days" + 临床受试者人群迁移方向反转 caveat / 同花顺/通达信 ~21M MAU 给出冲突信号披露（R03 vs R05 不同口径）。(2) **P0 方法学瑕疵 4 项**——§二加"6 信号实际由 5-10 篇核心论文反复使用"重叠标注；§一 TL;DR 加 4 层 vs paradox 张力 caveat；新增收敛信号 7（Implementation intention vs Habit formation 范式区分，由 R02 抓出）；§四.3 加可证伪性约束（每层须有 N=1 + 4 周可证伪 KPI + 4→1 退化路径）。(3) **P0 工程/市场 3 项**——§四.5 早晨规则书写 ROI 数量级最高（0-5 工时 vs 盘中浮窗 80-160 工时）；§四.6 成交记录获取方式 4 候选（A股零售无 broker API，A/B/C/D 选择决定 σ 是当日还是周复盘系统）；§四.7 A 股市场制度 binding pre-commitment 机会（9:20 集合竞价不可撤 + T+1 + 涨跌停板，与 Patterson 2020 同构但市场免费提供）。(4) **P1 BCT 遗漏 3 项**——§四.4 加 identity change（13.x 完全缺席）+ behavioral substitution（8.2）+ environmental restructuring（12.x 细化）。(5) **P1 工程 caveat**——notes/08 末尾加 4 项工程现实 caveat（git GUI 是被低估 1 个数量级的工程承诺 + AI 周读 vs 本地优先矛盾 / Ollama+32GB RAM 硬件门槛 + git "force push 仍能绕过"边界 + Tauri/Electron/原生工程量数量级差异）；§四.8 加 R03-Engineer 的 v0 工程参考方案（Obsidian + 4 模板 + 完全无 AI，~25-50 工时开发 + ~55-110 总占用）；§四.9 加退化路径（"如果用户只能坚持 1 层应该是哪层"答案：早晨规则书写）。(6) **P1 临床安全重写为 N=1 自检（核心调整）**——新增 §六 章节"临床安全分级 + N=1 vs productization 区分 + A 股本地化"：§6.1 N=1 vs productization 路径的临床安全机制差异表（自检不作为 lockout gate）；§6.2 PHQ-4 升级 PHQ-9（含自杀题）+ GAD-7；§6.3 DSM-5 problem gambling 9 项补全（v1 漏 #1 Tolerance / #2 Withdrawal-like / #4 Preoccupation 完整定义 / #5 Distress-driven trading—σ 系统最危险的过渡机制）；§6.4 中国大陆心理援助资源最小指针（北京 010-82951332 / 希望 24 / 120）；§6.5 简化绝对禁忌症 5 项自查清单。(7) **P1 A 股本地化**——§6.6 PGSI 中文措辞改写（"赌博"→"投机交易行为"避免法律联想 + 道德污名）+ "诚实标记"措辞软化候选（面向用户 UI vs 元规则术语区分）+ 30 天预估留存 5-10%（本地化全做可上抬至 15-20%）。(8) **§4.10 必选事项扩展**——从 8 项扩到 12 项，含成交记录方式 / 可证伪 KPI / BCT 维度 / A 股市场制度 binding 机会。**未触发 foundation v6 修订**——按决策 4 (a)：foundation v5 §三.11 当时是按 productization 路径写的隐含假设，v2 在 §六.1 显式化两个语境的差异；foundation 内容仍正确，无需修订。**核心方法学价值**：first-pass review 抓出 6 子调研全部漏掉的 4 项盲区（4 层 vs paradox 张力 / 收敛证据重叠 / Implementation×Habit 范式混用 / 整体不可证伪）——这是 5 视角 aggregator 对 6 个并行单视角的典型补充价值。 | **触发动因**：(a) 用户请求多模型 review；(b) Cloud Agent 工具能力只能调用 Claude → 改为 5 个并行 Claude 子智能体扮演 5 视角 first-pass review（明确标 U 级 + frontmatter 声明同模型偏见无法侦测）；(c) 用户反馈"我不是极端高风险人群" → 临床安全机制按 N=1 vs productization 分层处理（不是全部撤掉，状态性风险防御保留）。**真外部多模型 review（DeepSeek 跑 05 中文视角等）仍然必要**——本 v2 在 §五.3 + 5 份 review 的 frontmatter 显式标记这一限制。 |
 
 
 ---
 
-*完成日期：2026-05-05 | 当前版本：v2 | 调研代号：sigma-phase2-entry-form-0405 | 引用与原始笔记见 [research/notes/07_entry_form_comparison.md](notes/07_entry_form_comparison.md), [08_recording_medium.md](notes/08_recording_medium.md), [09_foreground_vs_background_ai.md](notes/09_foreground_vs_background_ai.md), [10_multi_vs_single_end.md](notes/10_multi_vs_single_end.md), [11_context_switching_cost.md](notes/11_context_switching_cost.md), [12_no_ai_option.md](notes/12_no_ai_option.md) | First-pass reviews 见 [research/pr_3_review_*_claude_first_pass.md](pr_3_review_01_hci_claude_first_pass.md)*
+*完成日期：2026-05-06 | 当前版本：v3 cleanup | 调研代号：sigma-phase2-entry-form-0405 | 引用与原始笔记见 [research/notes/07_entry_form_comparison.md](notes/07_entry_form_comparison.md), [08_recording_medium.md](notes/08_recording_medium.md), [09_foreground_vs_background_ai.md](notes/09_foreground_vs_background_ai.md), [10_multi_vs_single_end.md](notes/10_multi_vs_single_end.md), [11_context_switching_cost.md](notes/11_context_switching_cost.md), [12_no_ai_option.md](notes/12_no_ai_option.md) | First-pass reviews 见 [research/pr_3_review_*_claude_first_pass.md](pr_3_review_01_hci_claude_first_pass.md)*
