@@ -2,14 +2,16 @@
 
 > 这些文档**历史上有效**，但已被 master 上更新的文档**取代**。保留是为了追溯系统演进路径，**不是当前操作宪法**。
 
-## 当前状态（2026-05-05）
+## 当前状态（随 `master` 更新）
 
 如果你想看 σ 系统**当前**的设计，请查：
 
 | 你想看 | 当前权威文档 |
 |---|---|
 | 系统目标 / Plan 级约束 | [`research/foundation_2026.md`](../research/foundation_2026.md)（v5）|
-| 入口形态 / Plan→Design 桥梁 | [`research/entry_form_research_2026.md`](../research/entry_form_research_2026.md)（v2）|
+| 入口形态 / Plan→Design 桥梁 | [`research/entry_form_research_2026.md`](../research/entry_form_research_2026.md)（v3）|
+| v0 操作规范（Design） | [`research/design_proposal_2026.md`](../research/design_proposal_2026.md)（v0.1）|
+| 日盘前 / 交易流水模板 | [`sigma/`](../sigma/)、[`trades/TEMPLATE.md`](../trades/TEMPLATE.md) |
 | 操作层风控规则 | [`knowledge/risk_rules.md`](../knowledge/risk_rules.md) |
 | 元规则（诚实标记体系） | [`knowledge/meta-rule.md`](../knowledge/meta-rule.md) |
 | 知识库索引 | [`knowledge/INDEX.md`](../knowledge/INDEX.md) |
