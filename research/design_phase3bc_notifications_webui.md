@@ -430,6 +430,7 @@ inject-banner: ## 检查未确认 alert 并注入 banner
 │ 输出：                                                │
 │   webui/src/data/trades.json                         │
 │   webui/src/data/kpis.json                           │
+│   webui/src/data/strategy_metrics.json               │
 │   webui/src/data/weekly_reports.json                  │
 │   webui/src/data/violations.json                     │
 │   webui/src/data/screenshots.json                    │
@@ -446,47 +447,56 @@ inject-banner: ## 检查未确认 alert 并注入 banner
 #### 2.5.1 Dashboard（首页）
 
 ```
-┌────────────────────────────────────────────────────────────┐
-│  σ Dashboard                                    2026-05    │
-├────────────────────────────────────────────────────────────┤
-│                                                            │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
-│  │ 盘前完成率  │  │ EMA完成率  │  │ 决策链完整率 │  │ 本月盈亏   │  │
-│  │   85%    │  │   72%    │  │   92%    │  │  +¥1,200 │  │
-│  │  ▓▓▓▓░   │  │  ▓▓▓░░   │  │  ▓▓▓▓░   │  │   ↑12%  │  │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘  │
-│                                                            │
-│  ┌────────────────────────────────┐  ┌─────────────────┐  │
-│  │ KPI 趋势（折线图 · 最近 8 周）      │  │ 本周违规          │  │
-│  │                                │  │                 │  │
-│  │  100% ─┐                       │  │ • 止损穿越 ×1    │  │
-│  │        │  ╱╲    ╱╲             │  │ • 决策链跳过 ×0  │  │
-│  │   80% ─┤╱  ╲──╱  ╲──          │  │                 │  │
-│  │        │                       │  │ 待 acknowledge  │  │
-│  │   60% ─┤                       │  │ → alerts/05-18  │  │
-│  │        └───────────────────    │  │                 │  │
-│  │        W18 W19 W20 W21 W22     │  └─────────────────┘  │
-│  └────────────────────────────────┘                        │
-│                                                            │
-│  ┌────────────────────────────────────────────────────┐    │
-│  │ 最近交易                                              │    │
-│  │ 日期        标的        方向   盈亏    决策链  EMA      │    │
-│  │ 2026-05-18  MGC 06    long  +¥400   ✓      ✓       │    │
-│  │ 2026-05-15  MGC 06    short -¥200   ✓      ✗       │    │
-│  │ 2026-05-12  沪深300ETF  long  +¥150   ✓      ✓       │    │
-│  └────────────────────────────────────────────────────┘    │
-│                                                            │
-└────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────┐
+│  σ Dashboard                                          2026-05      │
+├────────────────────────────────────────────────────────────────────┤
+│                                                                    │
+│  ─── σ 行为指标 ───────────────────────────────────────────────    │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐          │
+│  │ 盘前完成率  │  │ EMA完成率  │  │ 决策链完整率 │  │ 止损遵守率  │          │
+│  │   85%    │  │   72%    │  │   92%    │  │   88%    │          │
+│  │  ▓▓▓▓░   │  │  ▓▓▓░░   │  │  ▓▓▓▓░   │  │  ▓▓▓▓░   │          │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘          │
+│                                                                    │
+│  ─── α 策略指标（n=34, U级参考）─────────────────────────────────    │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐          │
+│  │ 期望值     │  │ 胜率      │  │ Profit F │  │ 本月盈亏   │          │
+│  │  0.35R   │  │   53%    │  │   1.4    │  │  +¥1,200 │          │
+│  │  ⚠ n<50  │  │  ⚠ n<50  │  │  ⚠ n<50  │  │   ↑12%  │          │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘          │
+│                                                                    │
+│  ┌────────────────────────────────┐  ┌─────────────────┐          │
+│  │ KPI 趋势（折线图 · 最近 8 周）      │  │ 本周违规          │          │
+│  │                                │  │                 │          │
+│  │  100% ─┐                       │  │ • 止损穿越 ×1    │          │
+│  │        │  ╱╲    ╱╲             │  │ • 决策链跳过 ×0  │          │
+│  │   80% ─┤╱  ╲──╱  ╲──          │  │                 │          │
+│  │        │                       │  │ 待 acknowledge  │          │
+│  │   60% ─┤                       │  │ → alerts/05-18  │          │
+│  │        └───────────────────    │  │                 │          │
+│  │        W18 W19 W20 W21 W22     │  └─────────────────┘          │
+│  └────────────────────────────────┘                                │
+│                                                                    │
+│  ┌────────────────────────────────────────────────────────────┐    │
+│  │ 最近交易                                                      │    │
+│  │ 日期        标的       Setup         方向  R倍数  决策链 EMA   │    │
+│  │ 2026-05-18  MGC 06   breakout-re.  long  +1.8R   ✓    ✓    │    │
+│  │ 2026-05-15  MGC 06   mean-rev.     short -1.0R   ✓    ✗    │    │
+│  │ 2026-05-12  300ETF   trend-follow  long  +0.6R   ✓    ✓    │    │
+│  └────────────────────────────────────────────────────────────┘    │
+│                                                                    │
+└────────────────────────────────────────────────────────────────────┘
 ```
 
 #### 2.5.2 Trades（交易列表）
 
 | 功能 | 描述 |
 |------|------|
-| 列表视图 | 按时间倒序排列所有交易，显示 frontmatter 关键字段 |
-| 筛选器 | 按 symbol / direction / product_class / 日期范围 |
-| 单笔详情 | 点击展开：完整决策链内容 + EMA + 截图缩略图 |
-| 统计摘要 | 顶部卡片：总笔数 / 胜率 / 平均盈亏 / 最大回撤 |
+| 列表视图 | 按时间倒序排列所有交易，显示 frontmatter 关键字段 + setup_tag 标签 |
+| 筛选器 | 按 symbol / direction / product_class / **setup_tag / stop_type / market_condition** / 日期范围 |
+| 单笔详情 | 点击展开：完整决策链内容 + EMA + R 倍数 + 截图缩略图 |
+| 统计摘要 | 顶部卡片：总笔数 / 胜率 / 平均 R / 期望值 / 最大回撤（**随筛选条件实时更新**） |
+| R 倍数列 | 每笔交易显示 R 倍数（绿正/红负），快速识别大赢大亏 |
 
 #### 2.5.3 Weekly Review（周报可视化）
 
@@ -525,7 +535,80 @@ inject-banner: ## 检查未确认 alert 并注入 banner
 └────────────────────────────────────────────────────┘
 ```
 
-#### 2.5.5 KPI（绩效指标页）
+#### 2.5.5 Strategy（策略分析页）
+
+**核心页面——按 setup/止损/市场环境筛选和对比策略表现**
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│  σ Strategy Analysis                                               │
+├────────────────────────────────────────────────────────────────────┤
+│                                                                    │
+│  ┌─ 筛选面板 ─────────────────────────────────────────────────────┐ │
+│  │ Setup:    [All ▾] [breakout-retest] [mean-reversion] [trend]  │ │
+│  │ 止损类型: [All ▾] [structure] [atr] [percent]                  │ │
+│  │ 止盈类型: [All ▾] [fixed-rr] [trailing] [structure]            │ │
+│  │ 市场环境: [All ▾] [trending] [ranging] [volatile]              │ │
+│  │ 日期范围: [2026-01-01] ~ [2026-05-06]                          │ │
+│  └────────────────────────────────────────────────────────────────┘ │
+│                                                                    │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐          │
+│  │ 期望值     │  │ 胜率      │  │ Profit   │  │ 平均R     │          │
+│  │  0.45R   │  │   56%    │  │ Factor   │  │  0.45    │          │
+│  │  n=34    │  │  n=34    │  │   1.6    │  │          │          │
+│  │  U级参考  │  │  U级参考  │  │  n=34    │  │          │          │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘          │
+│                                                                    │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ R 倍数分布（柱状图）                                           │   │
+│  │                                                             │   │
+│  │     ▓                                                       │   │
+│  │     ▓  ▓                                                    │   │
+│  │  ▓  ▓  ▓  ▓                                                │   │
+│  │  ▓  ▓  ▓  ▓  ▓                                             │   │
+│  │  ▓  ▓  ▓  ▓  ▓  ▓                                          │   │
+│  │ ─┼──┼──┼──┼──┼──┼──                                        │   │
+│  │ -2R -1R  0  1R  2R  3R                                      │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                    │
+│  ┌───────────────────────────┐  ┌──────────────────────────────┐  │
+│  │ 滚动 Expectancy（20 笔窗口） │  │ 行为 × 策略 交叉分析           │  │
+│  │                           │  │                              │  │
+│  │  0.8R ─┐     ╱╲          │  │  合规笔 Exp: 0.6R (n=28)     │  │
+│  │        │   ╱╱  ╲         │  │  违规笔 Exp: -0.3R (n=6)     │  │
+│  │  0.0R ─┤──╱      ╲──     │  │                              │  │
+│  │        │                  │  │  → 纪律带来 0.9R/笔 的差异     │  │
+│  │ -0.4R ─┤                  │  │                              │  │
+│  │        └───────────────   │  │  止损遵守 PF: 1.8             │  │
+│  │        最近 20 笔           │  │  止损穿越 PF: 0.6             │  │
+│  └───────────────────────────┘  └──────────────────────────────┘  │
+│                                                                    │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │ Setup 对比表                                                 │   │
+│  │                                                             │   │
+│  │ Setup            n    胜率   期望值   PF    置信度             │   │
+│  │ breakout-retest  22   59%   0.6R   1.8   ⚠ U级(n<30)       │   │
+│  │ mean-reversion   15   47%   0.1R   1.1   ⚠ U级(n<30)       │   │
+│  │ trend-follow      8   50%   0.3R   1.3   ⚠ U级(n<30)       │   │
+│  │                                                             │   │
+│  │ ⚠ 所有分组 n<30，仅供观察趋势，不可作为结论。                   │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                    │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+| 功能 | 描述 |
+|------|------|
+| 筛选面板 | setup_tag × stop_type × target_type × market_condition × 日期范围 交叉筛选 |
+| 指标卡片 | 期望值 / 胜率 / Profit Factor / 平均 R（随筛选实时更新） |
+| R 分布图 | 柱状图展示当前筛选条件下所有交易的 R 倍数分布 |
+| 滚动 Expectancy | 折线图：最近 20 笔的滚动期望值（观察 edge 是否在改善/退化） |
+| 行为 × 策略交叉 | 最有价值的视图：合规笔 vs 违规笔分别算 expectancy + PF |
+| Setup 对比表 | 按 setup_tag 分组，横向对比各策略表现 |
+| 样本量警告 | n < 30 时大字橙色标注"⚠ U级 样本不足，仅供参考" |
+| 导出 | 可导出当前筛选的交易列表为 CSV |
+
+#### 2.5.6 KPI（绩效指标页）
 
 | 功能 | 描述 |
 |------|------|
@@ -548,29 +631,45 @@ webui/
 │   ├── main.ts
 │   ├── App.vue
 │   ├── router/
-│   │   └── index.ts          ← Vue Router（Dashboard/Trades/Weekly/Screenshots/KPI）
+│   │   └── index.ts             ← Vue Router（6 页：Dashboard/Trades/Weekly/Screenshots/Strategy/KPI）
+│   ├── views/
+│   │   ├── DashboardView.vue    ← 首页 dashboard
+│   │   ├── TradesView.vue       ← 交易列表页
+│   │   ├── WeeklyView.vue       ← 周报页
+│   │   ├── ScreenshotsView.vue  ← 截图画廊页
+│   │   ├── StrategyView.vue     ← 策略分析页（筛选 + 指标 + 图表）
+│   │   └── KpiView.vue          ← KPI 绩效页
 │   ├── components/
-│   │   ├── KpiCard.vue        ← 单个 KPI 指标卡片
-│   │   ├── KpiTrend.vue       ← KPI 折线图（Chart.js）
-│   │   ├── TradeList.vue      ← 交易列表 + 筛选
-│   │   ├── TradeDetail.vue    ← 单笔交易详情（含截图）
-│   │   ├── WeeklyReport.vue   ← 周报渲染
+│   │   ├── KpiCard.vue           ← 单个 KPI/策略指标卡片
+│   │   ├── KpiTrend.vue          ← KPI 折线图（Chart.js）
+│   │   ├── TradeList.vue         ← 交易列表 + 筛选
+│   │   ├── TradeDetail.vue       ← 单笔交易详情（含截图）
+│   │   ├── WeeklyReport.vue      ← 周报渲染
 │   │   ├── ScreenshotGallery.vue ← 截图画廊
-│   │   ├── AlertBanner.vue    ← 未确认 alert 提示
-│   │   └── ViolationList.vue  ← 违规列表
+│   │   ├── ScreenshotCompare.vue ← Entry/Exit 并排对照
+│   │   ├── AlertBanner.vue       ← 未确认 alert 提示
+│   │   ├── ViolationList.vue     ← 违规列表
+│   │   ├── StrategyFilter.vue    ← 策略筛选面板（setup × stop × target × market）
+│   │   ├── RDistribution.vue     ← R 倍数分布柱状图
+│   │   ├── RollingExpectancy.vue  ← 滚动 Expectancy 折线图
+│   │   ├── SetupComparison.vue   ← Setup 对比表
+│   │   ├── BehaviorCrossAnalysis.vue ← 行为 × 策略交叉分析
+│   │   └── SampleSizeWarning.vue ← 样本量不足警告组件
 │   ├── composables/
-│   │   ├── useTradeData.ts    ← 加载 + 计算交易数据
-│   │   └── useKpiData.ts      ← 加载 + 计算 KPI
-│   ├── data/                   ← build 时自动生成（不入 git）
-│   │   ├── trades.json
+│   │   ├── useTradeData.ts       ← 加载 + 计算交易数据
+│   │   ├── useKpiData.ts         ← 加载 + 计算 KPI
+│   │   └── useStrategyMetrics.ts ← 策略指标计算（筛选 + 分组 + R 倍数 + expectancy）
+│   ├── data/                      ← build 时自动生成（不入 git）
+│   │   ├── trades.json            ← 含 setup_tag / stop_type / market_condition
 │   │   ├── kpis.json
+│   │   ├── strategy_metrics.json  ← 预计算的策略指标（按 setup 分组）
 │   │   ├── weekly_reports.json
 │   │   ├── violations.json
 │   │   └── screenshots.json
 │   └── assets/
 │       └── tailwind.css
 ├── scripts/
-│   └── build_data.py          ← Markdown → JSON 转换器
+│   └── build_data.py             ← Markdown → JSON 转换器（含策略字段解析）
 └── README.md
 ```
 
@@ -579,7 +678,7 @@ webui/
 核心职责：将 markdown frontmatter + 内容解析为 JSON。
 
 ```python
-# 伪代码 — trades.json 生成逻辑
+# 伪代码 — trades.json + strategy_metrics.json 生成逻辑
 def parse_trades():
     trades = []
     for md_file in glob("trades/????/??/*.md"):
@@ -587,22 +686,73 @@ def parse_trades():
             continue
         fm = parse_frontmatter(md_file)
         content = parse_content(md_file)
+
+        entry = float(fm.get("entry_price") or 0)
+        exit_ = float(fm.get("exit_price") or 0)
+        stop = float(fm.get("stop_loss_price") or 0)
+        direction = fm.get("direction", "long")
+
+        # R 倍数计算
+        r_multiple = None
+        if entry and stop and exit_ and entry != stop:
+            if direction == "long":
+                r_multiple = (exit_ - entry) / (entry - stop)
+            else:
+                r_multiple = (entry - exit_) / (stop - entry)
+
         trades.append({
             "id": md_file.stem,
             "date": fm.get("date"),
             "symbol": fm.get("symbol"),
-            "direction": fm.get("direction"),
+            "direction": direction,
             "product_class": fm.get("product_class"),
             "market": fm.get("market"),
-            "entry_price": fm.get("entry_price"),
-            "exit_price": fm.get("exit_price"),
+            "setup_tag": fm.get("setup_tag"),
+            "stop_type": fm.get("stop_type"),
+            "target_type": fm.get("target_type"),
+            "target_rr": fm.get("target_rr"),
+            "market_condition": fm.get("market_condition"),
+            "entry_price": entry,
+            "exit_price": exit_,
+            "stop_loss_price": stop,
             "pnl_net": fm.get("pnl_net"),
-            "stop_loss_price": fm.get("stop_loss_price"),
+            "r_multiple": r_multiple,
             "has_decision_chain": check_decision_chain(content),
             "has_ema": check_ema(content),
+            "compliant": check_full_compliance(content),  # 决策链+EMA+止损遵守
             "screenshots": find_screenshots(md_file),
         })
     return sorted(trades, key=lambda t: t["date"], reverse=True)
+
+def build_strategy_metrics(trades):
+    """预计算策略指标 JSON，供 WebUI Strategy 页面使用"""
+    metrics = {}
+    for group_key in ["_all", "setup_tag", "stop_type", "market_condition"]:
+        if group_key == "_all":
+            groups = {"全局": trades}
+        else:
+            groups = group_by(trades, group_key)
+
+        metrics[group_key] = {}
+        for name, group in groups.items():
+            rs = [t["r_multiple"] for t in group if t["r_multiple"] is not None]
+            n = len(rs)
+            if n == 0:
+                continue
+            metrics[group_key][name] = {
+                "n": n,
+                "confidence": "U级" if n < 30 else ("初步参考" if n < 100 else "可信"),
+                "win_rate": sum(1 for r in rs if r > 0) / n,
+                "expectancy": sum(rs) / n,
+                "profit_factor": safe_pf(rs),
+                "avg_r": sum(rs) / n,
+                "max_consecutive_loss": max_consecutive_neg(rs),
+                "sharpe": sharpe(rs) if n >= 50 else None,
+                # 行为 × 策略交叉
+                "compliant_expectancy": calc_exp([t for t in group if t["compliant"]]),
+                "non_compliant_expectancy": calc_exp([t for t in group if not t["compliant"]]),
+            }
+    return metrics
 ```
 
 #### 2.6.3 开发 & 运行方式
@@ -658,14 +808,15 @@ export default defineConfig({
 | 组件 | 工时 | 依赖 |
 |------|------|------|
 | 项目脚手架（Vite + Vue 3 + Tailwind） | 2h | Node.js |
-| `scripts/build_data.py` 数据解析器 | 4h | Python gray-matter |
-| Dashboard 页面（KPI 卡片 + 趋势图） | 4h | Chart.js |
-| Trades 列表 + 详情 | 3h | 数据解析器 |
-| Weekly Review 渲染 | 2h | 数据解析器 |
+| `scripts/build_data.py` 数据解析器（含策略字段 + R 倍数） | 5h | Python gray-matter |
+| Dashboard 页面（KPI 卡片 + 趋势图 + 策略摘要） | 4h | Chart.js |
+| Trades 列表 + 详情（含 setup 标签筛选） | 3h | 数据解析器 |
+| Weekly Review 渲染（含策略指标章节） | 2h | 数据解析器 |
 | Screenshots 画廊 + 对照视图 | 3h | 截图路径解析 |
+| **Strategy 页面**（筛选面板 + R 分布 + 滚动 Exp + 交叉分析 + 对比表） | **6h** | Chart.js + useStrategyMetrics |
 | KPI 绩效页 | 2h | Chart.js |
 | Makefile 集成 + README | 1h | — |
-| **总计** | **~21h** | |
+| **总计** | **~28h** | |
 
 ### 2.9 WebUI — 未来扩展路径（Phase 3d 评估）
 
