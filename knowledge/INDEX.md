@@ -1,6 +1,6 @@
 # 知识库索引
 
-> 最后更新：2026-05-06
+> 最后更新：2026-05-07（Phase 3a 已落地后的索引同步）
 
 ## 元规则
 
@@ -50,7 +50,7 @@
 
 ## 主张库 (claims/)
 
-> ⚠️ **暂未建库（Level C 未启动）。** Phase 1 v5 + Phase 2 v3 + Phase 2 Design v0 已列出 14 项候选；建议在 Phase 3 Action 启动后建库（每个 claim 直接对应一个 Design 决策或 v0 实施约束时使用频率最高——属 Phase 3 PR-5/6 Level B sync 范围）。
+> ⚠️ **暂未建库（Level C 未启动）。** Phase 1 v5 + Phase 2 v3 + Phase 2 Design v0.1 已列出多项候选；**Phase 3a 工程已就位**，建库仍可安排在 Phase 3b（Level B sync）或你主动开 `claims/` 首条时。
 
 候选条目（仅列纲要，未真正建库；详见 [research/foundation_2026.md](../research/foundation_2026.md) / [entry_form_research_2026.md](../research/entry_form_research_2026.md) / [design_proposal_2026.md](../research/design_proposal_2026.md) 原文）：
 
@@ -72,19 +72,20 @@
 | `tech-001`   | A 股 9:20-9:25 集合竞价不可撤单 = 市场制度免费提供的 commitment device                                         | entry_form_research §四.7 + design_proposal §二 D7                    | 候选  |
 | `me-001`     | 用户自评不在极端高风险 → 临床安全自检不作 lockout gate                                                          | entry_form_research §6.1 + 用户输入 2026-05-05 + clinical_self_check 整体 | 候选  |
 | `me-002`     | 用户明确"老 Stage 0 工具不需要兼容，全新项目" → v0 是全新设计                                                      | 用户输入 2026-05-06 + design_proposal §一.1 + §七                         | 候选  |
-| `system-008` | 后台 AI 周读 + 自动违规扫描是 σ 物理边界内激活中等被审视感的核心机制                                                      | design_proposal v0.1 §三.2.2 + §收敛信号 5 + Lelkes 2012             | 候选  |
-| `system-009` | σ 物理边界内 4 类后台强制风控（A 违规扫描 + B KPI alert + C 红区 schema 拒绝 + D 训练资金对账）                              | design_proposal v0.1 §三.2.3 + foundation §三.3 / §三.10 / §三.12       | 候选  |
-| `system-010` | Mobile 仅作时点提醒辅助层 + 不承担主入口（与 §收敛信号 2 原文严格相容）                                                  | design_proposal v0.1 §二 D4 + §三.2.4 + entry_form_research §收敛信号 2 | 候选  |
-| `system-011` | D3 介质（markdown + git）是 N=1 起点偏好胜出的 satisficing，不是"最优解"                                          | design_proposal v0.1 §九.2 #7 + 用户 2026-05-06 当面抓出                | 候选  |
+| `system-008` | 后台 AI 周读 + 自动违规扫描是 σ 物理边界内激活中等被审视感的核心机制                                                      | design_proposal v0.1 §三.2.2 + §收敛信号 5 + Lelkes 2012                 | 候选  |
+| `system-009` | σ 物理边界内 4 类后台强制风控（A 违规扫描 + B KPI alert + C 红区 schema 拒绝 + D 训练资金对账）                          | design_proposal v0.1 §三.2.3 + foundation §三.3 / §三.10 / §三.12       | 候选  |
+| `system-010` | Mobile 仅作时点提醒辅助层 + 不承担主入口（与 §收敛信号 2 原文严格相容）                                                  | design_proposal v0.1 §二 D4 + §三.2.4 + entry_form_research §收敛信号 2   | 候选  |
+| `system-011` | D3 介质（markdown + git）是 N=1 起点偏好胜出的 satisficing，不是"最优解"                                       | design_proposal v0.1 §九.2 #7 + 用户 2026-05-06 当面抓出                   | 候选  |
 
 
 ## 待验证队列 (testing/queue.md)
 
 ⏸️ **暂未建立**（Phase 3 Action PR-8 范围 — KPI 计算工具上线后联动建立）。v0 σ 系统 6 个 P0/P1 KPI + 3 个校准 KPI 已在 [design_proposal §四](../research/design_proposal_2026.md) 完整定义；4 周节点判定后真实数据进入此队列。
 
-## 已归档 (deprecated/)
+## 已归档
 
-暂无。
+- **旧 Stage 0 工具**（不参与 v0 工作流）：[archive/deprecated_stage0/](../archive/deprecated_stage0/) + [DEPRECATION_NOTES.md](../archive/deprecated_stage0/DEPRECATION_NOTES.md)
+- **其它历史文档**：见 [archive/README.md](../archive/README.md)
 
 ## 学习源 (sources/)
 
@@ -131,11 +132,12 @@
 ## 更新记录
 
 
-| 日期             | 更新内容                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-05-03     | 初版索引创建（Stage -1 完成时）                                                                                                                                                                                                                                                                                                                                                                                                            |
-| 2026-05-05     | **Level A sync 更新**：加入 research/ 章节链接；claims/ 候选 12 项；学习源类别按调研笔记归类。                                                                                                                                                                                                                                                                                                                                                             |
-| **2026-05-06** | **Phase 2 Design 收口 sync**：(1) 顶层综合文档加入 [design_proposal_2026.md](../research/design_proposal_2026.md) v0；entry_form_research 标记 v3 cleanup（补齐 v2 内部不一致）；(2) 基础参考加入 [clinical_self_check.md](clinical_self_check.md)（Phase 2 Design D12 伴生交付）；(3) claims/ 候选从 12 项扩到 15 项（新增 system-006 退化路径 / system-007 BCT 三组 / me-002 全新项目）；(4) 待验证队列说明改为"Phase 3 Action PR-8 KPI 工具上线后建立"。**未建实际 claims 库（Level C 仍推到 Phase 3 Action 后）**。 |
-| **2026-05-06 (晚)** | **Phase 2 Design v0.1 修订 sync**：(1) design_proposal 标 v0.1（A+ 按优先级分阶段修订）—— 加后台强制风控 + WebUI 渲染层 + Mobile 提醒；P0/P1/P2/P3 + Phase 3a/b/c/d 阶段；总 PR 从 8 扩到 11；(2) **新增 4 项候选 claims**：system-008 后台 AI 周读 + 自动违规扫描激活中等被审视感 / system-009 σ 物理边界内 4 类后台强制风控（A/B/C/D） / system-010 Mobile 提醒辅助层（不主入口）/ system-011 D3 介质 satisficing 性质显式声明（v0 错标"最优"，v0.1 修正）。 |
+| 日期                 | 更新内容                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-05-03         | 初版索引创建（Stage -1 完成时）                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 2026-05-05         | **Level A sync 更新**：加入 research/ 章节链接；claims/ 候选 12 项；学习源类别按调研笔记归类。                                                                                                                                                                                                                                                                                                                                                             |
+| **2026-05-06**     | **Phase 2 Design 收口 sync**：(1) 顶层综合文档加入 [design_proposal_2026.md](../research/design_proposal_2026.md) v0；entry_form_research 标记 v3 cleanup（补齐 v2 内部不一致）；(2) 基础参考加入 [clinical_self_check.md](clinical_self_check.md)（Phase 2 Design D12 伴生交付）；(3) claims/ 候选从 12 项扩到 15 项（新增 system-006 退化路径 / system-007 BCT 三组 / me-002 全新项目）；(4) 待验证队列说明改为"Phase 3 Action PR-8 KPI 工具上线后建立"。**未建实际 claims 库（Level C 仍推到 Phase 3 Action 后）**。 |
+| **2026-05-06 (晚)** | **Phase 2 Design v0.1 修订 sync**：(1) design_proposal 标 v0.1（A+ 按优先级分阶段修订）—— 加后台强制风控 + WebUI 渲染层 + Mobile 提醒；P0/P1/P2/P3 + Phase 3a/b/c/d 阶段；总 PR 从 8 扩到 11；(2) **新增 4 项候选 claims**：system-008 后台 AI 周读 + 自动违规扫描激活中等被审视感 / system-009 σ 物理边界内 4 类后台强制风控（A/B/C/D） / system-010 Mobile 提醒辅助层（不主入口）/ system-011 D3 介质 satisficing 性质显式声明（v0 错标"最优"，v0.1 修正）。                                                                         |
+| **2026-05-07**      | **Phase 3a 落地后索引清理**：`deprecated/` 占位改为指向 `archive/deprecated_stage0/`；claims 说明改为「3a 已就位、建库时间可协商」；顶栏 `last_updated` 更新。                                                                                                                                                                                                                                                                                                                                    |
 
 

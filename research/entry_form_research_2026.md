@@ -380,7 +380,7 @@ Phase 2 调研新增的 Design 约束：
 |---|---|---|---|
 | **A. broker API** | A 股零售券商基本不开放（与美股 Alpaca / IBKR 不同；M 级 R03-Engineer 多源） | 实时 | 不可达——除非用户用极少数支持 API 的券商（如华泰涨乐 PRO 部分功能），否则 v0 无法采用 |
 | **B. 截图 OCR** | 极脆弱（券商 App UI 频繁更新 / OCR 错误率随版本变化 / 隐私边界） | 准实时 | v0 不推荐——工程负担 > 价值 |
-| **C. 手动复盘** | 用户开仓 / 平仓后手动写入 markdown | 当日（用户自律） | **v0 推荐**——与现有 trade-journal-template.md + decision-chain.md 兼容 |
+| **C. 手动复盘** | 用户开仓 / 平仓后手动写入 markdown | 当日（用户自律） | **v0 推荐**——与 `trades/TEMPLATE.md` + `sigma/decision-chain.md`（旧版已归档至 `archive/deprecated_stage0/`）一致 |
 | **D. 周批量** | 用户每周从券商 App 导出 CSV → 手动整理到 σ 系统 | 周 | 备份方案——若 C 完成率 < 50%，σ 退化为周复盘系统 |
 
 **推荐 = C + D 混合**：

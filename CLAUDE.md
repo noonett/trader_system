@@ -14,6 +14,7 @@
 - 不确定的事 → 说"我不确定"或"我目前没有足够信息判断"
 
 **禁止的行为：**
+
 - 用"研究表明"但不给具体研究
 - 把推测包装成事实
 - 在不确定时假装确定
@@ -32,21 +33,26 @@
 
 ```
 D:\project_x\
-├── CLAUDE.md              ← 本文件：项目上下文
-├── system_spec_v2.md       ← 系统规范文档（权威）
-├── knowledge/              ← 知识库（详见规范文档）
-│   ├── INDEX.md           ← 知识条目索引
-│   ├── meta-rule.md       ← 元规则（本文件的扩展版）
-│   └── claims/            ← 主张库
+├── CLAUDE.md                 ← 本文件：项目上下文
+├── system_spec_v2.md         ← 系统规范文档（权威）
+├── Makefile                  ← σ 后台批处理入口（weekly-report / violations-scan 等）
+├── sigma/                    ← v0 σ 模板（盘前、决策链、周/月复盘、ai-roles）
+├── scripts/                  ← 违规扫描、周报/月报 shell、kpi_alert、install_hooks.sh
+├── reviews/                  ← 周月报、violations、alerts、reconcile 输出目录
+├── research/                 ← Plan/Design 调研与设计交付（foundation / entry_form / design_proposal）
+├── knowledge/                ← 知识库（详见规范文档）
+│   ├── INDEX.md             ← 知识条目索引
+│   ├── meta-rule.md         ← 元规则（本文件的扩展版）
+│   └── claims/              ← 主张库（待建）
 │       └── ...
-├── trades/                 ← 交易记录
-│   └── YYYY/MM/           ← 按年月归档
-├── memory/                 ← 项目专属记忆（非 Claude Memory）
-│   ├── trader-profile.md  ← 关于你的认知积累
-│   ├── bias-patterns.md   ← 行为偏误发现
-│   └── stage.md           ← 当前进化阶段
-└── tools/                  ← 工具层（α 引擎）
-    └── ...
+├── trades/                   ← 交易记录（v0：TEMPLATE.md + YYYY/MM/）
+├── archive/                  ← 历史归档
+│   └── deprecated_stage0/   ← 旧 Stage 0 工具（仅历史，不纳入 v0 工作流）
+├── memory/                   ← 项目专属记忆（非 Claude Memory）
+│   ├── trader-profile.md    ← 关于你的认知积累
+│   ├── bias-patterns.md     ← 行为偏误发现
+│   └── stage.md             ← 当前进化阶段与 Phase 进度
+└── tools/                    ← α 引擎工具层（尚未建根目录；旧 position_sizer 在 archive/deprecated_stage0/）
 ```
 
 ## 用户特征
@@ -56,3 +62,4 @@ D:\project_x\
 - 认知驱动——不追求速成，追求可持续的成长
 - 非常重视诚实和论据来源
 - 认为 AI 是伙伴而非工具
+
