@@ -16,7 +16,7 @@ exit_price:
 position_size: 
 stop_loss_price: 
 pnl_gross: 
-pnl_net: # 毛盈亏 - 手续费 - 滑点 - 融资/隔夜成本
+pnl_net: # 毛盈亏 − 手续费 − 滑点 − 融资/隔夜成本。若来源为 ATAS：`PnL` 列为毛盈亏（**不含手续费**），见 README「ATAS trades export」节。
 fees: 
 
 # YYYY-MM-DD  <long/short>
