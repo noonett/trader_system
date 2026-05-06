@@ -26,8 +26,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 WORKSPACE = Path(__file__).resolve().parent.parent
-TRADES_DIR = WORKSPACE / "trades"
-RECONCILE_DIR = WORKSPACE / "reviews" / "reconcile"
+
+# Resolved per-trader at runtime (see main())
+TRADES_DIR = None
+RECONCILE_DIR = None
 
 
 def parse_broker_csv(csv_path):
@@ -192,7 +194,14 @@ def main():
     parser = argparse.ArgumentParser(description="σ 训练资金对账")
     parser.add_argument("csv_path", help="券商导出 CSV 文件路径")
     parser.add_argument("--week", help="指定周（如 2026-W19），默认当前周")
+    parser.add_argument("--trader", help="交易员 ID（默认 default）", default=None)
     args = parser.parse_args()
+
+    from paths import get_paths
+    p = get_paths(args.trader)
+    global TRADES_DIR, RECONCILE_DIR
+    TRADES_DIR = p["trades"]
+    RECONCILE_DIR = p["reconcile"]
 
     if not os.path.isfile(args.csv_path):
         print(f"ERROR: CSV 文件不存在: {args.csv_path}")

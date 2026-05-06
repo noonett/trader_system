@@ -21,9 +21,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 WORKSPACE = Path(__file__).resolve().parent.parent
-TRADES_DIR = WORKSPACE / "trades"
-DAILY_DIR = WORKSPACE / "sigma" / "daily"
-VIOLATIONS_DIR = WORKSPACE / "reviews" / "violations"
+
+# Resolved per-trader at runtime (see main())
+TRADES_DIR = None
+DAILY_DIR = None
+VIOLATIONS_DIR = None
 
 
 def get_current_week():
@@ -226,10 +228,28 @@ def write_report(year, week, violations):
     return filename
 
 
+def _init_paths(trader_id=None):
+    global TRADES_DIR, DAILY_DIR, VIOLATIONS_DIR
+    from paths import get_paths
+    p = get_paths(trader_id)
+    TRADES_DIR = p["trades"]
+    DAILY_DIR = p["daily"]
+    VIOLATIONS_DIR = p["violations"]
+
+
 def main():
+    trader_id = None
+    args = sys.argv[1:]
+    if "--trader" in args:
+        idx = args.index("--trader")
+        trader_id = args[idx + 1]
+        args = args[:idx] + args[idx + 2:]
+
+    _init_paths(trader_id)
+
     year, week = get_current_week()
-    if len(sys.argv) >= 3:
-        year, week = int(sys.argv[1]), int(sys.argv[2])
+    if len(args) >= 2:
+        year, week = int(args[0]), int(args[1])
 
     start, end = get_week_range(year, week)
     print(f"Scanning violations for {year}-W{week:02d} ({start.date()} to {end.date()})...")

@@ -18,9 +18,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 WORKSPACE = Path(__file__).resolve().parent.parent
-TRADES_DIR = WORKSPACE / "trades"
-DAILY_DIR = WORKSPACE / "sigma" / "daily"
-ALERTS_DIR = WORKSPACE / "reviews" / "alerts"
+
+# Resolved per-trader at runtime (see main())
+TRADES_DIR = None
+DAILY_DIR = None
+ALERTS_DIR = None
 
 
 def count_trading_days(start_date, end_date):
@@ -191,8 +193,24 @@ def generate_alert(level, reason, kpis_4w):
     return filename
 
 
+def _init_paths(trader_id=None):
+    global TRADES_DIR, DAILY_DIR, ALERTS_DIR
+    from paths import get_paths
+    p = get_paths(trader_id)
+    TRADES_DIR = p["trades"]
+    DAILY_DIR = p["daily"]
+    ALERTS_DIR = p["alerts"]
+
+
 def main():
-    print("=== σ KPI 退化检测 ===")
+    import sys
+    trader_id = None
+    if "--trader" in sys.argv:
+        idx = sys.argv.index("--trader")
+        trader_id = sys.argv[idx + 1]
+
+    _init_paths(trader_id)
+    print(f"=== σ KPI 退化检测 (trader: {trader_id or 'default'}) ===")
 
     kpis_4w = compute_kpis(4)
     kpis_8w = compute_kpis(8)

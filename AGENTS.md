@@ -38,27 +38,28 @@
 ## 项目文件结构
 
 ```
-D:\project_x\
-├── AGENTS.md                 ← 本文件：项目上下文（Agent / Cursor）
-├── Makefile                  ← σ 后台批处理入口（weekly-report / violations-scan 等）
-├── sigma/                    ← v0 σ 模板（盘前、决策链、周/月复盘、ai-roles）
-├── scripts/                  ← 违规扫描、周报/月报 shell、kpi_alert、install_hooks.sh
-├── reviews/                  ← 周月报、violations、alerts、reconcile 输出目录
-├── research/                 ← Plan/Design 调研与设计交付（foundation / entry_form / design_proposal）
-├── knowledge/                ← 知识库（详见规范文档）
-│   ├── INDEX.md             ← 知识条目索引
-│   ├── meta-rule.md         ← 元规则（本文件的扩展版）
-│   └── claims/              ← 主张库（待建）
-│       └── ...
-├── trades/                   ← 交易记录（v0：TEMPLATE.md + YYYY/MM/）
-├── archive/                  ← 历史归档（含 system_spec_v2.md、audit 报告、旧概念设计等）
-│   └── deprecated_stage0/   ← 旧 Stage 0 工具（仅历史，不纳入 v0 工作流）
-├── memory/                   ← 项目专属记忆（非 Claude Memory）
-│   ├── trader-profile.md    ← 关于你的认知积累
-│   ├── bias-patterns.md     ← 行为偏误发现
-│   └── stage.md             ← 当前进化阶段与 Phase 进度
-└── tools/                    ← α 引擎工具层（尚未建根目录；旧 position_sizer 在 archive/deprecated_stage0/）
+/workspace/
+├── AGENTS.md                           ← 本文件：项目上下文（Agent / Cursor）
+├── Makefile                            ← σ 后台批处理入口（支持 TRADER=xxx 多交易员）
+│
+├── sigma/templates/                    ← 共享：σ 模板（盘前、决策链、周/月复盘、ai-roles）
+│
+├── traders/                            ← 交易员数据（按 trader_id 隔离）
+│   └── default/                        ← 默认交易员（你自己）
+│       ├── config.yaml                 ← 个人配置（账户、阈值、偏好）
+│       ├── daily/                      ← 盘前 if-then 实例
+│       ├── trades/                     ← 交易记录（含 TEMPLATE.md）
+│       ├── reviews/                    ← 周月报、violations、alerts、reconcile
+│       └── profile/                    ← 交易员画像 + 阶段进度 + 偏误记录
+│
+├── scripts/                            ← 共享：违规扫描、周报/月报、kpi_alert、对账
+├── knowledge/                          ← 共享：知识库（glossary / risk_rules / meta-rule）
+├── research/                           ← 共享：Plan/Design 调研与设计交付
+├── webui/                              ← WebUI Agent 应用（开发中）
+└── archive/                            ← 历史归档
 ```
+
+> 详见 [research/design_webui_multitrader_2026.md](research/design_webui_multitrader_2026.md) 多交易员目录设计。
 
 ## 用户特征
 
