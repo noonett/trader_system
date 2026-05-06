@@ -1,6 +1,6 @@
 # 术语词典
 
-> 最后更新：2026-05-05（**仅 Level A sync — 头日期更新**；Phase 1 v5 + Phase 2 v2 引入的新术语 implementation intention / autocommitment / AAR / JITAI / BCT Taxonomy / Mental Accounting / engagement-effectiveness paradox / wise feedback / honesty oath / Future self / 集合竞价 binding pre-commitment 等**未入库** — 推到 Level B 同步范围）
+> 最后更新：2026-05-06（新增 §十四 策略表现指标：R 倍数 / Expectancy / Profit Factor / Sharpe Ratio / Sortino Ratio / 最大连续亏损 / Setup Tag。Phase 1 v5 + Phase 2 v2 引入的其他新术语 implementation intention / autocommitment / AAR / JITAI / BCT Taxonomy / Mental Accounting / engagement-effectiveness paradox / wise feedback / honesty oath / Future self / 集合竞价 binding pre-commitment 等**未入库** — 推到 Level B 同步范围）
 > 每一个术语标注：定义、实际用途、与 σ/α 引擎的关联。
 
 ## 一、估值与基本面
@@ -115,7 +115,7 @@
 
 - **定义：** 狭义：市场中资金的充裕程度和获取成本。常用代理变量：社融增速、M2 增速、银行间市场利率（DR007/隔夜 Shibor）。
 - **用法：** 流动性宽松 → 资金成本低 → 资金倾向流入风险资产（股市）。流动性收紧 → 相反。A 股历史上流动性拐点往往是市场拐点。
-- **诚实标记：** "流动性是第一推动力"这个论述在早期规范 [`archive/system_spec_v2.md`](../archive/system_spec_v2.md) 中有诚实标记——方向有证据，但"第一"的因果优先级未在学术上统一验证。当前 Plan 层见 [`research/foundation_2026.md`](../research/foundation_2026.md)。
+- **诚实标记：** "流动性是第一推动力"这个论述在早期规范 `[archive/system_spec_v2.md](../archive/system_spec_v2.md)` 中有诚实标记——方向有证据，但"第一"的因果优先级未在学术上统一验证。当前 Plan 层见 `[research/foundation_2026.md](../research/foundation_2026.md)`。
 - **与 σ 引擎：** 不直接相关。与 α-L0（环境识别）直接相关。
 - **状态：** 已理解 ✓
 
@@ -448,6 +448,68 @@
 - **与 σ 引擎：** 与决策链第 4 问（情绪觉察）相关——同样的数字，不同的说法，就能引发不同的情绪和决策。
 - **状态：** 待确认 ✓/✗
 
+## 十四、策略表现指标（Phase 3b/3c 新增）
+
+> 调研来源：[research/notes/13_strategy_performance_metrics.md](../research/notes/13_strategy_performance_metrics.md)
+
+### R 倍数（R-Multiple）
+
+- **定义：** (平仓价 - 入场价) / (入场价 - 止损价)。以初始风险（1R = 止损距离）为单位衡量单笔交易收益。long 方向公式如此；short 方向取反。
+- **来源：** Van Tharp (1998), *Trade Your Way to Financial Freedom*, McGraw-Hill.【M 级】
+- **用法：** +2R = 赚了 2 倍你愿意承受的风险；-1R = 精确止损出场。R 倍数标准化了不同仓位大小的交易，使跨交易比较有意义。**不受处置效应扭曲**。
+- **与 σ 引擎：** trades/TEMPLATE.md 已有 entry_price / exit_price / stop_loss_price → 自动计算。strategy_metrics.py 基于 R 倍数计算所有策略指标。
+- **状态：** 已理解 ✓
+
+### Expectancy（期望值 · R 计）
+
+- **定义：** (win_rate × avg_win_R) - (loss_rate × avg_loss_R)。以 R 为单位的每笔平均期望收益。与 glossary §四 的"期望值"是同一概念但**以 R 为单位**（非金额）。
+- **用法：** Expectancy > 0 = 你的交易系统有 edge。Expectancy = 0.5R 意味着每笔交易平均赚半个 R。**这是证明 edge 存在的最直接指标。**
+- **诚实标记：** n < 30 时 Expectancy 极不稳定（55% 真实胜率在 30 笔中有 40% 概率表现为不赚钱）。必须标注样本量。
+- **与 σ 引擎：** strategy_metrics.py 自动计算（全局 + 按 setup_tag 分组）。WebUI Strategy 页面核心指标。
+- **状态：** 已理解 ✓
+
+### Profit Factor（利润因子）
+
+- **定义：** 总毛利 / |总毛亏|。所有盈利交易的利润之和 ÷ 所有亏损交易的亏损之和。
+- **来源：** 行业标准指标；无单一学术来源。CrossTrade (2025) 综合。
+- **用法：** PF > 1 = 总体赚钱。PF 1.2-2.0 = 现实区间。PF > 3.0 = 很可能过拟合或极小样本。**PF 在 20 笔时几乎没有信息量，需要 100+ 笔才稳定。**
+- **诚实标记：** 账户级 PF 无法诊断问题——按 setup_tag 拆分后才有诊断价值（发现谁在拖后腿）。
+- **与 σ 引擎：** strategy_metrics.py 按 setup 分组计算。WebUI Strategy 页面 + 周报摘要。
+- **状态：** 已理解 ✓
+
+### Sharpe Ratio（夏普比率）
+
+- **定义：** (mean_return - risk_free_rate) / std_return × sqrt(252)。风险调整后收益的标准化度量。
+- **来源：** Sharpe, W. (1966). *Journal of Business*. 统计属性：Lo (2002), Ledoit & Wolf (2008).【S 级】
+- **用法：** Sharpe > 1 = 好；> 2 = 很好；> 3 = 可能过拟合。**在小样本下极不可靠**——Lo (2002) 显示月度 Sharpe 2.0 在 1 年数据下 95% CI 为 [0.4, 3.6]。
+- **诚实标记：** n < 50 笔时不应计算 Sharpe；n < 200 笔时应标"初步估计"。自相关结构（交易序列天然有自相关）进一步恶化估计。
+- **与 σ 引擎：** strategy_metrics.py Layer 3 指标（仅在 n ≥ 50 时计算）。
+- **状态：** 已理解 ✓
+
+### Sortino Ratio
+
+- **定义：** (mean_return - risk_free_rate) / downside_std × sqrt(252)。与 Sharpe 类似但仅用下行波动率作分母——不惩罚"好的"波动（大幅盈利）。
+- **来源：** Sortino, F. & Van Der Meer, R. (1991). *Journal of Portfolio Management*.
+- **用法：** 比 Sharpe 更适合描述"我承受了多少坏的风险换来了多少收益"。对非对称 R 分布（大部分交易小亏、少数交易大赚）的策略更公平。
+- **与 σ 引擎：** strategy_metrics.py Layer 3（n ≥ 50）。
+- **状态：** 已理解 ✓
+
+### 最大连续亏损（Max Consecutive Losses）
+
+- **定义：** 历史交易序列中最长的连续亏损笔数。
+- **用法：** 提前知道"正常运行时可能连亏 N 笔"——防止连续亏损时误判策略失效。55% 胜率策略连亏 7 笔概率 ≈ 1.5%（每 67 组 7 笔出现 1 次）。
+- **诚实标记：** 过去的最大连续亏损不是未来的上限——只是已知下界。
+- **与 σ 引擎：** strategy_metrics.py 自动计算；周报摘要呈现。
+- **状态：** 已理解 ✓
+
+### Setup Tag（策略标签）
+
+- **定义：** 用户自定义的交易策略分类标签（如 breakout-retest / mean-reversion / trend-follow）。在入场时标注，不可事后修改。
+- **用法：** 按 setup_tag 分组计算策略指标 → 发现"哪个策略有 edge、哪个在拖后腿"。交叉筛选 setup × stop_type × market_condition 可回答"哪种组合最优"。
+- **诚实标记：** 事后标注 setup tag 有后见之明偏差——必须在入场时/入场前决定。每个 setup_tag 需要独立积累 ≥ 30 笔才有初步判断力。
+- **与 σ 引擎：** trades/TEMPLATE.md frontmatter `setup_tag` 字段。WebUI Strategy 页面筛选维度。
+- **状态：** 已理解 ✓
+
 ---
 
 ## 格式说明
@@ -457,3 +519,4 @@
 - **用法：** 在实际交易中怎么用
 - **与 σ/α 引擎：** 在系统中的位置
 - **状态：** ✓ 已理解 / ✗ 待学习 / 🔄 理解中
+

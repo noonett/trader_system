@@ -6,8 +6,13 @@
 trades/
 ├── README.md          ← 本文件
 ├── TEMPLATE.md        ← v0 交易记录模板（复制到 YYYY/MM/ 下使用）
+├── SCREENSHOTS.md     ← 截图命名约定与工作流
 └── YYYY/MM/
-    └── YYYY-MM-DD-<symbol>-<dir>.md  ← 每笔交易一文聚合
+    ├── YYYY-MM-DD-<symbol>-<dir>.md  ← 每笔交易一文聚合
+    └── screenshots/                   ← 交易截图（入场/出场/过程）
+        ├── YYYY-MM-DD-<symbol>-<dir>-entry-1.png
+        ├── YYYY-MM-DD-<symbol>-<dir>-exit-1.png
+        └── YYYY-MM-DD-<symbol>-<dir>-context-1.png  (可选)
 ```
 
 ## 使用方法
@@ -15,10 +20,13 @@ trades/
 1. 每次开仓前，复制 `TEMPLATE.md` 到 `YYYY/MM/YYYY-MM-DD-<symbol>-<dir>.md`
 2. 填写 frontmatter（日期 / 标的 / 方向 / **product_class** / 市场 / 价格 / 仓位 / 止损）
 3. 填写 §二 决策链 5 项 if-then
-4. `git add + commit "open <symbol>"`
-5. 实际下单
-6. 平仓后 30 分钟内填写 §四 盘后 EMA
-7. `git add + commit "close <symbol>"`
+4. **截图当时的 K 线画面**（入场位/止损位可见）
+5. `git add + commit "open <symbol>"`
+6. 实际下单
+7. 平仓后 30 分钟内填写 §四 盘后 EMA
+8. **截图平仓时的 K 线画面**
+9. `git add + commit "close <symbol>"`
+10. **把截图贴给 AI**（对话中发图 + 说一句"这是 XX 的入场/出场"）→ AI 处理命名、归档、更新 §五
 
 ## product_class 枚举（产品分级，foundation §三.10）
 

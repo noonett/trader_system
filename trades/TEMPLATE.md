@@ -6,6 +6,11 @@ symbol:
 direction: # long / short
 product_class: # green-passive-etf / green-cash-stock / yellow-small-future / red
 market: # a-share / hk-stock / futures-cme / futures-cn
+setup_tag: # 策略标签（如 breakout-retest / mean-reversion / trend-follow）
+stop_type: # 止损类型（structure / atr / percent / time）
+target_type: # 止盈类型（fixed-rr / trailing / structure / time）
+target_rr: # 目标盈亏比（如 2.0）
+market_condition: # 市场状态（trending / ranging / volatile / low-vol）
 entry_price: 
 exit_price: 
 position_size: 
@@ -72,6 +77,7 @@ Q5a 估计来源：
 - 仓位不超过 risk_rules.md 单笔上限
 - 情绪不属于 {兴奋, 愤怒, 报复, 翻本, 恐惧}
 - reviews/alerts/ 无未 acknowledge 的 alert
+- 入场时截了图（贴给 AI 即可，AI 代为归档）
 
 ## 四、盘后 EMA（平仓后 30 分钟内填写，≤4 字段）
 
@@ -80,10 +86,24 @@ Q5a 估计来源：
 3. 平仓时情绪：，强度 [1-5]
 4. 一句话信号：
 
-## 五、事后复盘（可选——周复盘时写更详细的在 reviews/weekly/）
+## 五、截图证据
+
+> 截图由 AI 代为整理（你贴图 + 说一句话，AI 处理命名和归档）。
+> 下方由 AI 填写——周复盘时引用这些做对照分析。
+
+**入场截图**：
+- <!-- AI 填写：screenshots/{trade-id}-entry-N.png -->
+
+**平仓截图**：
+- <!-- AI 填写：screenshots/{trade-id}-exit-N.png -->
+
+**过程截图**（可选）：
+- <!-- AI 填写：screenshots/{trade-id}-context-N.png -->
+
+## 六、事后复盘（可选——周复盘时写更详细的在 reviews/weekly/）
 
 事前预设 vs 实际发生 vs 偏差：
 
 ---
 
-*模板版本：v0 | 来源：design_proposal_2026.md §三.2.1 + §三.3*
+*模板版本：v0.1 | 来源：design_proposal_2026.md §三.2.1 + §三.3 + foundation §五 AAR 客观证据约束*
