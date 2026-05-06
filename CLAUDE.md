@@ -27,14 +27,17 @@
 1. **σ 引擎（先建）：** 管住自己 — 决策链、仓位算法、止损锚定、交易日志、行为偏误检测、每周复盘
 2. **α 引擎（后建）：** 看懂市场 — 环境识别、资金流向、基本面筛选、技术时机、每日简报
 
-详见 `system_spec_v2.md`
+**规范与设计的当前权威**（取代早期 `archive/system_spec_v2.md`）：
+
+- Plan 宪法：`research/foundation_2026.md` v5  
+- 调研桥梁：`research/entry_form_research_2026.md` v3  
+- v0 设计与目录：`research/design_proposal_2026.md` v0.1
 
 ## 项目文件结构
 
 ```
 D:\project_x\
 ├── CLAUDE.md                 ← 本文件：项目上下文
-├── system_spec_v2.md         ← 系统规范文档（权威）
 ├── Makefile                  ← σ 后台批处理入口（weekly-report / violations-scan 等）
 ├── sigma/                    ← v0 σ 模板（盘前、决策链、周/月复盘、ai-roles）
 ├── scripts/                  ← 违规扫描、周报/月报 shell、kpi_alert、install_hooks.sh
@@ -46,7 +49,7 @@ D:\project_x\
 │   └── claims/              ← 主张库（待建）
 │       └── ...
 ├── trades/                   ← 交易记录（v0：TEMPLATE.md + YYYY/MM/）
-├── archive/                  ← 历史归档
+├── archive/                  ← 历史归档（含 system_spec_v2.md、audit 报告、旧概念设计等）
 │   └── deprecated_stage0/   ← 旧 Stage 0 工具（仅历史，不纳入 v0 工作流）
 ├── memory/                   ← 项目专属记忆（非 Claude Memory）
 │   ├── trader-profile.md    ← 关于你的认知积累

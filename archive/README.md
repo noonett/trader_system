@@ -20,13 +20,18 @@
 
 ### `system_design.md` — 早期概念设计
 - **作用**：σ 系统最初的设计稿（Stage 0 之前）
-- **被取代**：内容已被 `system_spec_v2.md`（Stage -1 时的版本）→ 进一步被 `research/foundation_2026.md` v5 取代
+- **被取代**：历史上曾以同目录 [`system_spec_v2.md`](system_spec_v2.md) 为「规范 V2」→ 二者均已归档；**当前**以 `research/foundation_2026.md` v5 等为权威（见上表）
 - **历史价值**：可看到原始的 α/σ 双引擎构想；Phase 1 调研之前的隐含假设
 - **诚实标记**：当时假设的"AI 必为核心交互入口" 已在 v4 撤销；当时的"承诺训练能让你赚钱"叙事已在 v2 修正为 4 层目标结构。**任何与 foundation v5 冲突的措辞，以 v5 为准**
 
+### `system_spec_v2.md` — 规范文档 V2（早期）
+- **作用**：Stage -1 前后的长文规范（双引擎、核心论题、进化指标、失败模式等）
+- **状态（2026-05-07）**：从仓库**根目录移入** `archive/`；文首有指向 `foundation` / `entry_form` / `design_proposal` 的归档说明
+- **被取代**：Plan → `research/foundation_2026.md` v5；调研 → `entry_form_research` v3；v0 结构 → `design_proposal` v0.1
+
 ### `audit_report.md` — 第一轮审计
 - **作用**：2026-05-03 第一轮审计——识别 7 个 P0/P1 缺口
-- **被取代**：审计触发的修复已合入 Stage -1 的 glossary.md / risk_rules.md / system_spec_v2.md，并最终演进为 foundation v5
+- **被取代**：审计触发的修复曾合入 Stage -1 的 glossary.md / risk_rules.md / `system_spec_v2.md`（现于本目录），并最终演进为 foundation v5
 - **历史价值**：看 Phase 1 何时从"假设充分"转向"承认证据不足"
 
 ### `audit_report_v2.md` — 第二轮审计
