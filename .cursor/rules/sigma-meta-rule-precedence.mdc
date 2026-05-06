@@ -7,7 +7,7 @@ alwaysApply: true
 
 本仓库装了两类 cursor rules：
 - 上游导入的 `karpathy-guidelines.mdc`（行为约束）
-- 项目层的 `CLAUDE.md` + foundation_2026.md 元规则（诚实标记体系）
+- 项目层的 `AGENTS.md`（根目录）+ `foundation_2026.md` 元规则（诚实标记体系）
 
 两者大多兼容。少数张力点由本规则仲裁。
 

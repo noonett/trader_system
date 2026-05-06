@@ -1,7 +1,7 @@
 # 交易员训练系统 — 规范文档 V2
 
 > **归档说明（2026-05-07）**：本文件为**历史规范**，已从仓库根目录移入 `archive/`。  
-> **当前权威**：Plan → `[research/foundation_2026.md](../research/foundation_2026.md)` v5；调研桥梁 → `[research/entry_form_research_2026.md](../research/entry_form_research_2026.md)` v3；v0 设计与操作结构 → `[research/design_proposal_2026.md](../research/design_proposal_2026.md)` v0.1。新对话与工程实施以 `CLAUDE.md` 与上述三份为准；下文保留仅供溯源。
+> **当前权威**：Plan → `[research/foundation_2026.md](../research/foundation_2026.md)` v5；调研桥梁 → `[research/entry_form_research_2026.md](../research/entry_form_research_2026.md)` v3；v0 设计与操作结构 → `[research/design_proposal_2026.md](../research/design_proposal_2026.md)` v0.1。新对话与工程实施以根目录 `[AGENTS.md](../AGENTS.md)`（原 `CLAUDE.md`）与上述三份为准；下文保留仅供溯源。
 
 > **一句话定义：** 这不是一个市场分析工具。这是一个帮助你从散户变为优秀交易员的 AI 训练系统。它有两个引擎：σ 引擎让你管住自己（先建），α 引擎让你看懂市场（后建）。
 

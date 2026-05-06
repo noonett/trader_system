@@ -1,10 +1,11 @@
 # 知识库索引
 
-> 最后更新：2026-05-07（Phase 3a 已落地后的索引同步）
+> 最后更新：2026-05-08（`CLAUDE.md` → `AGENTS.md` 根说明改名）
 
 ## 元规则
 
 - [meta-rule.md](meta-rule.md) — 论据来源与诚实标记（S 级约束，不可被任何知识条目覆盖）
+- [AGENTS.md](../AGENTS.md) — 仓库根上的 **Cursor / Agent 项目说明**（用户画像、目录地图、权威文档指针；原 `CLAUDE.md`）
 
 ## 基础参考
 
@@ -139,5 +140,6 @@
 | **2026-05-06**     | **Phase 2 Design 收口 sync**：(1) 顶层综合文档加入 [design_proposal_2026.md](../research/design_proposal_2026.md) v0；entry_form_research 标记 v3 cleanup（补齐 v2 内部不一致）；(2) 基础参考加入 [clinical_self_check.md](clinical_self_check.md)（Phase 2 Design D12 伴生交付）；(3) claims/ 候选从 12 项扩到 15 项（新增 system-006 退化路径 / system-007 BCT 三组 / me-002 全新项目）；(4) 待验证队列说明改为"Phase 3 Action PR-8 KPI 工具上线后建立"。**未建实际 claims 库（Level C 仍推到 Phase 3 Action 后）**。 |
 | **2026-05-06 (晚)** | **Phase 2 Design v0.1 修订 sync**：(1) design_proposal 标 v0.1（A+ 按优先级分阶段修订）—— 加后台强制风控 + WebUI 渲染层 + Mobile 提醒；P0/P1/P2/P3 + Phase 3a/b/c/d 阶段；总 PR 从 8 扩到 11；(2) **新增 4 项候选 claims**：system-008 后台 AI 周读 + 自动违规扫描激活中等被审视感 / system-009 σ 物理边界内 4 类后台强制风控（A/B/C/D） / system-010 Mobile 提醒辅助层（不主入口）/ system-011 D3 介质 satisficing 性质显式声明（v0 错标"最优"，v0.1 修正）。                                                                         |
 | **2026-05-07**      | **Phase 3a 落地后索引清理**：`deprecated/` 占位改为指向 `archive/deprecated_stage0/`；claims 说明改为「3a 已就位、建库时间可协商」；顶栏 `last_updated` 更新。                                                                                                                                                                                                                                                                                                                                    |
+| **2026-05-08**      | **根说明改名**：元规则节增加 [AGENTS.md](../AGENTS.md) 链接（原 `CLAUDE.md` → Cursor 惯例文件名）。                                                                                                                                                                                                                                                                                                                                                                                              |
 
 

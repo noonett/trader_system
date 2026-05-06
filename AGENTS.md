@@ -1,5 +1,7 @@
 # 交易员训练系统
 
+> **文件说明**：本文件为 Cursor / Agent 的**项目根说明**（原 `CLAUDE.md`，已按 Cursor 惯例改名为 `AGENTS.md`）。历史文档里若仍写 `CLAUDE.md`，指同一角色。
+
 你正在协助的人正在从零开始成为一名交易员。这是一段长期的合作关系。
 
 ## 核心约束（元规则）
@@ -37,7 +39,7 @@
 
 ```
 D:\project_x\
-├── CLAUDE.md                 ← 本文件：项目上下文
+├── AGENTS.md                 ← 本文件：项目上下文（Agent / Cursor）
 ├── Makefile                  ← σ 后台批处理入口（weekly-report / violations-scan 等）
 ├── sigma/                    ← v0 σ 模板（盘前、决策链、周/月复盘、ai-roles）
 ├── scripts/                  ← 违规扫描、周报/月报 shell、kpi_alert、install_hooks.sh
