@@ -17,7 +17,7 @@ weekly-report: violations-scan ## 周末：AI 周读报告 + 违规扫描
 
 monthly-calibration: violations-scan ## 月末：AI 月校准报告 + KPI alert
 	@bash scripts/monthly_calibration.sh
-	@python3 scripts/kpi_alert.py || echo "kpi_alert.py not yet implemented (Phase 3a PR-7b)"
+	@python3 scripts/kpi_alert.py
 
 violations-scan: ## 跑 5 类违规检测
 	@python3 scripts/violations_scan.py

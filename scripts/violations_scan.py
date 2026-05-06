@@ -84,6 +84,49 @@ def read_frontmatter(filepath):
     return fm, content
 
 
+MAX_SINGLE_POSITION_PCT = 20  # risk_rules.md §一 单票仓位上限
+
+
+def _check_overposition(trade_path, fm, content, violations):
+    """Check #3: position size exceeds risk_rules.md single-position limit.
+
+    Looks at two sources:
+    1. If 3 section "本笔占比：___%"
+    2. Frontmatter position_size vs a rough account-total from If 3
+    """
+    pct_match = re.search(r"本笔占比[：:]\s*([\d.]+)\s*%", content)
+    if pct_match:
+        try:
+            pct = float(pct_match.group(1))
+            if pct > MAX_SINGLE_POSITION_PCT:
+                violations.append((
+                    "仓位超阈值",
+                    f"{trade_path.name}: 本笔占比 {pct}% > 单票上限 {MAX_SINGLE_POSITION_PCT}%（risk_rules §一）"
+                ))
+                return
+        except ValueError:
+            pass
+
+    pos = fm.get("position_size", "").strip()
+    if not pos:
+        return
+    acct_match = re.search(r"训练资金账户总额[：:]\s*([\d,.]+)", content)
+    if not acct_match:
+        return
+    try:
+        position = float(pos.replace(",", ""))
+        account = float(acct_match.group(1).replace(",", ""))
+        if account > 0:
+            ratio = position / account * 100
+            if ratio > MAX_SINGLE_POSITION_PCT:
+                violations.append((
+                    "仓位超阈值",
+                    f"{trade_path.name}: position_size/账户 ≈ {ratio:.0f}% > 单票上限 {MAX_SINGLE_POSITION_PCT}%（risk_rules §一）"
+                ))
+    except ValueError:
+        pass
+
+
 def check_violations(start_date, end_date):
     """Run all 5 violation checks and return list of (type, detail) tuples."""
     violations = []
@@ -121,10 +164,8 @@ def check_violations(start_date, end_date):
                 f"{tf.name}: {', '.join(empty_ifs)} 未填写或内容不足"
             ))
 
-        # 3. 仓位超阈值（简化：检查 frontmatter position_size 是否存在）
-        if not fm.get("position_size") or fm.get("position_size") == "":
-            pass  # position_size 未填不算违规——但如果填了且超标则算
-        # NOTE: 完整检测需要 risk_rules.md 中的 max_position_pct，Phase 3b 强化
+        # 3. 仓位超阈值（从 If 3 "本笔占比" + frontmatter position_size 检测）
+        _check_overposition(tf, fm, content, violations)
 
         # 4. 止损穿越未平仓（简化：检查 stop_loss_price vs exit_price）
         stop = fm.get("stop_loss_price", "").strip()
