@@ -72,7 +72,7 @@ Q5a 估计来源：
 - 仓位不超过 risk_rules.md 单笔上限
 - 情绪不属于 {兴奋, 愤怒, 报复, 翻本, 恐惧}
 - reviews/alerts/ 无未 acknowledge 的 alert
-- 入场截图已保存（见下方 §截图）
+- 入场时截了图（贴给 AI 即可，AI 代为归档）
 
 ## 四、盘后 EMA（平仓后 30 分钟内填写，≤4 字段）
 
@@ -83,17 +83,17 @@ Q5a 估计来源：
 
 ## 五、截图证据
 
-> 截图保存到 `screenshots/` 子目录，命名规则见 [SCREENSHOTS.md](../SCREENSHOTS.md)。
-> 下方填写文件名即可——周复盘时 AI 会引用这些路径做对照分析。
+> 截图由 AI 代为整理（你贴图 + 说一句话，AI 处理命名和归档）。
+> 下方由 AI 填写——周复盘时引用这些做对照分析。
 
-**入场截图**（下单时的 K 线 + 标注入场位/止损位）：
-- 
+**入场截图**：
+- <!-- AI 填写：screenshots/{trade-id}-entry-N.png -->
 
-**平仓截图**（平仓时的 K 线 + 实际出场位）：
-- 
+**平仓截图**：
+- <!-- AI 填写：screenshots/{trade-id}-exit-N.png -->
 
-**过程截图**（可选——持仓期间的关键变化）：
-- 
+**过程截图**（可选）：
+- <!-- AI 填写：screenshots/{trade-id}-context-N.png -->
 
 ## 六、事后复盘（可选——周复盘时写更详细的在 reviews/weekly/）
 

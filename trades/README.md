@@ -20,14 +20,13 @@ trades/
 1. 每次开仓前，复制 `TEMPLATE.md` 到 `YYYY/MM/YYYY-MM-DD-<symbol>-<dir>.md`
 2. 填写 frontmatter（日期 / 标的 / 方向 / **product_class** / 市场 / 价格 / 仓位 / 止损）
 3. 填写 §二 决策链 5 项 if-then
-4. **截图：K 线 + 标注入场位/止损位** → 保存到 `YYYY/MM/screenshots/`（命名见 [SCREENSHOTS.md](SCREENSHOTS.md)）
-5. 在 §五 截图证据区填入文件名
-6. `git add . && git commit -m "open <symbol>"`
-7. 实际下单
-8. 平仓后 30 分钟内填写 §四 盘后 EMA
-9. **截图：平仓时 K 线 + 实际出场位** → 保存到 `screenshots/`
-10. 在 §五 截图证据区填入文件名
-11. `git add . && git commit -m "close <symbol>"`
+4. **截图当时的 K 线画面**（入场位/止损位可见）
+5. `git add + commit "open <symbol>"`
+6. 实际下单
+7. 平仓后 30 分钟内填写 §四 盘后 EMA
+8. **截图平仓时的 K 线画面**
+9. `git add + commit "close <symbol>"`
+10. **把截图贴给 AI**（对话中发图 + 说一句"这是 XX 的入场/出场"）→ AI 处理命名、归档、更新 §五
 
 ## product_class 枚举（产品分级，foundation §三.10）
 
