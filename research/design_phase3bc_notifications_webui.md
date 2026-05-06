@@ -18,11 +18,13 @@
 
 **全自动定时推送**——用户不需要手动跑任何 `make` 命令。系统自动在固定时间点完成：数据收集 → 分析/报告生成 → 推送到用户。
 
-| 类型 | 含义 | 时机 | 示例 |
-|------|------|------|------|
-| **固定时刻提醒** | 每天/每周/每月的周期性 nudge | 可预测，定时 | "盘前规则书写时间到" |
-| **定时批处理 + 推送** | 自动跑分析脚本 + 生成报告 + 推送结果 | 可预测，定时 | 周日 20:00 自动生成周报 + 推送摘要 |
-| **触发型 alert** | 系统检测到异常后主动通知 | 不可预测 | "KPI 退化到 L4-warning" / "本周有 3 条违规" |
+
+| 类型             | 含义                    | 时机     | 示例                                 |
+| -------------- | --------------------- | ------ | ---------------------------------- |
+| **固定时刻提醒**     | 每天/每周/每月的周期性 nudge    | 可预测，定时 | "盘前规则书写时间到"                        |
+| **定时批处理 + 推送** | 自动跑分析脚本 + 生成报告 + 推送结果 | 可预测，定时 | 周日 20:00 自动生成周报 + 推送摘要             |
+| **触发型 alert**  | 系统检测到异常后主动通知          | 不可预测   | "KPI 退化到 L4-warning" / "本周有 3 条违规" |
+
 
 ### 1.2 架构总览
 
@@ -70,14 +72,16 @@
 
 #### 1.3.1 调度时间表（全部自动执行，无需手动触发）
 
-| # | 时间 | 自动执行内容 | 推送内容 |
-|---|------|-------------|----------|
-| 1 | 工作日 08:30 | 检查昨日是否有未填 EMA 的已平仓交易 | 桌面通知"盘前规则书写时间到" + 未填 EMA 提醒 |
-| 2 | 工作日 09:15 | — | 桌面通知"9:20 集合竞价将至" |
-| 3 | 工作日 15:30 | 检查今日 trades/ 是否有新平仓但没 EMA | 桌面通知"盘后 EMA 截止" |
-| 4 | **每日 21:00** | 检查未 acknowledge alert + 注入 Banner | 如有未处理 alert → 邮件提醒 |
-| 5 | **周日 20:00** | **自动执行**：violations_scan → weekly_report → 策略指标计算 → git commit | 邮件推送**周报摘要**（KPI + 违规 + 策略表现） |
-| 6 | **月末 20:00** | **自动执行**：monthly_calibration → kpi_alert → reconcile_funds → git commit | 邮件推送**月报摘要**（KPI 趋势 + 退化判定 + 策略复盘） |
+
+| #   | 时间           | 自动执行内容                                                                  | 推送内容                               |
+| --- | ------------ | ----------------------------------------------------------------------- | ---------------------------------- |
+| 1   | 工作日 08:30    | 检查昨日是否有未填 EMA 的已平仓交易                                                    | 桌面通知"盘前规则书写时间到" + 未填 EMA 提醒        |
+| 2   | 工作日 09:15    | —                                                                       | 桌面通知"9:20 集合竞价将至"                  |
+| 3   | 工作日 15:30    | 检查今日 trades/ 是否有新平仓但没 EMA                                               | 桌面通知"盘后 EMA 截止"                    |
+| 4   | **每日 21:00** | 检查未 acknowledge alert + 注入 Banner                                       | 如有未处理 alert → 邮件提醒                 |
+| 5   | **周日 20:00** | **自动执行**：violations_scan → weekly_report → 策略指标计算 → git commit          | 邮件推送**周报摘要**（KPI + 违规 + 策略表现）      |
+| 6   | **月末 20:00** | **自动执行**：monthly_calibration → kpi_alert → reconcile_funds → git commit | 邮件推送**月报摘要**（KPI 趋势 + 退化判定 + 策略复盘） |
+
 
 #### 1.3.2 实现方式：统一调度器
 
@@ -205,11 +209,13 @@ email:
 
 #### 1.4.1 触发源（已有基础设施）
 
-| 触发源 | 脚本 | 产出 |
-|--------|------|------|
-| KPI 退化 | `scripts/kpi_alert.py` | `reviews/alerts/YYYY-MM-DD-alert.md` |
-| 违规扫描 | `scripts/violations_scan.py` | `reviews/violations/YYYY-WW.md` |
-| 训练资金对账异常 | `scripts/reconcile_funds.py`（待建） | `reviews/reconcile/YYYY-WW.md` |
+
+| 触发源      | 脚本                               | 产出                                   |
+| -------- | -------------------------------- | ------------------------------------ |
+| KPI 退化   | `scripts/kpi_alert.py`           | `reviews/alerts/YYYY-MM-DD-alert.md` |
+| 违规扫描     | `scripts/violations_scan.py`     | `reviews/violations/YYYY-WW.md`      |
+| 训练资金对账异常 | `scripts/reconcile_funds.py`（待建） | `reviews/reconcile/YYYY-WW.md`       |
+
 
 #### 1.4.2 通知通道
 
@@ -294,12 +300,14 @@ email:
 
 #### 1.4.4 通知频率控制（防 fatigue）
 
-| 规则 | 逻辑 |
-|------|------|
-| 同类 alert 去重 | 同一周内同一 level 只发一次邮件 |
-| 每日邮件上限 | 最多 1 封/天（多条合并为单封摘要） |
-| 静默时段 | 22:00-07:00 不发邮件（本地 cron 控制） |
-| 降级策略 | 连续 3 次邮件未 acknowledge → 仅保留文件 banner（用户主动忽略 = 退化路径触发条件之一） |
+
+| 规则          | 逻辑                                                        |
+| ----------- | --------------------------------------------------------- |
+| 同类 alert 去重 | 同一周内同一 level 只发一次邮件                                       |
+| 每日邮件上限      | 最多 1 封/天（多条合并为单封摘要）                                       |
+| 静默时段        | 22:00-07:00 不发邮件（本地 cron 控制）                              |
+| 降级策略        | 连续 3 次邮件未 acknowledge → 仅保留文件 banner（用户主动忽略 = 退化路径触发条件之一） |
+
 
 ### 1.5 消息系统 — 文件结构
 
@@ -336,18 +344,20 @@ inject-banner: ## 检查未确认 alert 并注入 banner
 
 ### 1.7 消息系统 — 工程量估算
 
-| 组件 | 工时 | 依赖 |
-|------|------|------|
-| `scripts/sigma_scheduler.py`（统一调度器） | 3h | Python |
-| `scripts/llm_call.py`（API 自动调用） | 2h | LLM API key |
-| `scripts/send_alert_email.py`（邮件推送） | 2h | SMTP 配置 |
-| `scripts/inject_banner.py`（Banner 注入） | 2h | 无 |
-| `scripts/notify.sh`（桌面通知） | 0.5h | 无 |
-| `scripts/install_scheduler.sh`（一键安装） | 1.5h | launchd/cron |
-| `sigma/reminders/sigma-calendar.ics` | 0.5h | 无 |
-| `~/.sigma/config.yaml` 模板 + README | 1h | 无 |
-| Makefile 集成 + 端到端测试 | 1.5h | 上述全部 |
-| **总计** | **~14h** | |
+
+| 组件                                    | 工时       | 依赖           |
+| ------------------------------------- | -------- | ------------ |
+| `scripts/sigma_scheduler.py`（统一调度器）   | 3h       | Python       |
+| `scripts/llm_call.py`（API 自动调用）       | 2h       | LLM API key  |
+| `scripts/send_alert_email.py`（邮件推送）   | 2h       | SMTP 配置      |
+| `scripts/inject_banner.py`（Banner 注入） | 2h       | 无            |
+| `scripts/notify.sh`（桌面通知）             | 0.5h     | 无            |
+| `scripts/install_scheduler.sh`（一键安装）  | 1.5h     | launchd/cron |
+| `sigma/reminders/sigma-calendar.ics`  | 0.5h     | 无            |
+| `~/.sigma/config.yaml` 模板 + README    | 1h       | 无            |
+| Makefile 集成 + 端到端测试                   | 1.5h     | 上述全部         |
+| **总计**                                | **~14h** |              |
+
 
 ---
 
@@ -358,6 +368,7 @@ inject-banner: ## 检查未确认 alert 并注入 banner
 在**不改变数据底层**（仍是 markdown + git）的前提下，提供一个**视觉化的只读界面**，让复盘体验从"读 markdown 文件"升级为"看 dashboard"。
 
 **不做的事**：
+
 - 不做 write 功能（写入仍在 Cursor + markdown）
 - 不做用户认证（本地运行 / 私有部署）
 - 不做 SaaS 化
@@ -365,16 +376,19 @@ inject-banner: ## 检查未确认 alert 并注入 banner
 
 ### 2.2 技术选型
 
-| 候选 | 优势 | 劣势 | 判定 |
-|------|------|------|------|
-| **Vite + Vue/React SPA** | 灵活、现代前端栈、热更新 | 需维护 node_modules | **采纳**（Vite + Vue 3） |
-| MkDocs Material | 零配置 markdown 渲染 | 不适合 dashboard / 图表 | 拒绝（更适合文档站） |
-| Quartz (Obsidian publish) | 漂亮的 note graph | 依赖 Obsidian 生态 | 拒绝（用户不用 Obsidian） |
-| Python Flask/FastAPI | 用户熟悉 Python 生态 | 需要后端进程 + 模板 | 备选 |
+
+| 候选                        | 优势              | 劣势                 | 判定                   |
+| ------------------------- | --------------- | ------------------ | -------------------- |
+| **Vite + Vue/React SPA**  | 灵活、现代前端栈、热更新    | 需维护 node_modules   | **采纳**（Vite + Vue 3） |
+| MkDocs Material           | 零配置 markdown 渲染 | 不适合 dashboard / 图表 | 拒绝（更适合文档站）           |
+| Quartz (Obsidian publish) | 漂亮的 note graph  | 依赖 Obsidian 生态     | 拒绝（用户不用 Obsidian）    |
+| Python Flask/FastAPI      | 用户熟悉 Python 生态  | 需要后端进程 + 模板        | 备选                   |
+
 
 **最终选择：Vite + Vue 3 + Tailwind CSS + Chart.js**
 
 理由：
+
 - 用户可以 `npm run dev` 一键启动本地 dashboard
 - 纯静态前端，不需要后端进程
 - 数据通过读取 markdown 文件（build 时解析 / dev 时 watch）
@@ -490,31 +504,37 @@ inject-banner: ## 检查未确认 alert 并注入 banner
 
 #### 2.5.2 Trades（交易列表）
 
-| 功能 | 描述 |
-|------|------|
-| 列表视图 | 按时间倒序排列所有交易，显示 frontmatter 关键字段 + setup_tag 标签 |
-| 筛选器 | 按 symbol / direction / product_class / **setup_tag / stop_type / market_condition** / 日期范围 |
-| 单笔详情 | 点击展开：完整决策链内容 + EMA + R 倍数 + 截图缩略图 |
-| 统计摘要 | 顶部卡片：总笔数 / 胜率 / 平均 R / 期望值 / 最大回撤（**随筛选条件实时更新**） |
-| R 倍数列 | 每笔交易显示 R 倍数（绿正/红负），快速识别大赢大亏 |
+
+| 功能    | 描述                                                                                         |
+| ----- | ------------------------------------------------------------------------------------------ |
+| 列表视图  | 按时间倒序排列所有交易，显示 frontmatter 关键字段 + setup_tag 标签                                             |
+| 筛选器   | 按 symbol / direction / product_class / **setup_tag / stop_type / market_condition** / 日期范围 |
+| 单笔详情  | 点击展开：完整决策链内容 + EMA + R 倍数 + 截图缩略图                                                          |
+| 统计摘要  | 顶部卡片：总笔数 / 胜率 / 平均 R / 期望值 / 最大回撤（**随筛选条件实时更新**）                                           |
+| R 倍数列 | 每笔交易显示 R 倍数（绿正/红负），快速识别大赢大亏                                                                |
+
 
 #### 2.5.3 Weekly Review（周报可视化）
 
-| 功能 | 描述 |
-|------|------|
+
+| 功能      | 描述                                    |
+| ------- | ------------------------------------- |
 | AI 报告渲染 | 将 `reviews/weekly/*-auto.md` 渲染为格式化卡片 |
-| 违规详情 | 嵌入当周 `reviews/violations/` 内容 |
-| 对比视图 | 本周 vs 上周 KPI 变化（颜色标注） |
-| 历史回溯 | 左右切换周次 |
+| 违规详情    | 嵌入当周 `reviews/violations/` 内容         |
+| 对比视图    | 本周 vs 上周 KPI 变化（颜色标注）                 |
+| 历史回溯    | 左右切换周次                                |
+
 
 #### 2.5.4 Screenshots（截图画廊）
 
-| 功能 | 描述 |
-|------|------|
+
+| 功能    | 描述                                  |
+| ----- | ----------------------------------- |
 | 时间线视图 | 按交易日期排列截图，entry / exit / context 分组 |
-| 对照视图 | 同一笔交易的 entry + exit 截图并排显示 |
-| 放大查看 | 点击截图全屏 lightbox |
-| 关联交易 | 每张截图旁标注对应 trade 文件链接 |
+| 对照视图  | 同一笔交易的 entry + exit 截图并排显示          |
+| 放大查看  | 点击截图全屏 lightbox                     |
+| 关联交易  | 每张截图旁标注对应 trade 文件链接                |
+
 
 **这是截图系统的核心复盘价值——"当时你看到了什么 vs 后来发生了什么"可视化对照**：
 
@@ -597,25 +617,29 @@ inject-banner: ## 检查未确认 alert 并注入 banner
 └────────────────────────────────────────────────────────────────────┘
 ```
 
-| 功能 | 描述 |
-|------|------|
-| 筛选面板 | setup_tag × stop_type × target_type × market_condition × 日期范围 交叉筛选 |
-| 指标卡片 | 期望值 / 胜率 / Profit Factor / 平均 R（随筛选实时更新） |
-| R 分布图 | 柱状图展示当前筛选条件下所有交易的 R 倍数分布 |
-| 滚动 Expectancy | 折线图：最近 20 笔的滚动期望值（观察 edge 是否在改善/退化） |
-| 行为 × 策略交叉 | 最有价值的视图：合规笔 vs 违规笔分别算 expectancy + PF |
-| Setup 对比表 | 按 setup_tag 分组，横向对比各策略表现 |
-| 样本量警告 | n < 30 时大字橙色标注"⚠ U级 样本不足，仅供参考" |
-| 导出 | 可导出当前筛选的交易列表为 CSV |
+
+| 功能            | 描述                                                                 |
+| ------------- | ------------------------------------------------------------------ |
+| 筛选面板          | setup_tag × stop_type × target_type × market_condition × 日期范围 交叉筛选 |
+| 指标卡片          | 期望值 / 胜率 / Profit Factor / 平均 R（随筛选实时更新）                           |
+| R 分布图         | 柱状图展示当前筛选条件下所有交易的 R 倍数分布                                           |
+| 滚动 Expectancy | 折线图：最近 20 笔的滚动期望值（观察 edge 是否在改善/退化）                                |
+| 行为 × 策略交叉     | 最有价值的视图：合规笔 vs 违规笔分别算 expectancy + PF                              |
+| Setup 对比表     | 按 setup_tag 分组，横向对比各策略表现                                           |
+| 样本量警告         | n < 30 时大字橙色标注"⚠ U级 样本不足，仅供参考"                                     |
+| 导出            | 可导出当前筛选的交易列表为 CSV                                                  |
+
 
 #### 2.5.6 KPI（绩效指标页）
 
-| 功能 | 描述 |
-|------|------|
-| 仪表盘 | 三个 P0 KPI 的当前值 + 阈值线 |
-| 趋势图 | 最近 12 周 KPI 折线图 |
+
+| 功能      | 描述                              |
+| ------- | ------------------------------- |
+| 仪表盘     | 三个 P0 KPI 的当前值 + 阈值线            |
+| 趋势图     | 最近 12 周 KPI 折线图                 |
 | 退化路径可视化 | 当前 Level（L4/L3/L2/L1）+ 下一退化触发条件 |
-| 校准指标 | 预估胜率 vs 实际胜率散点图（月度更新） |
+| 校准指标    | 预估胜率 vs 实际胜率散点图（月度更新）           |
+
 
 ### 2.6 技术实现细节
 
@@ -795,37 +819,43 @@ export default defineConfig({
 
 ### 2.7 WebUI — 设计约束
 
-| 约束 | 来源 | 实现 |
-|------|------|------|
-| Read-only | design_proposal D1 | 无任何写入接口；数据修改必须回 Cursor + git |
-| 数据底层不变 | design_proposal D3 | 所有数据仍是 markdown + git；WebUI 只是渲染层 |
-| 无 SaaS lock-in | notes/08 caveat | 纯本地运行；可选 GitHub Pages 私有部署 |
-| 无 gamification | notes/06 Q3 | 无积分/徽章/排行榜；纯信息呈现 |
-| 4 周不用就关 | design_proposal §零.3 | 退化路径：WebUI 上线 4 周后用户不打开 → 关掉 |
+
+| 约束             | 来源                   | 实现                                |
+| -------------- | -------------------- | --------------------------------- |
+| Read-only      | design_proposal D1   | 无任何写入接口；数据修改必须回 Cursor + git      |
+| 数据底层不变         | design_proposal D3   | 所有数据仍是 markdown + git；WebUI 只是渲染层 |
+| 无 SaaS lock-in | notes/08 caveat      | 纯本地运行；可选 GitHub Pages 私有部署        |
+| 无 gamification | notes/06 Q3          | 无积分/徽章/排行榜；纯信息呈现                  |
+| 4 周不用就关        | design_proposal §零.3 | 退化路径：WebUI 上线 4 周后用户不打开 → 关掉      |
+
 
 ### 2.8 WebUI — 工程量估算
 
-| 组件 | 工时 | 依赖 |
-|------|------|------|
-| 项目脚手架（Vite + Vue 3 + Tailwind） | 2h | Node.js |
-| `scripts/build_data.py` 数据解析器（含策略字段 + R 倍数） | 5h | Python gray-matter |
-| Dashboard 页面（KPI 卡片 + 趋势图 + 策略摘要） | 4h | Chart.js |
-| Trades 列表 + 详情（含 setup 标签筛选） | 3h | 数据解析器 |
-| Weekly Review 渲染（含策略指标章节） | 2h | 数据解析器 |
-| Screenshots 画廊 + 对照视图 | 3h | 截图路径解析 |
-| **Strategy 页面**（筛选面板 + R 分布 + 滚动 Exp + 交叉分析 + 对比表） | **6h** | Chart.js + useStrategyMetrics |
-| KPI 绩效页 | 2h | Chart.js |
-| Makefile 集成 + README | 1h | — |
-| **总计** | **~28h** | |
+
+| 组件                                                 | 工时       | 依赖                            |
+| -------------------------------------------------- | -------- | ----------------------------- |
+| 项目脚手架（Vite + Vue 3 + Tailwind）                     | 2h       | Node.js                       |
+| `scripts/build_data.py` 数据解析器（含策略字段 + R 倍数）        | 5h       | Python gray-matter            |
+| Dashboard 页面（KPI 卡片 + 趋势图 + 策略摘要）                  | 4h       | Chart.js                      |
+| Trades 列表 + 详情（含 setup 标签筛选）                       | 3h       | 数据解析器                         |
+| Weekly Review 渲染（含策略指标章节）                          | 2h       | 数据解析器                         |
+| Screenshots 画廊 + 对照视图                              | 3h       | 截图路径解析                        |
+| **Strategy 页面**（筛选面板 + R 分布 + 滚动 Exp + 交叉分析 + 对比表） | **6h**   | Chart.js + useStrategyMetrics |
+| KPI 绩效页                                            | 2h       | Chart.js                      |
+| Makefile 集成 + README                               | 1h       | —                             |
+| **总计**                                             | **~28h** |                               |
+
 
 ### 2.9 WebUI — 未来扩展路径（Phase 3d 评估）
 
-| 扩展 | 触发条件 | 工时 |
-|------|----------|------|
-| 部署到 GitHub Pages 私有 | 手机查看周报需求强烈 | +2h |
-| 增加月度校准可视化 | 月校准数据累积 ≥ 3 月 | +3h |
-| 增加行为偏误热力图 | 违规数据累积 ≥ 8 周 | +4h |
-| 增加 AI 周报对话式展开 | 用户反馈"想在 WebUI 里追问 AI" | +8h（需后端） |
+
+| 扩展                  | 触发条件                  | 工时       |
+| ------------------- | --------------------- | -------- |
+| 部署到 GitHub Pages 私有 | 手机查看周报需求强烈            | +2h      |
+| 增加月度校准可视化           | 月校准数据累积 ≥ 3 月         | +3h      |
+| 增加行为偏误热力图           | 违规数据累积 ≥ 8 周          | +4h      |
+| 增加 AI 周报对话式展开       | 用户反馈"想在 WebUI 里追问 AI" | +8h（需后端） |
+
 
 ---
 
@@ -888,38 +918,44 @@ export default defineConfig({
 
 ## 四、实施时间线
 
-| 阶段 | 触发条件 | 交付 |
-|------|----------|------|
-| **Phase 3b-1** | v0 运行 4 周 P0 达标 | 全自动调度器 + 消息推送：sigma_scheduler + llm_call + send_alert_email + inject_banner + notify.sh + install_scheduler |
-| **Phase 3b-2** | Phase 3b-1 后 1 周 | 策略指标计算 + 训练资金对账：strategy_metrics.py + reconcile_funds.py |
-| **Phase 3c-1** | v0.1 运行 8 周 KPI 达标 | WebUI 骨架：Vite + Vue 3 + build_data.py + Dashboard 页 |
-| **Phase 3c-2** | Phase 3c-1 后 2 周 | WebUI 完整：Trades + Weekly + Screenshots + Strategy + KPI 五页 |
-| **Phase 3c-3** | 用户需求 | GitHub Pages 私有部署（手机看周报） |
+
+| 阶段             | 触发条件               | 交付                                                                                                          |
+| -------------- | ------------------ | ----------------------------------------------------------------------------------------------------------- |
+| **Phase 3b-1** | v0 运行 4 周 P0 达标    | 全自动调度器 + 消息推送：sigma_scheduler + llm_call + send_alert_email + inject_banner + notify.sh + install_scheduler |
+| **Phase 3b-2** | Phase 3b-1 后 1 周   | 策略指标计算 + 训练资金对账：strategy_metrics.py + reconcile_funds.py                                                    |
+| **Phase 3c-1** | v0.1 运行 8 周 KPI 达标 | WebUI 骨架：Vite + Vue 3 + build_data.py + Dashboard 页                                                         |
+| **Phase 3c-2** | Phase 3c-1 后 2 周   | WebUI 完整：Trades + Weekly + Screenshots + Strategy + KPI 五页                                                  |
+| **Phase 3c-3** | 用户需求               | GitHub Pages 私有部署（手机看周报）                                                                                    |
+
 
 ---
 
 ## 五、风险与缓解
 
-| 风险 | 概率 | 缓解 |
-|------|------|------|
+
+| 风险               | 概率            | 缓解                                  |
+| ---------------- | ------------- | ----------------------------------- |
 | SMTP 配置对非技术用户有门槛 | 低（用户是 git 用户） | 提供详细 README + 支持 Gmail App Password |
-| WebUI 增加维护负担 | 中 | 4 周不用即关；数据层不变所以关掉无损 |
-| 通知频率导致疲劳 | 中 | 频率控制规则（§1.4.4）+ 静默时段 |
-| 截图体积增长 | 低（v0 交易频率低） | 预留 Git LFS 迁移路径；WebUI build 时可压缩 |
-| Node.js 环境依赖 | 低 | `package.json` 锁版本；可选 Docker 运行 |
+| WebUI 增加维护负担     | 中             | 4 周不用即关；数据层不变所以关掉无损                 |
+| 通知频率导致疲劳         | 中             | 频率控制规则（§1.4.4）+ 静默时段                |
+| 截图体积增长           | 低（v0 交易频率低）   | 预留 Git LFS 迁移路径；WebUI build 时可压缩    |
+| Node.js 环境依赖     | 低             | `package.json` 锁版本；可选 Docker 运行     |
+
 
 ---
 
 ## 六、决策记录
 
-| 决策 | 选择 | 拒绝候选 | 理由 |
-|------|------|----------|------|
-| 固定提醒通道 | ICS 日历导入 | Telegram bot / 微信 | 零依赖 + 原生跨设备；Telegram/微信有反向证据 |
-| 触发通知通道 | 邮件 SMTP | Webhook / 微信 | 跨平台 + 可靠 + 用户已有邮箱 |
-| WebUI 框架 | Vite + Vue 3 | MkDocs / Flask / Next.js | 轻量 SPA + 热更新 + 不需要后端 |
-| 数据解析 | Python 脚本 build 时生成 JSON | 运行时 markdown 解析 | 性能好 + 前端不依赖 markdown parser |
-| 截图显示 | Vite dev server fs.allow | 复制到 public/ | 避免重复存储；dev 时直接引用原文件 |
-| 部署 | 默认本地；可选 GitHub Pages | Vercel / Netlify | 私有数据不适合公开平台；GH Pages 支持私有仓库 |
+
+| 决策       | 选择                       | 拒绝候选                     | 理由                           |
+| -------- | ------------------------ | ------------------------ | ---------------------------- |
+| 固定提醒通道   | ICS 日历导入                 | Telegram bot / 微信        | 零依赖 + 原生跨设备；Telegram/微信有反向证据 |
+| 触发通知通道   | 邮件 SMTP                  | Webhook / 微信             | 跨平台 + 可靠 + 用户已有邮箱            |
+| WebUI 框架 | Vite + Vue 3             | MkDocs / Flask / Next.js | 轻量 SPA + 热更新 + 不需要后端         |
+| 数据解析     | Python 脚本 build 时生成 JSON | 运行时 markdown 解析          | 性能好 + 前端不依赖 markdown parser  |
+| 截图显示     | Vite dev server fs.allow | 复制到 public/              | 避免重复存储；dev 时直接引用原文件          |
+| 部署       | 默认本地；可选 GitHub Pages     | Vercel / Netlify         | 私有数据不适合公开平台；GH Pages 支持私有仓库  |
+
 
 ---
 
@@ -935,21 +971,25 @@ export default defineConfig({
 
 #### 7.2.1 支持追踪的证据
 
-| 证据 | 等级 | 含义 |
-|------|------|------|
+
+| 证据                                                     | 等级  | 含义                                             |
+| ------------------------------------------------------ | --- | ---------------------------------------------- |
 | Profit Factor by Setup 是诊断的关键（trading-journals.com 综合） | M/W | 账户级 profit factor 无法诊断；按 setup 拆分才能发现"哪个策略拖后腿" |
-| Expectancy 是证明 edge 存在的基础指标（行业共识） | M | 没有 expectancy 就无法回答"我的交易系统有正期望值吗" |
-| 处置效应人为膨胀胜率（SSRN 4636623, 2024）| S | 真实胜率 47% 被处置效应膨胀到 52%——如果只看胜率会系统性高估自己 |
-| Setup-specific 追踪能发现"A+ trade 贡献大部分利润"（ACY 2025 综合） | M/W | 职业交易台用 setup quality scoring 区分 A+/B/C 级交易 |
-| 市场环境条件化：setup 往往只在特定 regime 下有效 | M | 需要按 trending/ranging/high-vol 分类统计 |
+| Expectancy 是证明 edge 存在的基础指标（行业共识）                      | M   | 没有 expectancy 就无法回答"我的交易系统有正期望值吗"              |
+| 处置效应人为膨胀胜率（SSRN 4636623, 2024）                         | S   | 真实胜率 47% 被处置效应膨胀到 52%——如果只看胜率会系统性高估自己          |
+| Setup-specific 追踪能发现"A+ trade 贡献大部分利润"（ACY 2025 综合）    | M/W | 职业交易台用 setup quality scoring 区分 A+/B/C 级交易     |
+| 市场环境条件化：setup 往往只在特定 regime 下有效                        | M   | 需要按 trending/ranging/high-vol 分类统计             |
+
 
 #### 7.2.2 样本量硬约束（**必须诚实标注**）
 
-| 胜率假设 | 95% 置信需要的交易笔数 | 含义 |
-|---------|----------------------|------|
-| 52% | ~2,400 笔 | 接近随机的策略几乎不可能在小样本中被证伪 |
-| 55% | ~380 笔 | 中等 edge 需要大半年到一年 |
-| 60% | ~95 笔 | 较强 edge 约 3-6 个月可初步验证 |
+
+| 胜率假设 | 95% 置信需要的交易笔数 | 含义                    |
+| ---- | ------------- | --------------------- |
+| 52%  | ~2,400 笔      | 接近随机的策略几乎不可能在小样本中被证伪  |
+| 55%  | ~380 笔        | 中等 edge 需要大半年到一年      |
+| 60%  | ~95 笔         | 较强 edge 约 3-6 个月可初步验证 |
+
 
 **关键发现**：
 
@@ -966,31 +1006,37 @@ export default defineConfig({
 
 **Layer 1：每笔交易自动计算（≥ 1 笔即可计算，但意义随 n 增长）**
 
-| 指标 | 公式 | 所需数据 |
-|------|------|----------|
-| **R 倍数** | (exit - entry) / (entry - stop) | entry_price, exit_price, stop_loss_price |
+
+| 指标         | 公式                                | 所需数据                                        |
+| ---------- | --------------------------------- | ------------------------------------------- |
+| **R 倍数**   | (exit - entry) / (entry - stop)   | entry_price, exit_price, stop_loss_price    |
 | **实际风险金额** | position_size × abs(entry - stop) | position_size, entry_price, stop_loss_price |
-| **持仓时间** | exit_date - entry_date | 日期 |
+| **持仓时间**   | exit_date - entry_date            | 日期                                          |
+
 
 **Layer 2：累计指标（≥ 10 笔可初看趋势，≥ 30 笔初步可信，≥ 100 笔稳定）**
 
-| 指标 | 公式 | 诚实标注 |
-|------|------|----------|
-| **胜率** | win_count / total_count | n < 30 时标"U 级噪音" |
-| **期望值 (Expectancy)** | (win_rate × avg_win_R) - (loss_rate × avg_loss_R) | 核心！证明 edge 存在与否 |
-| **Profit Factor** | gross_profit / gross_loss | < 1.0 = 无 edge；1.2-2.0 = 现实区间；> 3.0 = 可能过拟合 |
-| **平均 R 倍数** | sum(R) / n | 正 = 每笔平均赚多少 R |
-| **最大连续亏损** | max consecutive losses | 用于止损心理准备 |
-| **最大回撤** | max drawdown from equity peak | 直觉理解风险 |
+
+| 指标                   | 公式                                                | 诚实标注                                        |
+| -------------------- | ------------------------------------------------- | ------------------------------------------- |
+| **胜率**               | win_count / total_count                           | n < 30 时标"U 级噪音"                            |
+| **期望值 (Expectancy)** | (win_rate × avg_win_R) - (loss_rate × avg_loss_R) | 核心！证明 edge 存在与否                             |
+| **Profit Factor**    | gross_profit / gross_loss                         | < 1.0 = 无 edge；1.2-2.0 = 现实区间；> 3.0 = 可能过拟合 |
+| **平均 R 倍数**          | sum(R) / n                                        | 正 = 每笔平均赚多少 R                               |
+| **最大连续亏损**           | max consecutive losses                            | 用于止损心理准备                                    |
+| **最大回撤**             | max drawdown from equity peak                     | 直觉理解风险                                      |
+
 
 **Layer 3：高级指标（≥ 50 笔 + 跨 regime 才有意义）**
 
-| 指标 | 公式 | 诚实标注 |
-|------|------|----------|
-| **Sharpe Ratio** | mean(R) / std(R) × sqrt(252) | 年化；n < 50 时极不可靠 |
-| **Sortino Ratio** | mean(R) / downside_std × sqrt(252) | 只惩罚下行波动 |
-| **Calmar Ratio** | annual_return / max_drawdown | 需要 ≥ 6 个月数据 |
-| **Recovery Factor** | net_profit / max_drawdown | |
+
+| 指标                  | 公式                                 | 诚实标注            |
+| ------------------- | ---------------------------------- | --------------- |
+| **Sharpe Ratio**    | mean(R) / std(R) × sqrt(252)       | 年化；n < 50 时极不可靠 |
+| **Sortino Ratio**   | mean(R) / downside_std × sqrt(252) | 只惩罚下行波动         |
+| **Calmar Ratio**    | annual_return / max_drawdown       | 需要 ≥ 6 个月数据     |
+| **Recovery Factor** | net_profit / max_drawdown          |                 |
+
 
 #### 7.2.4 按 Setup 筛选 — 设计
 
@@ -1014,13 +1060,15 @@ market_condition: trending    # ← 新增：当时市场状态
 
 **字段设计**：
 
-| 新字段 | 值域 | 用途 |
-|--------|------|------|
-| `setup_tag` | 用户自定义（如 `breakout-retest` / `mean-reversion` / `trend-follow`） | 按策略分组统计 |
-| `stop_type` | `structure` / `atr` / `percent` / `time` | 按止损方式分组 |
-| `target_type` | `fixed-rr` / `trailing` / `structure` / `time` | 按止盈方式分组 |
-| `target_rr` | 数字（目标盈亏比） | 与实际 R 倍数对比 |
-| `market_condition` | `trending` / `ranging` / `volatile` / `low-vol` | 按市场环境分组 |
+
+| 新字段                | 值域                                                             | 用途         |
+| ------------------ | -------------------------------------------------------------- | ---------- |
+| `setup_tag`        | 用户自定义（如 `breakout-retest` / `mean-reversion` / `trend-follow`） | 按策略分组统计    |
+| `stop_type`        | `structure` / `atr` / `percent` / `time`                       | 按止损方式分组    |
+| `target_type`      | `fixed-rr` / `trailing` / `structure` / `time`                 | 按止盈方式分组    |
+| `target_rr`        | 数字（目标盈亏比）                                                      | 与实际 R 倍数对比 |
+| `market_condition` | `trending` / `ranging` / `volatile` / `low-vol`                | 按市场环境分组    |
+
 
 **筛选维度**（WebUI + 周报都支持）：
 
@@ -1071,6 +1119,7 @@ market_condition: trending    # ← 新增：当时市场状态
 ```
 
 **最有价值的分析不是"策略指标本身"，而是"行为合规 × 策略表现"的交叉**。这能回答：
+
 - "我的系统有 edge 吗？" → 期望值
 - "我有没有在执行这个 edge？" → 合规率 × 策略表现对比
 - "我的哪个 setup 值得继续？" → 按 setup 筛选 profit factor
@@ -1152,14 +1201,16 @@ def compute_metrics(trades, group_by=None, min_sample=5):
 
 在 WebUI 增加 **Strategy** 页面（第 6 页）：
 
-| 功能 | 描述 |
-|------|------|
-| Setup 选择器 | 下拉选择 setup_tag → 展示该 setup 的所有指标 |
-| 筛选面板 | setup_tag × stop_type × market_condition 交叉筛选 |
-| R 倍数分布图 | 柱状图展示该 setup 所有交易的 R 分布 |
-| Expectancy 趋势 | 滚动 20 笔 expectancy 折线图（看是否在改善） |
-| 行为 × 策略交叉 | "合规笔 vs 违规笔"的 expectancy 对比 |
-| 样本量警告 | n < 30 时大字标注"样本不足，仅供参考" |
+
+| 功能            | 描述                                            |
+| ------------- | --------------------------------------------- |
+| Setup 选择器     | 下拉选择 setup_tag → 展示该 setup 的所有指标              |
+| 筛选面板          | setup_tag × stop_type × market_condition 交叉筛选 |
+| R 倍数分布图       | 柱状图展示该 setup 所有交易的 R 分布                       |
+| Expectancy 趋势 | 滚动 20 笔 expectancy 折线图（看是否在改善）                |
+| 行为 × 策略交叉     | "合规笔 vs 违规笔"的 expectancy 对比                   |
+| 样本量警告         | n < 30 时大字标注"样本不足，仅供参考"                       |
+
 
 #### 7.4.4 TEMPLATE.md 修改
 
@@ -1175,31 +1226,37 @@ market_condition:    # 市场状态（trending / ranging / volatile / low-vol）
 
 ### 7.5 策略指标 — 诚实约束（必须严格执行）
 
-| 约束 | 内容 | 来源 |
-|------|------|------|
-| 样本量标注 | n < 30 标 "U 级"；n < 100 标"初步参考" | foundation §三.5 |
-| 不做统计结论 | "这个 setup 的胜率是 60%（n=12）" ≠ "这个 setup 有效" | ai-roles.md §5 |
-| Regime 警告 | 如果所有数据来自单一市场环境，必须标注"单 regime 数据" | 学术文献共识 |
-| 过拟合警告 | Profit Factor > 3.0 或 Sharpe > 3.0 → 标"可能过拟合" | CrossTrade + 行业共识 |
-| 处置效应校正 | 胜率统计时标注"含处置效应风险"——真实胜率可能低 2-5 个百分点 | SSRN 4636623 (2024) |
+
+| 约束        | 内容                                            | 来源                  |
+| --------- | --------------------------------------------- | ------------------- |
+| 样本量标注     | n < 30 标 "U 级"；n < 100 标"初步参考"                | foundation §三.5     |
+| 不做统计结论    | "这个 setup 的胜率是 60%（n=12）" ≠ "这个 setup 有效"     | ai-roles.md §5      |
+| Regime 警告 | 如果所有数据来自单一市场环境，必须标注"单 regime 数据"              | 学术文献共识              |
+| 过拟合警告     | Profit Factor > 3.0 或 Sharpe > 3.0 → 标"可能过拟合" | CrossTrade + 行业共识   |
+| 处置效应校正    | 胜率统计时标注"含处置效应风险"——真实胜率可能低 2-5 个百分点            | SSRN 4636623 (2024) |
+
 
 ### 7.6 策略指标 — 何时启动
 
-| 阶段 | 触发 | 内容 |
-|------|------|------|
-| **立即** | v0 TEMPLATE.md 更新 | frontmatter 增加 setup_tag 等字段（开始积累数据） |
-| **Phase 3b** | 4 周 P0 达标 | strategy_metrics.py 上线 + 周报追加策略章节 |
-| **Phase 3c** | 8 周 + 累计 ≥ 30 笔 | WebUI Strategy 页面 + 筛选功能 |
-| **长期** | 累计 ≥ 100 笔 | 正式评估 setup edge 有效性；低于阈值的 setup 建议淘汰 |
+
+| 阶段           | 触发                | 内容                                   |
+| ------------ | ----------------- | ------------------------------------ |
+| **立即**       | v0 TEMPLATE.md 更新 | frontmatter 增加 setup_tag 等字段（开始积累数据） |
+| **Phase 3b** | 4 周 P0 达标         | strategy_metrics.py 上线 + 周报追加策略章节    |
+| **Phase 3c** | 8 周 + 累计 ≥ 30 笔   | WebUI Strategy 页面 + 筛选功能             |
+| **长期**       | 累计 ≥ 100 笔        | 正式评估 setup edge 有效性；低于阈值的 setup 建议淘汰 |
+
 
 ---
 
 ## 八、修订记录
 
-| 日期 | 版本 | 变更 |
-|------|------|------|
-| 2026-05-06 | v0 | 初版：消息系统 + WebUI 详细设计 |
+
+| 日期         | 版本   | 变更                                                                                                                                             |
+| ---------- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-05-06 | v0   | 初版：消息系统 + WebUI 详细设计                                                                                                                           |
 | 2026-05-06 | v0.1 | (1) 消息系统改为全自动定时推送——`sigma_scheduler.py` 统一调度，用户不再需要手动 `make`；(2) 新增 §七 策略/Setup 指标体系（调研 + 设计）——支持按 setup_tag / stop_type / market_condition 筛选 |
+
 
 ---
 
