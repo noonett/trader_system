@@ -21,7 +21,7 @@ cat > "$HOOKS_DIR/pre-commit" << 'HOOK_EOF'
 
 RED_FOUND=0
 
-for file in $(git diff --cached --name-only --diff-filter=ACM | grep '^trades/.*\.md$'); do
+for file in $(git diff --cached --name-only --diff-filter=ACM | grep 'trades/.*\.md$'); do
     # Skip TEMPLATE.md and README.md
     basename=$(basename "$file")
     if [ "$basename" = "TEMPLATE.md" ] || [ "$basename" = "README.md" ]; then
