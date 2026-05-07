@@ -41,6 +41,7 @@
 | [11_context_switching_cost.md](../research/notes/11_context_switching_cost.md)                       | 上下文切换成本 + 物理可达性矩阵            | 922   | 2     |
 | [12_no_ai_option.md](../research/notes/12_no_ai_option.md)                                           | "完全不用 AI 前台"作为合法选项           | 893   | 2     |
 | [13_strategy_performance_metrics.md](../research/notes/13_strategy_performance_metrics.md)           | 策略表现指标：追踪、样本量、自欺避免       | ~250  | 3b    |
+| [14_semi_auto_trading_ai_landscape.md](../research/notes/14_semi_auto_trading_ai_landscape.md)     | 半自动交易 AI 助手产品形态与设计模式    | ~400  | —     |
 
 
 ### Review 档案
