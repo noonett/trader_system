@@ -1,5 +1,6 @@
 import { anthropic } from "@ai-sdk/anthropic";
 import { createOpenAI } from "@ai-sdk/openai";
+import { createDeepSeekRequestFetch } from "@/lib/deepseek-fetch";
 
 /**
  * Resolve LLM provider + model from environment variables.
@@ -29,32 +30,38 @@ export function getModel() {
       const ollama = createOpenAI({
         baseURL: process.env.OLLAMA_BASE_URL || "http://localhost:11434/v1",
         apiKey: "ollama",
+        name: "ollama",
       });
-      return ollama(modelId || "llama3.2");
+      // OpenAI-compat servers implement Chat Completions, not OpenAI Responses API.
+      return ollama.chat(modelId || "llama3.2");
     }
 
     case "openrouter": {
       const openrouter = createOpenAI({
         baseURL: "https://openrouter.ai/api/v1",
         apiKey: process.env.OPENROUTER_API_KEY,
+        name: "openrouter",
       });
-      return openrouter(modelId || "anthropic/claude-sonnet-4");
+      return openrouter.chat(modelId || "anthropic/claude-sonnet-4");
     }
 
     case "deepseek": {
       const deepseek = createOpenAI({
         baseURL: "https://api.deepseek.com/v1",
         apiKey: process.env.DEEPSEEK_API_KEY,
+        name: "deepseek",
+        fetch: createDeepSeekRequestFetch(),
       });
-      return deepseek(modelId || "deepseek-chat");
+      return deepseek.chat(modelId || "deepseek-chat");
     }
 
     case "custom": {
       const custom = createOpenAI({
         baseURL: process.env.CUSTOM_BASE_URL,
         apiKey: process.env.CUSTOM_API_KEY,
+        name: "custom-openai-compat",
       });
-      return custom(modelId || "default");
+      return custom.chat(modelId || "default");
     }
 
     default:
