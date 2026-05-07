@@ -2,7 +2,7 @@
 
 > **位置**：本文件是 Phase 3c+ 的补充设计文档。
 > **输入**：design_proposal_2026.md v0.1（N=1 目录结构）+ 用户 2026-05-06 "WebUI 嵌入 Agent + 多交易员记录隔离" 需求。
-> **当前版本**：v0.1（2026-05-06）
+> **当前版本**：v0.2（2026-05-07）
 
 ---
 
@@ -119,6 +119,10 @@
 │
 ├── webui/                            ← WebUI 应用代码
 │   ├── package.json
+│   ├── e2e/                          ← Playwright（真实 dev + LLM API）
+│   ├── tests/                        ← Vitest
+│   ├── playwright.config.mjs
+│   ├── vitest.config.ts
 │   ├── src/
 │   └── ...
 │
@@ -305,12 +309,28 @@ ln -s traders/default/reviews reviews
 
 ---
 
+## 九、WebUI 工程备忘（运行与测试）
+
+与目录结构正交，仅便于 Agent / 人类在仓库内定位命令（细节以 `webui/package.json` 与 `webui/.env.example` 为准）。
+
+| 目的 | 命令 / 说明 |
+|---|---|
+| 安装依赖 | `cd webui && npm install` |
+| 本地开发 | `npm run dev`（Next.js，默认端口 3000） |
+| 环境变量 | 复制 `.env.example` → `.env.local`；`SIGMA_PROVIDER` / 各 Key 见模板注释 |
+| 单测 | `npm test`（Vitest，`webui/tests/`） |
+| E2E | `npm run test:e2e`；首次需 `npx playwright install chromium`，或环境变量 `PW_CHANNEL=msedge` 使用本机 Edge |
+| DeepSeek 思考模式 | 默认在请求层关闭 `thinking`（见官方 [Create Chat Completion](https://api-docs.deepseek.com/api/create-chat-completion/) 的 `thinking`）；若设 `DEEPSEEK_THINKING=enabled` 则交给 API 默认行为，多轮工具场景需自行承担兼容性风险 |
+
+---
+
 ## 附：修订记录
 
 | 日期 | 版本 | 修订内容 |
 |---|---|---|
 | 2026-05-06 | v0.1 | 初版：多交易员目录结构 + config.yaml + 脚本适配 + WebUI Agent context + 迁移方案 |
+| 2026-05-07 | v0.2 | 目录树补充 `e2e/`、`tests/` 与配置文件；新增「九、WebUI 工程备忘（运行与测试）」 |
 
 ---
 
-*完成日期：2026-05-06 | 上游 Design：design_proposal_2026.md v0.1*
+*完成日期：2026-05-07 | 上游 Design：design_proposal_2026.md v0.1*
