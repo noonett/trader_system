@@ -1,0 +1,23 @@
+# σ 交易员配置 — default
+# 对应 research/design_webui_multitrader_2026.md §四
+
+trader_id: default
+display_name: "Trader"
+
+accounts:
+  - id: cme-training
+    broker: "Interactive Brokers"
+    market: futures-cme
+    fund_type: training
+    currency: USD
+
+overrides:
+  max_single_position_pct: 20
+  max_daily_loss_pct: 3
+  yellow_weekly_limit: 3
+  black_swan_window_minutes: 30
+
+preferences:
+  timezone: "Asia/Shanghai"
+  language: "zh-CN"
+  mobile_readonly: true

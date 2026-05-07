@@ -6,6 +6,8 @@ symbol:
 direction: # long / short
 product_class: # green-passive-etf / green-cash-stock / yellow-small-future / red
 market: # a-share / hk-stock / futures-cme / futures-cn
+account: # 账户标识（如 cme-training / a-share-main）
+fund_type: # training / long-term
 setup_tag: # 策略标签（如 breakout-retest / mean-reversion / trend-follow）
 stop_type: # 止损类型（structure / atr / percent / time）
 target_type: # 止盈类型（fixed-rr / trailing / structure / time）

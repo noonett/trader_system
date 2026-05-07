@@ -1,6 +1,6 @@
 # 术语词典
 
-> 最后更新：2026-05-06（新增 §十四 策略表现指标：R 倍数 / Expectancy / Profit Factor / Sharpe Ratio / Sortino Ratio / 最大连续亏损 / Setup Tag。Phase 1 v5 + Phase 2 v2 引入的其他新术语 implementation intention / autocommitment / AAR / JITAI / BCT Taxonomy / Mental Accounting / engagement-effectiveness paradox / wise feedback / honesty oath / Future self / 集合竞价 binding pre-commitment 等**未入库** — 推到 Level B 同步范围）
+> 最后更新：2026-05-06（Phase 3b Level B sync：新增 §十五 行为科学与系统设计 12 术语——implementation intention / autocommitment / AAR / JITAI / BCT Taxonomy / Mental Accounting / engagement-effectiveness paradox / wise feedback / honesty oath / Future self / binding pre-commitment / product filter。来源：foundation v5 + entry_form_research v3 + design_proposal v0.1）
 > 每一个术语标注：定义、实际用途、与 σ/α 引擎的关联。
 
 ## 一、估值与基本面
@@ -508,6 +508,108 @@
 - **用法：** 按 setup_tag 分组计算策略指标 → 发现"哪个策略有 edge、哪个在拖后腿"。交叉筛选 setup × stop_type × market_condition 可回答"哪种组合最优"。
 - **诚实标记：** 事后标注 setup tag 有后见之明偏差——必须在入场时/入场前决定。每个 setup_tag 需要独立积累 ≥ 30 笔才有初步判断力。
 - **与 σ 引擎：** trades/TEMPLATE.md frontmatter `setup_tag` 字段。WebUI Strategy 页面筛选维度。
+- **状态：** 已理解 ✓
+
+## 十五、行为科学与系统设计（Phase 3b Level B sync 新增）
+
+> 来源：foundation v5 §一调研 1–6 + entry_form_research v3 + design_proposal v0.1。这些术语支撑 σ 系统的设计决策。
+
+### Implementation Intention（执行意图）
+
+- **定义：** "如果 [情境 X]，那么我将 [行动 Y]" 的 if-then 计划格式。将模糊的目标意图转化为与情境绑定的具体执行计划。
+- **来源：** Gollwitzer, P.M. (1999), "Implementation Intentions: Strong Effects of Simple Plans", *American Psychologist*; 跨域元分析 d=0.65（Sheeran, Listrom & Gollwitzer 2024, 642 篇 meta）。【S 级】
+- **用法：** σ 决策链 5 问即为 implementation intention 结构——"如果到达 P_stop，则平仓"比"我会止损"有效得多。盘前规则书写的核心格式。
+- **诚实标记：** d=0.65 来自健康/学业等领域，交易场景迁移效应量预计被打折（foundation §一调研 1 caveat）。
+- **与 σ 引擎：** sigma/decision-chain.md 整体设计基础；sigma/pre-market.md if-then 格式。
+- **状态：** 已理解 ✓
+
+### Autocommitment（自动承诺 / Commitment Device）
+
+- **定义：** 在冷静状态下预先设定的、限制自己未来行动的机制。目的是在 hot state（冲动、恐惧、贪婪）到来时减少自由度。
+- **来源：** Patterson, T. (2020), Cornell RCT——commitment device +24% 学习时间。经典文献：Thaler & Sunstein (2008), *Nudge*。
+- **用法：** σ 系统利用 A 股 9:20 集合竞价不可撤单规则作为天然 commitment device——在冷静的 9:00-9:15 写下规则，9:20 后制度锁定执行。
+- **与 σ 引擎：** design_proposal §二 D7（A 股市场制度 binding）。
+- **状态：** 已理解 ✓
+
+### AAR（After-Action Review，行动后复盘）
+
+- **定义：** 结构化的事后回顾，对比"事前计划"与"实际发生"，分析偏差并提取可迁移的学习。源自美军训练方法论。
+- **来源：** Keiser & Arthur (2021), 元分析 d=0.79（复杂模糊任务）。Tannenbaum & Cerasoli (2013) 也支持结构化复盘优于自由回忆。【S 级】
+- **用法：** σ 周复盘和月校准均采用 AAR 结构：事前预设 → 实际发生 → 偏差 → 可迁移学习。trades/TEMPLATE.md §六。
+- **与 σ 引擎：** sigma/weekly-review.md + sigma/monthly-calibration.md 核心结构。
+- **状态：** 已理解 ✓
+
+### JITAI（Just-in-Time Adaptive Intervention，即时适应性干预）
+
+- **定义：** 在行为发生的**当下**，根据实时数据动态触发干预。典型场景：手机感应到你走进赌场 → 弹窗提醒。
+- **来源：** Wang et al. (2023) 元分析 g=0.77（mHealth 领域）。【S 级】
+- **用法：** σ 系统**无法实现 JITAI**（无传感器、无实时数据流）。离线批处理（每周违规扫描 + KPI alert）是 JITAI 的次优近似。
+- **诚实标记：** σ 的"AI 周读 + 违规扫描"激活的是 §收敛信号 5 "中等被审视感"，不是 JITAI 的实时干预。
+- **与 σ 引擎：** design_proposal §二 D2 + §九.2 #8。
+- **状态：** 已理解 ✓
+
+### BCT Taxonomy（行为改变技术分类法）
+
+- **定义：** 93 种行为改变技术的标准化编目系统（BCTTv1）。每种技术有编号和标准定义，用于精确描述干预中使用了哪些行为改变手段。
+- **来源：** Michie, S. et al. (2013), "The Behavior Change Technique Taxonomy (v1) of 93 Hierarchically Clustered Techniques", *Annals of Behavioral Medicine*. 【S 级】
+- **用法：** σ 系统显式使用三种 BCT：13.x（Identity change）、8.2（Behavioral substitution）、12.x（Environmental restructuring）。
+- **与 σ 引擎：** design_proposal §二 D9 三项落地。
+- **状态：** 已理解 ✓
+
+### Mental Accounting（心理账户）
+
+- **定义：** 人在心理上把同质的钱划分到不同"账户"，对不同账户的风险容忍度和决策规则不同。
+- **来源：** Thaler, R. (1999), "Mental Accounting Matters", *Journal of Behavioral Decision Making*. 【S 级】
+- **用法：** σ 系统利用 Mental Accounting 做"训练资金 vs 长期财富"分离（design §五 + risk_rules §九.0）——但也警惕其反面：用户可能把训练资金重建构为"赌资"（foundation §四.2 隐含假设盲区 #3）。reconcile_funds.py（D 类对账）正是检测 Mental Accounting 边界违规的工具。
+- **与 σ 引擎：** risk_rules §九.0 + scripts/reconcile_funds.py。
+- **状态：** 已理解 ✓
+
+### Engagement-Effectiveness Paradox（参与-效果悖论）
+
+- **定义：** 数字健康工具中观察到的现象：让用户更"上瘾"的功能（如推送通知、社交排名、gamification）提高了参与度，但往往**降低**了真实行为改变效果，甚至造成伤害。
+- **来源：** entry_form_research v3 §二（跨调研收敛分析）+ Linardon 2024（mHealth apps 元分析）。【M 级综合】
+- **用法：** σ 系统**不**追求 DAU/MAU 式的参与度指标。"用户打开次数少但每次都走完决策链"优于"每天打开 10 次但不走流程"。
+- **与 σ 引擎：** design_proposal §二 D1/D2（禁 gamification + 禁前台推送轰炸）。
+- **状态：** 已理解 ✓
+
+### Wise Feedback（智慧反馈）
+
+- **定义：** 同时传递"高标准"和"明确信任"两个信号的反馈方式——既不温暖共情（降低标准），也不严厉批评（破坏信任）。
+- **来源：** Yeager, D.S. et al. (2014), "Breaking the Cycle of Mistrust: Wise Interventions to Provide Critical Feedback Across the Racial Divide", *Journal of Experimental Psychology: General*. 【S 级】
+- **用法：** σ 系统 AI 角色的反馈模式 = wise feedback。sigma/ai-roles.md 第 6 条 prompt 约束：高标准 + 明确信任，禁温暖共情或严厉批评。
+- **与 σ 引擎：** sigma/ai-roles.md 第 6 条。
+- **状态：** 已理解 ✓
+
+### Honesty Oath（诚实宣誓）
+
+- **定义：** 在任务开始前做出"我将诚实记录"的承诺。轻微但显著地提高后续自报告数据的诚实度。
+- **来源：** Shu, L. et al. (2012), "Signing at the beginning makes ethics salient...", *PNAS*（S 级，但后续有部分复制失败争议；Kristal et al. 2020 复制成功）。
+- **用法：** σ 周复盘模板包含 identity + honesty oath："这周我作为系统化交易者，是否符合自己的标准"。盘前规则书写的第一人称 identity 表述即为 honesty oath 的简化版。
+- **与 σ 引擎：** sigma/weekly-review.md honesty oath 段 + sigma/pre-market.md identity 表述。
+- **状态：** 已理解 ✓
+
+### Future Self（未来自我）
+
+- **定义：** 人倾向于把未来的自己当作"另一个人"，导致低估未来需求（不储蓄）或高估未来自控力（"明天再止损"）。
+- **来源：** Hershfield, H.E. (2011), "Future Self-Continuity: How Conceptions of the Future Self Transform Intertemporal Choice", *Annals of the New York Academy of Sciences*. Oyserman, D. et al. (2015), identity-based motivation theory. 【S 级】
+- **用法：** σ 盘前规则的第一人称 identity 表述（BCT 13.x）就是缩小"现在的我"和"未来的我"距离的手段——"我**作为系统化交易者**今天的执行约束是 X"。
+- **与 σ 引擎：** design_proposal §二 D9（BCT identity change）。
+- **状态：** 已理解 ✓
+
+### Binding Pre-commitment（约束性预先承诺）
+
+- **定义：** 在做出承诺的同时，让违反承诺的成本足够高（制度性/物理性），使承诺具有真实约束力，而非仅依赖自律。
+- **来源：** foundation §三.3 + entry_form_research §四.7 + Patterson 2020 Cornell RCT（S 级）。
+- **用法：** σ 利用 A 股 9:20 集合竞价不可撤单作为天然 binding pre-commitment；trades/ 红区 product_class pre-commit hook 作为工程层 binding；violations scan 事后追责作为社会性 binding。
+- **与 σ 引擎：** design_proposal §二 D7 + §三.2.3 全部 4 类后台强制。
+- **状态：** 已理解 ✓
+
+### Product Filter（产品过滤器）
+
+- **定义：** σ 系统将金融产品分为红/黄/绿三区，不同区域有不同的准入规则和门禁级别。
+- **来源：** foundation §三.10（基于 FCA 2024 RCT + ESMA 2018+ 零售衍生品亏损率数据）。
+- **用法：** 红区（0DTE 期权、高杠杆永续等）= 技术性禁入；黄区（小型期货如 MGC/MES）= 必须叠加额外门禁；绿区（低成本 ETF、现金股票）= 默认允许。
+- **与 σ 引擎：** risk_rules §三 + trades/TEMPLATE.md frontmatter `product_class` + pre-commit hook。
 - **状态：** 已理解 ✓
 
 ---

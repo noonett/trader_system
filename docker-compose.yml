@@ -1,0 +1,12 @@
+services:
+  sigma-webui:
+    build: ./webui
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/data
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - SIGMA_WORKSPACE=/data
+      - SIGMA_PASSWORD=${SIGMA_PASSWORD:-}
+    restart: unless-stopped

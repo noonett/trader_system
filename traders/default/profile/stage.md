@@ -32,8 +32,8 @@ last_updated: 2026-05-07
 | 1 · Plan       | ✅     | `foundation_2026.md` v5                                             |
 | 2 · 调研         | ✅     | `entry_form_research_2026.md` v3                                    |
 | 2 · Design     | ✅     | `design_proposal_2026.md` v0.1 + `knowledge/clinical_self_check.md` |
-| **3a · v0 硬集** | **✅** | 6 PR 已在 `master`                                                    |
-| 3b · v0.1      | ⏸️    | P1；通常等 4 周 P0 KPI                                                   |
+| **3a · v0 硬集** | **✅** | 6 PR 已在 `master`；遗留缺陷修复（kpi_alert 三维 + violations #3 + sigma/daily/）  |
+| **3b · v0.1**  | **🔧** | PR-6 glossary sync ✅ / PR-7c reminders+reconcile ✅ / PR-5 risk_rules 已在 v2 无需再改 |
 | 3c / 3d        | ⏸️    | P2 / P3，见设计稿                                                        |
 
 
@@ -54,7 +54,7 @@ last_updated: 2026-05-07
 ## 当前阻塞项
 
 - **实战侧**：需你本人按 v0 写盘前、走 `trades/TEMPLATE.md`、周末 `make weekly-report`（Bash 环境）——无自动化替你下单。
-- **工程侧**：Phase 3b 未启动；**Level C `claims/`** 仍未建库。
+- **工程侧**：Phase 3b 工程交付已完成（reminders + reconcile + glossary sync）；**Level C `claims/`** 仍未建库；Phase 3c WebUI 待 KPI 数据积累后启动。
 
 ## 更新记录
 
@@ -65,3 +65,4 @@ last_updated: 2026-05-07
 | 2026-05-05     | Level A sync：双轨进度、Phase 1+2 产出、Stage 门槛诚实标记                              |
 | 2026-05-06     | Phase 2 收口 + v0.1 设计修订 + 旧 Stage 0 迁 archive 计划                          |
 | **2026-05-07** | **文档与进度对齐**：Phase 3a 标为已完成；修复失效链接与错误 frontmatter；KPI 改为「自 v0 实操起算」；阻塞项更新 |
+| **2026-05-06** | **Phase 3b 工程推进**：(1) Phase 3a 遗留修复——kpi_alert.py §4.4 三维退化检测 + violations_scan.py check #3 仓位超阈值 + sigma/daily/ 目录 + Makefile 消息修正；(2) Phase 3b PR-7c——sigma/reminders/（Calendar 5 模板 + 邮件 cron 配置）+ scripts/reconcile_funds.py（D 类对账）；(3) Phase 3b PR-6——glossary Level B sync 12 术语入库 |

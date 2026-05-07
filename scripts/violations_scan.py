@@ -21,9 +21,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 WORKSPACE = Path(__file__).resolve().parent.parent
-TRADES_DIR = WORKSPACE / "trades"
-DAILY_DIR = WORKSPACE / "sigma" / "daily"
-VIOLATIONS_DIR = WORKSPACE / "reviews" / "violations"
+
+# Resolved per-trader at runtime (see main())
+TRADES_DIR = None
+DAILY_DIR = None
+VIOLATIONS_DIR = None
 
 
 def get_current_week():
@@ -84,6 +86,49 @@ def read_frontmatter(filepath):
     return fm, content
 
 
+MAX_SINGLE_POSITION_PCT = 20  # risk_rules.md §一 单票仓位上限
+
+
+def _check_overposition(trade_path, fm, content, violations):
+    """Check #3: position size exceeds risk_rules.md single-position limit.
+
+    Looks at two sources:
+    1. If 3 section "本笔占比：___%"
+    2. Frontmatter position_size vs a rough account-total from If 3
+    """
+    pct_match = re.search(r"本笔占比[：:]\s*([\d.]+)\s*%", content)
+    if pct_match:
+        try:
+            pct = float(pct_match.group(1))
+            if pct > MAX_SINGLE_POSITION_PCT:
+                violations.append((
+                    "仓位超阈值",
+                    f"{trade_path.name}: 本笔占比 {pct}% > 单票上限 {MAX_SINGLE_POSITION_PCT}%（risk_rules §一）"
+                ))
+                return
+        except ValueError:
+            pass
+
+    pos = fm.get("position_size", "").strip()
+    if not pos:
+        return
+    acct_match = re.search(r"训练资金账户总额[：:]\s*([\d,.]+)", content)
+    if not acct_match:
+        return
+    try:
+        position = float(pos.replace(",", ""))
+        account = float(acct_match.group(1).replace(",", ""))
+        if account > 0:
+            ratio = position / account * 100
+            if ratio > MAX_SINGLE_POSITION_PCT:
+                violations.append((
+                    "仓位超阈值",
+                    f"{trade_path.name}: position_size/账户 ≈ {ratio:.0f}% > 单票上限 {MAX_SINGLE_POSITION_PCT}%（risk_rules §一）"
+                ))
+    except ValueError:
+        pass
+
+
 def check_violations(start_date, end_date):
     """Run all 5 violation checks and return list of (type, detail) tuples."""
     violations = []
@@ -121,10 +166,8 @@ def check_violations(start_date, end_date):
                 f"{tf.name}: {', '.join(empty_ifs)} 未填写或内容不足"
             ))
 
-        # 3. 仓位超阈值（简化：检查 frontmatter position_size 是否存在）
-        if not fm.get("position_size") or fm.get("position_size") == "":
-            pass  # position_size 未填不算违规——但如果填了且超标则算
-        # NOTE: 完整检测需要 risk_rules.md 中的 max_position_pct，Phase 3b 强化
+        # 3. 仓位超阈值（从 If 3 "本笔占比" + frontmatter position_size 检测）
+        _check_overposition(tf, fm, content, violations)
 
         # 4. 止损穿越未平仓（简化：检查 stop_loss_price vs exit_price）
         stop = fm.get("stop_loss_price", "").strip()
@@ -185,10 +228,28 @@ def write_report(year, week, violations):
     return filename
 
 
+def _init_paths(trader_id=None):
+    global TRADES_DIR, DAILY_DIR, VIOLATIONS_DIR
+    from paths import get_paths
+    p = get_paths(trader_id)
+    TRADES_DIR = p["trades"]
+    DAILY_DIR = p["daily"]
+    VIOLATIONS_DIR = p["violations"]
+
+
 def main():
+    trader_id = None
+    args = sys.argv[1:]
+    if "--trader" in args:
+        idx = args.index("--trader")
+        trader_id = args[idx + 1]
+        args = args[:idx] + args[idx + 2:]
+
+    _init_paths(trader_id)
+
     year, week = get_current_week()
-    if len(sys.argv) >= 3:
-        year, week = int(sys.argv[1]), int(sys.argv[2])
+    if len(args) >= 2:
+        year, week = int(args[0]), int(args[1])
 
     start, end = get_week_range(year, week)
     print(f"Scanning violations for {year}-W{week:02d} ({start.date()} to {end.date()})...")

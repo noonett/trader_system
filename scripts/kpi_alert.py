@@ -18,9 +18,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 WORKSPACE = Path(__file__).resolve().parent.parent
-TRADES_DIR = WORKSPACE / "trades"
-DAILY_DIR = WORKSPACE / "sigma" / "daily"
-ALERTS_DIR = WORKSPACE / "reviews" / "alerts"
+
+# Resolved per-trader at runtime (see main())
+TRADES_DIR = None
+DAILY_DIR = None
+ALERTS_DIR = None
 
 
 def count_trading_days(start_date, end_date):
@@ -99,14 +101,38 @@ def compute_kpis(weeks_back=4):
     }
 
 
+def _any_p0_below(kpis, threshold):
+    """Check if any P0 KPI (pre_rate, chain_rate, ema_rate) < threshold.
+
+    Design §4.4: "P0 任一 < 50% → 退化"
+    Only triggers when there is actual activity (trading_days > 0) and at
+    least one trade exists (so chain_rate/ema_rate are meaningful).
+    """
+    if kpis["trading_days"] <= 0:
+        return False
+    below = kpis["pre_rate"] < threshold
+    if kpis["total_trades"] > 0:
+        below = below or kpis["chain_rate"] < threshold or kpis["ema_rate"] < threshold
+    return below
+
+
 def determine_level(kpis_4w, kpis_8w, kpis_12w):
-    """Determine current degradation level based on KPI data."""
-    if kpis_12w["pre_rate"] < 50 and kpis_12w["trading_days"] > 0:
-        return "L0", "触发退出协议（v5 §三.6）——12 周 P0 盘前规则完成率 < 50%"
-    if kpis_8w["pre_rate"] < 50 and kpis_8w["trading_days"] > 0:
-        return "L1", "4→1 退化——仅保留盘前规则书写（8 周 P0 < 50%）"
-    if kpis_4w["pre_rate"] < 50 and kpis_4w["trading_days"] > 0:
-        return "L2", "4→2 退化——盘前 + 月校准（4 周 P0 < 50%）"
+    """Determine current degradation level based on KPI data.
+
+    Design §4.4 triggers:
+      12w any P0 < 50% → L0 (exit protocol)
+       8w any P0 < 50% → L1 (pre-market only)
+       4w any P0 < 50% → L2 (pre-market + monthly calibration)
+    """
+    if _any_p0_below(kpis_12w, 50):
+        dims = _format_dims(kpis_12w)
+        return "L0", f"触发退出协议（v5 §三.6）——12 周 P0 任一 < 50%（{dims}）"
+    if _any_p0_below(kpis_8w, 50):
+        dims = _format_dims(kpis_8w)
+        return "L1", f"4→1 退化——仅保留盘前规则书写（8 周 P0 任一 < 50%: {dims}）"
+    if _any_p0_below(kpis_4w, 50):
+        dims = _format_dims(kpis_4w)
+        return "L2", f"4→2 退化——盘前 + 月校准（4 周 P0 任一 < 50%: {dims}）"
 
     any_below_threshold = (
         kpis_4w["pre_rate"] < 80 or
@@ -117,6 +143,10 @@ def determine_level(kpis_4w, kpis_8w, kpis_12w):
         return "L4-warning", f"L4 维持但有 KPI 低于阈值——盘前 {kpis_4w['pre_rate']:.0f}% / 决策链 {kpis_4w['chain_rate']:.0f}% / EMA {kpis_4w['ema_rate']:.0f}%"
 
     return "L4", "L4 完整版维持——所有 P0 KPI 达标"
+
+
+def _format_dims(kpis):
+    return f"盘前 {kpis['pre_rate']:.0f}% / 决策链 {kpis['chain_rate']:.0f}% / EMA {kpis['ema_rate']:.0f}%"
 
 
 def generate_alert(level, reason, kpis_4w):
@@ -163,16 +193,31 @@ def generate_alert(level, reason, kpis_4w):
     return filename
 
 
+def _init_paths(trader_id=None):
+    global TRADES_DIR, DAILY_DIR, ALERTS_DIR
+    from paths import get_paths
+    p = get_paths(trader_id)
+    TRADES_DIR = p["trades"]
+    DAILY_DIR = p["daily"]
+    ALERTS_DIR = p["alerts"]
+
+
 def main():
-    print("=== σ KPI 退化检测 ===")
+    import sys
+    trader_id = None
+    if "--trader" in sys.argv:
+        idx = sys.argv.index("--trader")
+        trader_id = sys.argv[idx + 1]
+
+    _init_paths(trader_id)
+    print(f"=== σ KPI 退化检测 (trader: {trader_id or 'default'}) ===")
 
     kpis_4w = compute_kpis(4)
     kpis_8w = compute_kpis(8)
     kpis_12w = compute_kpis(12)
 
-    print(f"4w: pre={kpis_4w['pre_rate']:.0f}% chain={kpis_4w['chain_rate']:.0f}% ema={kpis_4w['ema_rate']:.0f}%")
-    print(f"8w: pre={kpis_8w['pre_rate']:.0f}%")
-    print(f"12w: pre={kpis_12w['pre_rate']:.0f}%")
+    for label, k in [("4w", kpis_4w), ("8w", kpis_8w), ("12w", kpis_12w)]:
+        print(f"{label}: pre={k['pre_rate']:.0f}% chain={k['chain_rate']:.0f}% ema={k['ema_rate']:.0f}%")
 
     level, reason = determine_level(kpis_4w, kpis_8w, kpis_12w)
     alert_path = generate_alert(level, reason, kpis_4w)
