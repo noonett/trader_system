@@ -1,4 +1,4 @@
-import { streamText, stepCountIs } from "ai";
+import { convertToModelMessages, streamText, stepCountIs } from "ai";
 import { createTools } from "@/lib/tools";
 import { SYSTEM_PROMPT } from "@/lib/system-prompt";
 import { getModel } from "@/lib/model";
@@ -10,12 +10,15 @@ export async function POST(req: Request) {
 
   const traderId = "default";
   const tools = createTools(traderId);
+  // useChat() sends UIMessage[]; streamText expects ModelMessage[] (AI SDK v6)
+  const modelMessages = await convertToModelMessages(messages, {
+    ignoreIncompleteToolCalls: true,
+  });
 
   const result = streamText({
     model: getModel(),
     system: SYSTEM_PROMPT,
-    messages,
-    // @ts-expect-error zod v4 + AI SDK v6 type mismatch; runtime works
+    messages: modelMessages,
     tools,
     stopWhen: stepCountIs(10),
   });

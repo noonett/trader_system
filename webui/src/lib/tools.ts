@@ -1,24 +1,29 @@
+import { tool } from "ai";
 import { z } from "zod";
 import { readFile, writeFile, listFiles, gitCommit } from "./repo";
 
+/**
+ * AI SDK v6 expects `inputSchema` on each tool (not `parameters`).
+ * Use `tool()` for a typed tool object compatible with streamText.
+ */
 export function createTools(traderId = "default") {
   return {
-    readTraderFile: {
+    readTraderFile: tool({
       description:
         "Read a file from the trader's data directory or shared templates/knowledge. Returns file content.",
-      parameters: z.object({
+      inputSchema: z.object({
         filePath: z.string().describe("Relative path from workspace root"),
       }),
       execute: async ({ filePath }: { filePath: string }) => {
         const content = await readFile(filePath);
         return content.slice(0, 12000);
       },
-    },
+    }),
 
-    writeTraderFile: {
+    writeTraderFile: tool({
       description:
         "Write/create a markdown file in the trader's data directory. Use for pre-market daily files, trade records, EMA entries, and reviews.",
-      parameters: z.object({
+      inputSchema: z.object({
         filePath: z.string().describe("Relative path, must be under traders/{id}/"),
         content: z.string().describe("Full file content to write"),
       }),
@@ -29,22 +34,22 @@ export function createTools(traderId = "default") {
         await writeFile(filePath, content);
         return `Written: ${filePath}`;
       },
-    },
+    }),
 
-    listTraderFiles: {
+    listTraderFiles: tool({
       description: "List markdown files in a directory. Useful for finding trades, daily files, or reviews.",
-      parameters: z.object({
+      inputSchema: z.object({
         directory: z.string().describe("Relative directory path"),
       }),
       execute: async ({ directory }: { directory: string }) => {
         const files = await listFiles(directory);
         return files.length > 0 ? files.join("\n") : "No .md files found";
       },
-    },
+    }),
 
-    gitCommit: {
+    gitCommit: tool({
       description: "Stage and commit files to git. Use after writing pre-market rules, trade records, or reviews.",
-      parameters: z.object({
+      inputSchema: z.object({
         files: z.array(z.string()).describe("File paths to stage"),
         message: z.string().describe("Git commit message"),
       }),
@@ -52,11 +57,16 @@ export function createTools(traderId = "default") {
         const hash = await gitCommit(files, message);
         return `Committed: ${hash} — ${message}`;
       },
-    },
+    }),
 
-    getTodayInfo: {
+    getTodayInfo: tool({
       description: "Get today's date, day of week, and trading session info.",
-      parameters: z.object({}),
+      inputSchema: z.object({
+        localeHint: z
+          .string()
+          .optional()
+          .describe("Optional locale hint for wording (e.g. zh-CN); does not change computed dates."),
+      }),
       execute: async () => {
         const now = new Date();
         const yyyy = now.getFullYear();
@@ -85,12 +95,12 @@ export function createTools(traderId = "default") {
           dailyFilePath: `traders/${traderId}/daily/${yyyy}-${mm}/${yyyy}-${mm}-${dd}-pre.md`,
         });
       },
-    },
+    }),
 
-    readTemplate: {
+    readTemplate: tool({
       description:
         "Read a shared σ template (pre-market, decision-chain, post-trade-ema, weekly-review, monthly-calibration, ai-roles).",
-      parameters: z.object({
+      inputSchema: z.object({
         templateName: z.enum([
           "pre-market",
           "decision-chain",
@@ -104,6 +114,6 @@ export function createTools(traderId = "default") {
         const content = await readFile(`sigma/templates/${templateName}.md`);
         return content;
       },
-    },
+    }),
   };
 }

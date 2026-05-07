@@ -73,7 +73,11 @@ export function Chat() {
         )}
 
         {messages.map((m) => (
-          <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+          <div
+            key={m.id}
+            data-testid={m.role === "user" ? "message-user" : "message-assistant"}
+            className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+          >
             <div
               className={`max-w-[80%] rounded-xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
                 m.role === "user"
@@ -113,7 +117,10 @@ export function Chat() {
         )}
 
         {error && (
-          <div className="bg-red-950/50 border border-red-800 rounded-xl px-4 py-3 text-sm text-red-300">
+          <div
+            data-testid="chat-error"
+            className="bg-red-950/50 border border-red-800 rounded-xl px-4 py-3 text-sm text-red-300"
+          >
             错误: {error.message}
           </div>
         )}
@@ -122,6 +129,7 @@ export function Chat() {
       <form onSubmit={handleSubmit} className="px-6 py-4 border-t border-zinc-800 shrink-0">
         <div className="flex gap-3">
           <input
+            data-testid="chat-input"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="输入消息..."
