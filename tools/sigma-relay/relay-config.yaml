@@ -1,0 +1,26 @@
+# sigma-relay 配置文件
+# 环境变量可覆盖此文件中的值（前缀 SIGMA_）
+
+port: 9733
+
+# 项目根目录（sigma-relay 需要知道 trades/ 在哪）
+# workspace_root: /path/to/your/workspace
+
+# 交易员 ID
+trader_id: default
+
+# 通知通道：log / telegram / webhook
+notify_channel: log
+
+# Telegram 配置（notify_channel = telegram 时需要）
+# telegram_bot_token: "your-bot-token"
+# telegram_chat_id: "your-chat-id"
+
+# Webhook 配置（notify_channel = webhook 时需要）
+# webhook_url: "https://your-webhook-endpoint"
+
+# 截图监控目录（可选 — 如果使用文件监控模式而非 HTTP 推送）
+# screenshot_watch_dir: "C:\\Users\\you\\Documents\\sigma-screenshots"
+
+# Partial fill 超时（秒）：多久没有新 fill 视为一笔开仓完成
+partial_fill_timeout_seconds: 60

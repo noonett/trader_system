@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SigmaBridge</RootNamespace>
+    <AssemblyName>SigmaBridge</AssemblyName>
+  </PropertyGroup>
+
+  <!--
+    ATAS.Indicators.dll 引用 — 路径需根据你的 ATAS 安装位置修改。
+    典型路径：
+      - C:\Program Files\ATAS Platform\ATAS.Indicators.dll
+      - C:\Program Files (x86)\ATAS Platform\ATAS.Indicators.dll
+    
+    你也可以通过 NuGet 引用（如果 ATAS 已发布包）。
+    2026 年 ATAS 文档建议检查 docs.atas.net 获取最新引用方式。
+  -->
+  <ItemGroup>
+    <Reference Include="ATAS.Indicators">
+      <HintPath>..\..\lib\ATAS.Indicators.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
