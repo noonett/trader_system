@@ -273,6 +273,8 @@ WebUI A1 起步形态候选：local Vite + 一个 `weekly-dashboard.html` 直接
 
 **退化候选**：若用户 4 周内周批量对账完成率 < 30%，退化到仅 C（接受"σ 是当日复盘系统 + 已知盲区"的形态定位）。
 
+> **CME 期货 / ATAS 补充（2026-05-08）**：上述 D6 推荐基于"A 股零售无 broker API"的约束。对于 CME 期货（用户当前使用 ATAS + dxfeed），该约束不适用——ATAS 提供 C# 指标 API 可直接获取结构化成交数据。已实现 **SigmaBridge + sigma-relay** 实时捕获路径（详见 [design_atas_realtime_capture_2026.md](design_atas_realtime_capture_2026.md)）。D6 原路径（C+D）对 A 股/港股不变；CME sleeve 使用实时捕获 + 周对账作为二次确认。
+
 ### D7 A 股市场制度 binding 利用
 
 **推荐 = (i) 9:20 集合竞价 + (ii) T+1 + (iii) 涨跌停板 三项全用**——这是 A 股版 σ 优于美股版的结构性优势（§四.7）。

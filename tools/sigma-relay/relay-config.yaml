@@ -1,0 +1,49 @@
+# sigma-relay 配置文件
+# 环境变量可覆盖（前缀 SIGMA_）
+
+port: 9733
+
+# 项目根目录（sigma-relay 需要知道 trades/ 在哪）
+# 默认自动检测（相对于本文件 ../../）
+# workspace_root: "C:\\Users\\you\\path\\to\\trader_system"
+
+trader_id: default
+
+# ─── 通知配置 ────────────────────────────────────────────────────────────────
+
+# 通知通道列表（同时支持多通道）
+notify_channels:
+  - toast           # Windows 系统弹窗
+  - wechat_work     # 企业微信群机器人
+
+# 企业微信群机器人 Webhook URL
+# 获取方式：群设置 → 群机器人 → 添加 → 复制 Webhook 地址
+# wechat_work_webhook_url: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=YOUR_KEY"
+
+# 如果不用企业微信，可以用 PushPlus 推送到个人微信
+# 获取方式：https://www.pushplus.plus/ 注册后在"一对一推送"拿 token
+# pushplus_token: "your_pushplus_token"
+
+# 或者 Server酱
+# serverchan_key: "your_sendkey"
+
+# ─── 截图配置 ────────────────────────────────────────────────────────────────
+
+# 成交时自动截图
+auto_screenshot: true
+
+# 截图的显示器序号（0=全部显示器合并, 1=主显示器, 2=副显示器...）
+# 建议设为 ATAS 窗口所在的显示器编号
+screenshot_monitor: 1
+
+# ─── 高级 ────────────────────────────────────────────────────────────────────
+
+# Partial fill 超时（秒）：多久没有新 fill 视为一笔开仓完成
+# NOTE: 尚未实现。当前仅在收到 position_closed 事件时生成 draft。
+# partial_fill_timeout_seconds: 60
+
+# ─── 退化模式：文件监控（ATAS 沙箱阻止 HTTP 时使用）───────────────────────────
+# 如果 ATAS 自定义指标无法使用 System.Net.Http，改为写本地 JSONL 文件。
+# 设置此目录后，sigma-relay 启动时自动开启 file_watcher 监控。
+# SigmaBridge C# 侧需改为 File.AppendAllText 输出到此目录的 events.jsonl。
+# file_watcher_dir: "C:\\sigma-events"

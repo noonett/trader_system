@@ -52,6 +52,8 @@
 │       ├── reviews/                    ← 周月报、violations、alerts、reconcile
 │       └── profile/                    ← 交易员画像 + 阶段进度 + 偏误记录
 │
+├── atas-plugin/SigmaBridge/            ← ATAS C# 桥接指标（成交事件 → HTTP POST 到 sigma-relay）
+├── tools/sigma-relay/                  ← Python 本地中继服务（聚合 fills → 生成 trade draft → git commit）
 ├── scripts/                            ← 共享：违规扫描、周报/月报、kpi_alert、对账
 ├── knowledge/                          ← 共享：知识库（glossary / risk_rules / meta-rule）
 ├── research/                           ← 共享：Plan/Design 调研与设计交付
@@ -68,6 +70,17 @@
 - 单测：`cd webui && npm test`（Vitest）。
 - 端到端：`cd webui && npx playwright install chromium`（或本机已装 Edge 时用 `PW_CHANNEL=msedge`），再 `npm run test:e2e`；快测一条对话可用 `npm run test:e2e:quick`；仅跑「盘后 EMA」快捷按钮流（Playwright tag `@ema-tools`）可用 `npm run test:e2e:ema`；全部快捷按钮场景可用 `npm run test:e2e:quick-actions`。
 - DeepSeek：`webui/.env.example` 说明 `DEEPSEEK_THINKING`；默认在发往 Chat Completions 的请求里关闭 `thinking`，避免多轮工具与 AI SDK 消息映射组合下出现官方文档所述需回传 `reasoning_content` 的约束问题（见 [Create Chat Completion](https://api-docs.deepseek.com/api/create-chat-completion/) 中 `thinking` 字段说明）。
+
+### ATAS 实时捕获（CME 期货专用）
+
+> 设计文档：[research/design_atas_realtime_capture_2026.md](research/design_atas_realtime_capture_2026.md)。对应 design_proposal D6 的**升级路径**——A 股/港股仍走 D6 原路径（手动复盘 + 周对账），CME 期货通过 ATAS 指标 API 实时捕获成交数据。
+
+- **数据流**：ATAS SigmaBridge（C# 指标）→ HTTP POST → sigma-relay（Python 本地服务）→ 聚合 partial fills → 生成 trade draft（markdown + git commit）→ 通知用户补填决策链。
+- **编译 SigmaBridge**：`cd atas-plugin/SigmaBridge && dotnet build -c Release`（需 .NET 8 SDK，无需 VS）。
+- **启动 sigma-relay**：`cd tools/sigma-relay && pip install -r requirements.txt && python server.py`（默认 `127.0.0.1:9733`）。
+- 配置：`tools/sigma-relay/relay-config.yaml`（通知通道、截图、trader_id 等）。
+- 测试：`cd tools/sigma-relay && pytest tests/`（22 个测试）。
+- **最高风险未知数**：ATAS 指标沙箱是否允许 `System.Net.Http`——如不允许，配置 `file_watcher_dir` 切换为文件监控模式。
 
 ## 用户特征
 
