@@ -22,6 +22,7 @@
 - [research/foundation_2026.md](../research/foundation_2026.md) — **σ 系统证据基础（v5）**，758 行，13 节 Plan 级约束 + 4 层目标结构 + 12 个 S 级证据组件 + 4.2 隐含假设盲区 6 条。**当前 Plan 宪法**。
 - [research/entry_form_research_2026.md](../research/entry_form_research_2026.md) — Phase 2 入口形态调研整合（**v3 cleanup**，2026-05-06），~750 行。Plan→Design 桥梁；6+1 收敛信号 + §四.3-4.10 12 项 Phase 2 Design 必决事项（v3 补齐 v2 内部不一致）+ §六 N=1 vs productization 临床安全分级。
 - [research/design_proposal_2026.md](../research/design_proposal_2026.md) — **Phase 2 Design v0.1（2026-05-06，A+ 按优先级分阶段修订）**，~1000 行。在 N=1 用户语境下对 12 项 D1–D12 给出推荐选择 + 主证据 + 反向证据 + 退化路径；§零 优先级矩阵（P0/P1/P2/P3）+ Phase 3a/b/c/d 阶段拆分 + 11 个独立小 PR；定义 v0 sigma/ 目录结构（含 scripts/ + ai-roles.md + reviews/violations/ + reviews/alerts/ + webui/ 占位）+ 5 层工作流（用户手动 + AI 后台批处理 + 后台强制风控 4 类 A/B/C/D + Mobile 提醒 + WebUI 渲染）+ 4 周可证伪 KPI + 4→3→2→1→0 退化 + 退出协议；§六 相容性核查双栏（Phase 3a 后 vs 前）；§七 处置旧 Stage 0 工具。**当前 Design 主交付**。
+- [research/design_atas_realtime_capture_2026.md](../research/design_atas_realtime_capture_2026.md) — **ATAS 实时捕获技术方案 v0.2（2026-05-08）**，~600 行。D6 升级路径：CME 期货通过 ATAS C# 指标 API 实时捕获成交数据 → sigma-relay 聚合 → draft 生成。组件 1（SigmaBridge）+ 组件 2（sigma-relay）已实现，待用户 Windows 实盘验证。
 
 ### 原始调研笔记（research/notes/）
 
@@ -142,5 +143,6 @@
 | **2026-05-06 (晚)** | **Phase 2 Design v0.1 修订 sync**：(1) design_proposal 标 v0.1（A+ 按优先级分阶段修订）—— 加后台强制风控 + WebUI 渲染层 + Mobile 提醒；P0/P1/P2/P3 + Phase 3a/b/c/d 阶段；总 PR 从 8 扩到 11；(2) **新增 4 项候选 claims**：system-008 后台 AI 周读 + 自动违规扫描激活中等被审视感 / system-009 σ 物理边界内 4 类后台强制风控（A/B/C/D） / system-010 Mobile 提醒辅助层（不主入口）/ system-011 D3 介质 satisficing 性质显式声明（v0 错标"最优"，v0.1 修正）。                                                                         |
 | **2026-05-07**      | **Phase 3a 落地后索引清理**：`deprecated/` 占位改为指向 `archive/deprecated_stage0/`；claims 说明改为「3a 已就位、建库时间可协商」；顶栏 `last_updated` 更新。                                                                                                                                                                                                                                                                                                                                    |
 | **2026-05-08**      | **根说明改名**：元规则节增加 [AGENTS.md](../AGENTS.md) 链接（原 `CLAUDE.md` → Cursor 惯例文件名）。                                                                                                                                                                                                                                                                                                                                                                                              |
+| **2026-05-08 (晚)** | **ATAS 实时捕获落地**：(1) 顶层综合文档新增 [design_atas_realtime_capture_2026.md](../research/design_atas_realtime_capture_2026.md) v0.2（D6 升级路径——CME 期货 ATAS 实时捕获）；(2) design_proposal D6 加 CME sleeve 补充说明；(3) AGENTS.md 项目文件结构增加 `atas-plugin/SigmaBridge/` + `tools/sigma-relay/`。 |
 
 
