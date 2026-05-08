@@ -26,6 +26,7 @@ from draft_generator import generate_draft_markdown
 from config import get_config
 from screenshot import capture_screen, move_to_trade_screenshots
 from notify import send_notification
+from persistence import EventStore
 
 logging.basicConfig(
     level=logging.INFO,
@@ -39,7 +40,21 @@ logger = logging.getLogger("sigma-relay")
 
 app = FastAPI(title="σ sigma-relay", version="0.1.0")
 
+event_store = EventStore()
+
 open_positions: dict[tuple[str, str], dict] = {}
+
+
+@app.on_event("startup")
+async def startup():
+    """Recover open positions from today's event log (handles restart)."""
+    global open_positions
+    recovered = event_store.rebuild_open_positions()
+    if recovered:
+        open_positions.update(recovered)
+        logger.info(
+            f"Recovered {len(recovered)} open position(s) from event log"
+        )
 
 
 class TradeEvent(BaseModel):
@@ -89,12 +104,40 @@ async def health():
     }
 
 
+@app.get("/events")
+async def get_events(date: Optional[str] = None):
+    """Query stored events. Defaults to today."""
+    if date is None:
+        date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    events = event_store.load_date(date)
+    return {"date": date, "count": len(events), "events": events}
+
+
+@app.get("/positions")
+async def get_positions():
+    """Query current open positions being tracked."""
+    result = {}
+    for (symbol, account), pos in open_positions.items():
+        fills = pos.get("fills", [])
+        total_qty = sum(f["qty"] for f in fills)
+        result[f"{symbol}|{account}"] = {
+            "symbol": symbol,
+            "direction": pos["direction"],
+            "fills": len(fills),
+            "total_qty": total_qty,
+            "first_fill": pos.get("first_fill_time", ""),
+        }
+    return {"open_positions": result}
+
+
 @app.post("/trade-event")
 async def handle_trade(event: TradeEvent):
     key = (event.symbol, event.account or "")
     logger.info(
         f"Trade event: {event.symbol} {event.side} {event.quantity}@{event.price}"
     )
+
+    event_store.append(event.model_dump())
 
     if key not in open_positions:
         open_positions[key] = {
@@ -143,6 +186,8 @@ async def handle_close(event: PositionClosed):
         f"Position closed: {event.symbol} PnL={event.realized_pnl} "
         f"avg_entry={event.avg_entry_price}"
     )
+
+    event_store.append(event.model_dump())
 
     pos = open_positions.pop(key, None)
     if pos is None:
@@ -197,6 +242,8 @@ async def handle_order(event: OrderUpdate):
         f"Order update: {event.symbol} {event.order_type} "
         f"stop={event.stop_price} state={event.order_state}"
     )
+
+    event_store.append(event.model_dump())
 
     if key in open_positions and event.stop_price > 0:
         open_positions[key]["stop_prices"].append(
