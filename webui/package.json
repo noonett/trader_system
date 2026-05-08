@@ -11,6 +11,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:quick": "playwright test --grep \"首页加载\"",
+    "test:e2e:ema": "playwright test --grep \"@ema-tools\"",
+    "test:e2e:quick-actions": "playwright test --grep \"快捷\"",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:ui": "playwright test --ui"
   },

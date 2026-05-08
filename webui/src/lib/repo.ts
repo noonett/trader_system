@@ -1,8 +1,34 @@
 import path from "path";
-import fs from "fs/promises";
+import fs from "fs";
+import fsp from "fs/promises";
 import simpleGit from "simple-git";
 
-const WORKSPACE = process.env.SIGMA_WORKSPACE || path.resolve(__dirname, "../../../..");
+/**
+ * Resolve the σ repo root (contains sigma/templates/, traders/, etc.).
+ * Next.js bundles server code deep under .next/, so __dirname-based hops are unreliable.
+ * Prefer SIGMA_WORKSPACE, then walk up from cwd until pre-market template exists.
+ */
+function resolveSigmaWorkspace(): string {
+  const env = process.env.SIGMA_WORKSPACE?.trim();
+  if (env) {
+    return path.resolve(env);
+  }
+  let dir = process.cwd();
+  for (let i = 0; i < 16; i++) {
+    const marker = path.join(dir, "sigma", "templates", "pre-market.md");
+    if (fs.existsSync(marker)) {
+      return dir;
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) {
+      break;
+    }
+    dir = parent;
+  }
+  return path.resolve(__dirname, "../../../..");
+}
+
+const WORKSPACE = resolveSigmaWorkspace();
 
 export function traderRoot(traderId = "default") {
   return path.join(WORKSPACE, "traders", traderId);
@@ -41,7 +67,7 @@ export async function readFile(filePath: string): Promise<string> {
   if (!resolved.startsWith(WORKSPACE)) {
     throw new Error("Path traversal blocked");
   }
-  return fs.readFile(resolved, "utf-8");
+  return fsp.readFile(resolved, "utf-8");
 }
 
 export async function writeFile(filePath: string, content: string): Promise<void> {
@@ -49,8 +75,8 @@ export async function writeFile(filePath: string, content: string): Promise<void
   if (!resolved.startsWith(WORKSPACE)) {
     throw new Error("Path traversal blocked");
   }
-  await fs.mkdir(path.dirname(resolved), { recursive: true });
-  await fs.writeFile(resolved, content, "utf-8");
+  await fsp.mkdir(path.dirname(resolved), { recursive: true });
+  await fsp.writeFile(resolved, content, "utf-8");
 }
 
 export async function listFiles(dirPath: string): Promise<string[]> {
@@ -59,7 +85,7 @@ export async function listFiles(dirPath: string): Promise<string[]> {
     throw new Error("Path traversal blocked");
   }
   try {
-    const entries = await fs.readdir(resolved, { withFileTypes: true, recursive: true });
+    const entries = await fsp.readdir(resolved, { withFileTypes: true, recursive: true });
     return entries
       .filter((e) => e.isFile() && e.name.endsWith(".md"))
       .map((e) => path.relative(WORKSPACE, path.join((e as unknown as { parentPath?: string }).parentPath || "", e.name)));

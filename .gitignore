@@ -24,3 +24,4 @@ Thumbs.db
 
 # Graphify (knowledge-graph build artifacts; rules are tracked, output is not)
 graphify-out/
+.graphify_python

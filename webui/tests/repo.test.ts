@@ -3,6 +3,32 @@ import * as os from "os";
 import * as path from "path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+describe("repo (workspace discovery from cwd)", () => {
+  let repoRoot: string;
+
+  beforeEach(() => {
+    repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), "webui-repo-cwd-"));
+    const tplDir = path.join(repoRoot, "sigma", "templates");
+    fs.mkdirSync(tplDir, { recursive: true });
+    fs.writeFileSync(path.join(tplDir, "pre-market.md"), "# template");
+    delete process.env.SIGMA_WORKSPACE;
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    fs.rmSync(repoRoot, { recursive: true, force: true });
+  });
+
+  it("finds repo root when cwd is webui subdirectory", async () => {
+    const webuiDir = path.join(repoRoot, "webui");
+    fs.mkdirSync(webuiDir, { recursive: true });
+    const cwdSpy = vi.spyOn(process, "cwd").mockReturnValue(webuiDir);
+    const { traderRoot } = await import("../src/lib/repo");
+    expect(traderRoot("default")).toBe(path.join(repoRoot, "traders", "default"));
+    cwdSpy.mockRestore();
+  });
+});
+
 describe("repo (SIGMA_WORKSPACE isolation)", () => {
   let tmp: string;
 

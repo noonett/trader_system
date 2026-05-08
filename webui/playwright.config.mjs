@@ -16,7 +16,8 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: 1,
   reporter: [["list"]],
-  timeout: 180_000,
+  /** 含「盘后 EMA」等多 tool 流式回合 */
+  timeout: 300_000,
   expect: { timeout: 20_000 },
   use: {
     baseURL,
@@ -34,7 +35,10 @@ export default defineConfig({
     command: "npm run dev",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
+    timeout: 240_000,
     cwd: __dirname,
+    /** 默认 pipe 时终端几乎无输出，易被误认为「没起 dev」 */
+    stdout: "inherit",
+    stderr: "inherit",
   },
 });

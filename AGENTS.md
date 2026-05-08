@@ -66,7 +66,7 @@
 - 配置：复制 `webui/.env.example` 为 `webui/.env.local`，填入对应 provider 的 API Key（E2E 会读 `.env.local`，无 mock）。
 - 开发：`cd webui && npm install && npm run dev`（默认 `http://127.0.0.1:3000`）。
 - 单测：`cd webui && npm test`（Vitest）。
-- 端到端：`cd webui && npx playwright install chromium`（或本机已装 Edge 时用 `PW_CHANNEL=msedge`），再 `npm run test:e2e`；快测一条对话可用 `npm run test:e2e:quick`。
+- 端到端：`cd webui && npx playwright install chromium`（或本机已装 Edge 时用 `PW_CHANNEL=msedge`），再 `npm run test:e2e`；快测一条对话可用 `npm run test:e2e:quick`；仅跑「盘后 EMA」快捷按钮流（Playwright tag `@ema-tools`）可用 `npm run test:e2e:ema`；全部快捷按钮场景可用 `npm run test:e2e:quick-actions`。
 - DeepSeek：`webui/.env.example` 说明 `DEEPSEEK_THINKING`；默认在发往 Chat Completions 的请求里关闭 `thinking`，避免多轮工具与 AI SDK 消息映射组合下出现官方文档所述需回传 `reasoning_content` 的约束问题（见 [Create Chat Completion](https://api-docs.deepseek.com/api/create-chat-completion/) 中 `thinking` 字段说明）。
 
 ## 用户特征
