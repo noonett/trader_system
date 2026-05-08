@@ -238,16 +238,16 @@ class TestServerSafetyHelpers:
     def test_apply_trade_to_position_excludes_reducing_fill_from_entry(self):
         import sys
         sys.path.insert(0, str(Path(__file__).parent.parent))
-        import server
+        from position_core import apply_trade_to_position, new_position
 
-        pos = server._new_position(
+        pos = new_position(
             symbol="MGC",
             account="A1",
             direction="long",
             first_fill_time="2026-05-08T10:00:00Z",
         )
 
-        assert server._apply_trade_to_position(
+        assert apply_trade_to_position(
             pos,
             price=4700,
             quantity=1,
@@ -255,7 +255,7 @@ class TestServerSafetyHelpers:
             trade_id="t1",
             side="Buy",
         )
-        assert not server._apply_trade_to_position(
+        assert not apply_trade_to_position(
             pos,
             price=4710,
             quantity=1,
@@ -272,16 +272,17 @@ class TestServerSafetyHelpers:
         import sys
         sys.path.insert(0, str(Path(__file__).parent.parent))
         import server
+        from position_core import new_position
 
         server.open_positions.clear()
         try:
-            server.open_positions[("MGC", "A1")] = server._new_position(
+            server.open_positions[("MGC", "A1")] = new_position(
                 symbol="MGC",
                 account="A1",
                 direction="long",
                 first_fill_time="2026-05-08T10:00:00Z",
             )
-            server.open_positions[("MGC", "A2")] = server._new_position(
+            server.open_positions[("MGC", "A2")] = new_position(
                 symbol="MGC",
                 account="A2",
                 direction="short",

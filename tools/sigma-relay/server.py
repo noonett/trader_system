@@ -18,15 +18,15 @@
     - 事件日志存储在本地磁盘，不包含账户密码类敏感信息
 """
 
-import json
 import logging
 import subprocess
+import threading
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
 
 from draft_generator import generate_draft_markdown
@@ -34,6 +34,11 @@ from config import get_config
 from screenshot import capture_screen, move_to_trade_screenshots
 from notify import send_notification
 from persistence import EventStore
+from position_core import (
+    apply_trade_to_position,
+    new_position,
+    side_to_direction,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -48,87 +53,11 @@ logger = logging.getLogger("sigma-relay")
 event_store = EventStore()
 
 open_positions: dict[tuple[str, str], dict] = {}
-
-
-def _side_to_direction(side: str) -> str:
-    return "long" if side.lower() in ("buy", "long") else "short"
-
-
-def _is_opening_fill(direction: str, side: str) -> bool:
-    normalized_side = side.lower()
-    if direction == "long":
-        return normalized_side in ("buy", "long")
-    if direction == "short":
-        return normalized_side in ("sell", "short")
-    return True
-
-
-def _new_position(symbol: str, account: str, direction: str, first_fill_time: str) -> dict:
-    return {
-        "symbol": symbol,
-        "direction": direction,
-        "fills": [],
-        "first_fill_time": first_fill_time,
-        "account": account,
-        "stop_prices": [],
-        "screenshots": [],
-        # Remaining quantity in the original direction.
-        "remaining_qty": 0.0,
-    }
-
-
-def _apply_trade_to_position(
-    position: dict,
-    *,
-    price: float,
-    quantity: float,
-    trade_time: str,
-    trade_id: Optional[str],
-    side: str,
-) -> bool:
-    """Apply one fill to a position.
-
-    Returns True if this is an opening fill in position direction, False otherwise.
-    Closing/reducing fills update remaining_qty but are excluded from entry fills,
-    so draft entry metrics stay accurate.
-    """
-    qty = float(quantity)
-    if qty <= 0:
-        logger.warning(f"Ignoring non-positive quantity fill: qty={quantity}")
-        return False
-
-    if _is_opening_fill(position["direction"], side):
-        position["fills"].append(
-            {
-                "price": price,
-                "qty": qty,
-                "time": trade_time,
-                "trade_id": trade_id,
-            }
-        )
-        position["remaining_qty"] = float(position.get("remaining_qty", 0.0)) + qty
-        return True
-
-    remaining_qty = float(position.get("remaining_qty", 0.0))
-    if remaining_qty <= 0:
-        logger.warning(
-            f"Received reducing fill with no open qty for {position['symbol']} "
-            f"{position.get('account', '')}: {side} {qty}@{price}"
-        )
-        return False
-
-    new_remaining = remaining_qty - qty
-    position["remaining_qty"] = max(0.0, new_remaining)
-    if new_remaining < 0:
-        logger.warning(
-            f"Reducing fill exceeded tracked qty for {position['symbol']} "
-            f"{position.get('account', '')}: reduce={qty}, tracked={remaining_qty}"
-        )
-    return False
+_positions_lock = threading.Lock()
 
 
 def _resolve_position_key(symbol: str, account: str, *, context: str) -> Optional[tuple[str, str]]:
-    """Resolve position key safely.
+    """Resolve position key safely.  Caller must hold _positions_lock.
 
     Exact (symbol, account) match first. Symbol-only fallback is allowed only when
     there is exactly one candidate; otherwise skip to avoid wrong attribution.
@@ -246,16 +175,17 @@ async def get_events(date: Optional[str] = None):
 async def get_positions():
     """Query current open positions being tracked."""
     result = {}
-    for (symbol, account), pos in open_positions.items():
-        fills = pos.get("fills", [])
-        total_qty = sum(f["qty"] for f in fills)
-        result[f"{symbol}|{account}"] = {
-            "symbol": symbol,
-            "direction": pos["direction"],
-            "fills": len(fills),
-            "total_qty": total_qty,
-            "first_fill": pos.get("first_fill_time", ""),
-        }
+    with _positions_lock:
+        for (symbol, account), pos in open_positions.items():
+            fills = pos.get("fills", [])
+            total_qty = sum(f["qty"] for f in fills)
+            result[f"{symbol}|{account}"] = {
+                "symbol": symbol,
+                "direction": pos["direction"],
+                "fills": len(fills),
+                "total_qty": total_qty,
+                "first_fill": pos.get("first_fill_time", ""),
+            }
     return {"open_positions": result}
 
 
@@ -268,26 +198,28 @@ async def handle_trade(event: TradeEvent):
 
     event_store.append(event.model_dump())
 
-    if key not in open_positions:
-        open_positions[key] = _new_position(
-            symbol=event.symbol,
-            account=event.account or "",
-            direction=_side_to_direction(event.side),
-            first_fill_time=event.local_time or event.timestamp,
+    with _positions_lock:
+        if key not in open_positions:
+            open_positions[key] = new_position(
+                symbol=event.symbol,
+                account=event.account or "",
+                direction=side_to_direction(event.side),
+                first_fill_time=event.local_time or event.timestamp,
+            )
+
+        is_opening_fill = apply_trade_to_position(
+            open_positions[key],
+            price=event.price,
+            quantity=event.quantity,
+            trade_time=event.local_time or event.timestamp,
+            trade_id=event.trade_id,
+            side=event.side,
         )
 
-    is_opening_fill = _apply_trade_to_position(
-        open_positions[key],
-        price=event.price,
-        quantity=event.quantity,
-        trade_time=event.local_time or event.timestamp,
-        trade_id=event.trade_id,
-        side=event.side,
-    )
+        fill_count = len(open_positions[key]["fills"])
+        total_qty = sum(f["qty"] for f in open_positions[key]["fills"])
+        remaining_qty = float(open_positions[key].get("remaining_qty", 0.0))
 
-    fill_count = len(open_positions[key]["fills"])
-    total_qty = sum(f["qty"] for f in open_positions[key]["fills"])
-    remaining_qty = float(open_positions[key].get("remaining_qty", 0.0))
     logger.info(
         f"  Aggregated entry fills: {fill_count}, entry qty={total_qty}, "
         f"open qty={remaining_qty}"
@@ -302,9 +234,11 @@ async def handle_trade(event: TradeEvent):
             monitor_index=config.get("screenshot_monitor", 0),
         )
         if screenshot_path:
-            open_positions[key]["screenshots"].append(
-                {"path": str(screenshot_path), "type": capture_type}
-            )
+            with _positions_lock:
+                if key in open_positions:
+                    open_positions[key]["screenshots"].append(
+                        {"path": str(screenshot_path), "type": capture_type}
+                    )
 
     return {
         "status": "aggregating",
@@ -325,22 +259,19 @@ async def handle_close(event: PositionClosed):
 
     event_store.append(event.model_dump())
 
-    pos = open_positions.pop(key, None)
+    with _positions_lock:
+        pos = open_positions.pop(key, None)
     if pos is None:
         logger.warning(
             f"No open position found for {key}. "
             "Relay may have restarted. Creating minimal draft."
         )
-        pos = {
-            "symbol": event.symbol,
-            "direction": "unknown",
-            "fills": [],
-            "first_fill_time": event.timestamp,
-            "account": event.account or "",
-            "stop_prices": [],
-            "screenshots": [],
-            "remaining_qty": 0.0,
-        }
+        pos = new_position(
+            symbol=event.symbol,
+            account=event.account or "",
+            direction="unknown",
+            first_fill_time=event.timestamp,
+        )
 
     config = get_config()
 
@@ -399,25 +330,26 @@ async def handle_order(event: OrderUpdate):
     event_store.append(event.model_dump())
 
     if event.stop_price > 0:
-        resolved_key = _resolve_position_key(
-            event.symbol,
-            event.account or "",
-            context="order-update",
-        )
-        if resolved_key is None:
-            logger.warning(
-                f"Skipping stop update without unique position: "
-                f"symbol={event.symbol} account={event.account or '<empty>'}"
+        with _positions_lock:
+            resolved_key = _resolve_position_key(
+                event.symbol,
+                event.account or "",
+                context="order-update",
             )
-            return {"status": "ignored_no_match"}
+            if resolved_key is None:
+                logger.warning(
+                    f"Skipping stop update without unique position: "
+                    f"symbol={event.symbol} account={event.account or '<empty>'}"
+                )
+                return {"status": "ignored_no_match"}
 
-        open_positions[resolved_key]["stop_prices"].append(
-            {
-                "price": event.stop_price,
-                "time": event.timestamp,
-                "type": event.order_type,
-            }
-        )
+            open_positions[resolved_key]["stop_prices"].append(
+                {
+                    "price": event.stop_price,
+                    "time": event.timestamp,
+                    "type": event.order_type,
+                }
+            )
 
     return {"status": "recorded"}
 
@@ -430,17 +362,18 @@ async def handle_screenshot(notif: ScreenshotNotification):
         f"type={notif.capture_type} path={notif.file_path}"
     )
 
-    matched_key = _resolve_position_key(
-        notif.symbol,
-        notif.account or "",
-        context="screenshot",
-    )
-
-    if matched_key and Path(notif.file_path).exists():
-        open_positions[matched_key]["screenshots"].append(
-            {"path": notif.file_path, "type": notif.capture_type}
+    with _positions_lock:
+        matched_key = _resolve_position_key(
+            notif.symbol,
+            notif.account or "",
+            context="screenshot",
         )
-        return {"status": "associated", "position": matched_key[0]}
+
+        if matched_key and Path(notif.file_path).exists():
+            open_positions[matched_key]["screenshots"].append(
+                {"path": notif.file_path, "type": notif.capture_type}
+            )
+            return {"status": "associated", "position": matched_key[0]}
 
     return {"status": "noted_no_position", "file_path": notif.file_path}
 
@@ -448,7 +381,8 @@ async def handle_screenshot(notif: ScreenshotNotification):
 def git_commit_draft(draft_path: Path, symbol: str, direction: str, screenshot_paths: list[Path] = None):
     """Stage and commit only the draft file (+ screenshots), nothing else.
 
-    Uses a temporary index to avoid committing unrelated staged changes.
+    Uses git pathspec (``-- <files>``) so that only our files are included in
+    the commit, even if other changes are already staged.
     """
     config = get_config()
     workspace = Path(config["workspace_root"])
@@ -507,9 +441,10 @@ def git_commit_draft(draft_path: Path, symbol: str, direction: str, screenshot_p
 
 
 def _handle_file_event(event_data: dict):
-    """Callback for file_watcher: injects events into the same pipeline as HTTP."""
-    import asyncio
+    """Callback for file_watcher (runs on watchdog thread).
 
+    All open_positions mutations are guarded by _positions_lock for thread safety.
+    """
     event_type = event_data.get("event_type", "")
     logger.info(f"File watcher event: {event_type} {event_data.get('symbol', '?')}")
 
@@ -517,67 +452,62 @@ def _handle_file_event(event_data: dict):
 
     if event_type == "new_trade":
         key = (event_data.get("symbol", ""), event_data.get("account", ""))
-        if key not in open_positions:
-            side = event_data.get("side", "")
-            open_positions[key] = _new_position(
-                symbol=event_data.get("symbol", ""),
-                account=event_data.get("account", ""),
-                direction=_side_to_direction(side),
-                first_fill_time=event_data.get("local_time") or event_data.get("timestamp", ""),
+        with _positions_lock:
+            if key not in open_positions:
+                side = event_data.get("side", "")
+                open_positions[key] = new_position(
+                    symbol=event_data.get("symbol", ""),
+                    account=event_data.get("account", ""),
+                    direction=side_to_direction(side),
+                    first_fill_time=event_data.get("local_time") or event_data.get("timestamp", ""),
+                )
+            apply_trade_to_position(
+                open_positions[key],
+                price=event_data.get("price", 0),
+                quantity=event_data.get("quantity", 0),
+                trade_time=event_data.get("local_time") or event_data.get("timestamp", ""),
+                trade_id=event_data.get("trade_id"),
+                side=event_data.get("side", ""),
             )
-        _apply_trade_to_position(
-            open_positions[key],
-            price=event_data.get("price", 0),
-            quantity=event_data.get("quantity", 0),
-            trade_time=event_data.get("local_time") or event_data.get("timestamp", ""),
-            trade_id=event_data.get("trade_id"),
-            side=event_data.get("side", ""),
-        )
 
     elif event_type == "position_closed":
         key = (event_data.get("symbol", ""), event_data.get("account", ""))
-        pos = open_positions.pop(key, None)
+        with _positions_lock:
+            pos = open_positions.pop(key, None)
         if pos is None:
-            pos = {
-                "symbol": event_data.get("symbol", ""),
-                "direction": "unknown",
-                "fills": [],
-                "first_fill_time": event_data.get("timestamp", ""),
-                "account": event_data.get("account", ""),
-                "stop_prices": [],
-                "screenshots": [],
-                "remaining_qty": 0.0,
-            }
+            pos = new_position(
+                symbol=event_data.get("symbol", ""),
+                account=event_data.get("account", ""),
+                direction="unknown",
+                first_fill_time=event_data.get("timestamp", ""),
+            )
         config = get_config()
 
-        class _CloseMock:
-            realized_pnl = event_data.get("realized_pnl", 0)
-            avg_entry_price = event_data.get("avg_entry_price", 0)
-            timestamp = event_data.get("timestamp", "")
-            account = event_data.get("account", "")
+        close_event = PositionClosed.model_validate(event_data)
 
-        draft_path = generate_draft_markdown(pos, _CloseMock(), config)
+        draft_path = generate_draft_markdown(pos, close_event, config)
         git_commit_draft(draft_path, event_data.get("symbol", ""), pos["direction"])
-        pnl = event_data.get("realized_pnl", 0)
+        pnl = close_event.realized_pnl
         pnl_str = f"+{pnl}" if pnl >= 0 else str(pnl)
         send_notification(
-            title=f"σ Draft: {event_data.get('symbol', '?')} {pos['direction']}",
+            title=f"σ Draft: {close_event.symbol} {pos['direction']}",
             message=f"PnL: {pnl_str}\nDraft: {draft_path.name}\n待补填：决策链 5 问 + 盘后 EMA",
             config=config,
         )
 
     elif event_type == "stop_order_update":
-        resolved_key = _resolve_position_key(
-            event_data.get("symbol", ""),
-            event_data.get("account", ""),
-            context="file-watcher-stop-update",
-        )
-        if resolved_key and event_data.get("stop_price", 0) > 0:
-            open_positions[resolved_key]["stop_prices"].append({
-                "price": event_data["stop_price"],
-                "time": event_data.get("timestamp", ""),
-                "type": event_data.get("order_type", ""),
-            })
+        with _positions_lock:
+            resolved_key = _resolve_position_key(
+                event_data.get("symbol", ""),
+                event_data.get("account", ""),
+                context="file-watcher-stop-update",
+            )
+            if resolved_key and event_data.get("stop_price", 0) > 0:
+                open_positions[resolved_key]["stop_prices"].append({
+                    "price": event_data["stop_price"],
+                    "time": event_data.get("timestamp", ""),
+                    "type": event_data.get("order_type", ""),
+                })
 
 
 if __name__ == "__main__":

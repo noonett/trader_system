@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using ATAS.Indicators;
@@ -150,11 +151,14 @@ namespace SigmaBridge
             }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
+        private static readonly Regex SafeSymbolPattern = new(@"[^a-zA-Z0-9_\-]", RegexOptions.Compiled);
+
         private void TriggerScreenCapture(string symbol)
         {
             try
             {
-                var filename = $"sigma_capture_{DateTime.Now:yyyyMMdd_HHmmss}_{symbol}.png";
+                var safeSymbol = SafeSymbolPattern.Replace(symbol, "");
+                var filename = $"sigma_capture_{DateTime.Now:yyyyMMdd_HHmmss}_{safeSymbol}.png";
                 var targetDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
                     + "\\sigma-screenshots";
                 System.IO.Directory.CreateDirectory(targetDir);

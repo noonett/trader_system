@@ -15,6 +15,8 @@ DEFAULT_CONFIG = {
     "serverchan_key": "",
     "auto_screenshot": True,
     "screenshot_monitor": 1,
+    # TODO: not yet implemented — positions are finalized only by position_closed events.
+    # Future: background task to auto-close stale positions after this timeout.
     "partial_fill_timeout_seconds": 60,
 }
 
@@ -24,6 +26,7 @@ def get_config() -> dict:
     config = DEFAULT_CONFIG.copy()
 
     config_path = Path(__file__).parent / "relay-config.yaml"
+    file_config: dict = {}
     if config_path.exists():
         with open(config_path, encoding="utf-8") as f:
             file_config = yaml.safe_load(f) or {}
@@ -43,8 +46,8 @@ def get_config() -> dict:
         if val is not None:
             config[key] = cast(val)
 
-    # Normalize: accept legacy singular key
-    if "notify_channel" in config and "notify_channels" not in config:
-        config["notify_channels"] = [config.pop("notify_channel")]
+    # Normalize: accept legacy singular key from file config
+    if "notify_channel" in file_config and "notify_channels" not in file_config:
+        config["notify_channels"] = [file_config["notify_channel"]]
 
     return config

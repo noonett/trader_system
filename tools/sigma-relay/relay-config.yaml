@@ -39,7 +39,8 @@ screenshot_monitor: 1
 # ─── 高级 ────────────────────────────────────────────────────────────────────
 
 # Partial fill 超时（秒）：多久没有新 fill 视为一笔开仓完成
-partial_fill_timeout_seconds: 60
+# NOTE: 尚未实现。当前仅在收到 position_closed 事件时生成 draft。
+# partial_fill_timeout_seconds: 60
 
 # ─── 退化模式：文件监控（ATAS 沙箱阻止 HTTP 时使用）───────────────────────────
 # 如果 ATAS 自定义指标无法使用 System.Net.Http，改为写本地 JSONL 文件。

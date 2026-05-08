@@ -1,0 +1,5 @@
+# Runtime data (event logs, screenshots)
+data/
+
+# Virtual environment
+.venv/
