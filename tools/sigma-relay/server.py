@@ -50,6 +50,107 @@ event_store = EventStore()
 open_positions: dict[tuple[str, str], dict] = {}
 
 
+def _side_to_direction(side: str) -> str:
+    return "long" if side.lower() in ("buy", "long") else "short"
+
+
+def _is_opening_fill(direction: str, side: str) -> bool:
+    normalized_side = side.lower()
+    if direction == "long":
+        return normalized_side in ("buy", "long")
+    if direction == "short":
+        return normalized_side in ("sell", "short")
+    return True
+
+
+def _new_position(symbol: str, account: str, direction: str, first_fill_time: str) -> dict:
+    return {
+        "symbol": symbol,
+        "direction": direction,
+        "fills": [],
+        "first_fill_time": first_fill_time,
+        "account": account,
+        "stop_prices": [],
+        "screenshots": [],
+        # Remaining quantity in the original direction.
+        "remaining_qty": 0.0,
+    }
+
+
+def _apply_trade_to_position(
+    position: dict,
+    *,
+    price: float,
+    quantity: float,
+    trade_time: str,
+    trade_id: Optional[str],
+    side: str,
+) -> bool:
+    """Apply one fill to a position.
+
+    Returns True if this is an opening fill in position direction, False otherwise.
+    Closing/reducing fills update remaining_qty but are excluded from entry fills,
+    so draft entry metrics stay accurate.
+    """
+    qty = float(quantity)
+    if qty <= 0:
+        logger.warning(f"Ignoring non-positive quantity fill: qty={quantity}")
+        return False
+
+    if _is_opening_fill(position["direction"], side):
+        position["fills"].append(
+            {
+                "price": price,
+                "qty": qty,
+                "time": trade_time,
+                "trade_id": trade_id,
+            }
+        )
+        position["remaining_qty"] = float(position.get("remaining_qty", 0.0)) + qty
+        return True
+
+    remaining_qty = float(position.get("remaining_qty", 0.0))
+    if remaining_qty <= 0:
+        logger.warning(
+            f"Received reducing fill with no open qty for {position['symbol']} "
+            f"{position.get('account', '')}: {side} {qty}@{price}"
+        )
+        return False
+
+    new_remaining = remaining_qty - qty
+    position["remaining_qty"] = max(0.0, new_remaining)
+    if new_remaining < 0:
+        logger.warning(
+            f"Reducing fill exceeded tracked qty for {position['symbol']} "
+            f"{position.get('account', '')}: reduce={qty}, tracked={remaining_qty}"
+        )
+    return False
+
+
+def _resolve_position_key(symbol: str, account: str, *, context: str) -> Optional[tuple[str, str]]:
+    """Resolve position key safely.
+
+    Exact (symbol, account) match first. Symbol-only fallback is allowed only when
+    there is exactly one candidate; otherwise skip to avoid wrong attribution.
+    """
+    exact_key = (symbol, account or "")
+    if exact_key in open_positions:
+        return exact_key
+
+    candidates = [k for k in open_positions if k[0] == symbol]
+    if not candidates:
+        return None
+    if len(candidates) == 1:
+        return candidates[0]
+
+    candidate_accounts = [acc for _, acc in candidates]
+    logger.warning(
+        f"Ambiguous {context} position match for symbol={symbol} account={account or '<empty>'} "
+        f"candidates={candidate_accounts}; skipping fallback."
+    )
+    return None
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup: recover open positions from recent event logs.
@@ -119,6 +220,7 @@ class ScreenshotNotification(BaseModel):
     timestamp: str
     symbol: str
     file_path: str
+    account: Optional[str] = ""
     capture_type: str = "entry"  # entry / exit / context
 
 
@@ -167,31 +269,32 @@ async def handle_trade(event: TradeEvent):
     event_store.append(event.model_dump())
 
     if key not in open_positions:
-        open_positions[key] = {
-            "symbol": event.symbol,
-            "direction": "long" if event.side.lower() in ("buy", "long") else "short",
-            "fills": [],
-            "first_fill_time": event.local_time or event.timestamp,
-            "account": event.account or "",
-            "stop_prices": [],
-            "screenshots": [],
-        }
+        open_positions[key] = _new_position(
+            symbol=event.symbol,
+            account=event.account or "",
+            direction=_side_to_direction(event.side),
+            first_fill_time=event.local_time or event.timestamp,
+        )
 
-    open_positions[key]["fills"].append(
-        {
-            "price": event.price,
-            "qty": event.quantity,
-            "time": event.local_time or event.timestamp,
-            "trade_id": event.trade_id,
-        }
+    is_opening_fill = _apply_trade_to_position(
+        open_positions[key],
+        price=event.price,
+        quantity=event.quantity,
+        trade_time=event.local_time or event.timestamp,
+        trade_id=event.trade_id,
+        side=event.side,
     )
 
     fill_count = len(open_positions[key]["fills"])
     total_qty = sum(f["qty"] for f in open_positions[key]["fills"])
-    logger.info(f"  Aggregated: {fill_count} fills, total qty={total_qty}")
+    remaining_qty = float(open_positions[key].get("remaining_qty", 0.0))
+    logger.info(
+        f"  Aggregated entry fills: {fill_count}, entry qty={total_qty}, "
+        f"open qty={remaining_qty}"
+    )
 
     config = get_config()
-    if config.get("auto_screenshot", True):
+    if config.get("auto_screenshot", True) and is_opening_fill:
         capture_type = "entry" if fill_count == 1 else "context"
         screenshot_path = capture_screen(
             symbol=event.symbol,
@@ -203,7 +306,13 @@ async def handle_trade(event: TradeEvent):
                 {"path": str(screenshot_path), "type": capture_type}
             )
 
-    return {"status": "aggregating", "fills": fill_count, "total_qty": total_qty}
+    return {
+        "status": "aggregating",
+        "fills": fill_count,
+        "total_qty": total_qty,
+        "open_qty": remaining_qty,
+        "opening_fill": is_opening_fill,
+    }
 
 
 @app.post("/position-closed")
@@ -230,6 +339,7 @@ async def handle_close(event: PositionClosed):
             "account": event.account or "",
             "stop_prices": [],
             "screenshots": [],
+            "remaining_qty": 0.0,
         }
 
     config = get_config()
@@ -281,7 +391,6 @@ async def handle_close(event: PositionClosed):
 
 @app.post("/order-update")
 async def handle_order(event: OrderUpdate):
-    key = (event.symbol, event.account or "")
     logger.info(
         f"Order update: {event.symbol} {event.order_type} "
         f"stop={event.stop_price} state={event.order_state}"
@@ -289,26 +398,26 @@ async def handle_order(event: OrderUpdate):
 
     event_store.append(event.model_dump())
 
-    if key in open_positions and event.stop_price > 0:
-        open_positions[key]["stop_prices"].append(
+    if event.stop_price > 0:
+        resolved_key = _resolve_position_key(
+            event.symbol,
+            event.account or "",
+            context="order-update",
+        )
+        if resolved_key is None:
+            logger.warning(
+                f"Skipping stop update without unique position: "
+                f"symbol={event.symbol} account={event.account or '<empty>'}"
+            )
+            return {"status": "ignored_no_match"}
+
+        open_positions[resolved_key]["stop_prices"].append(
             {
                 "price": event.stop_price,
                 "time": event.timestamp,
                 "type": event.order_type,
             }
         )
-    elif event.stop_price > 0:
-        # Fallback: try matching by symbol only (account might differ)
-        for pos_key, pos in open_positions.items():
-            if pos_key[0] == event.symbol:
-                pos["stop_prices"].append(
-                    {
-                        "price": event.stop_price,
-                        "time": event.timestamp,
-                        "type": event.order_type,
-                    }
-                )
-                break
 
     return {"status": "recorded"}
 
@@ -316,18 +425,16 @@ async def handle_order(event: OrderUpdate):
 @app.post("/screenshot")
 async def handle_screenshot(notif: ScreenshotNotification):
     """Receive screenshot notification and associate with current open position."""
-    logger.info(f"Screenshot: {notif.symbol} type={notif.capture_type} path={notif.file_path}")
+    logger.info(
+        f"Screenshot: {notif.symbol} account={notif.account or '<empty>'} "
+        f"type={notif.capture_type} path={notif.file_path}"
+    )
 
-    key = (notif.symbol, "")
-    # Try exact match, then symbol-only fallback
-    matched_key = None
-    if key in open_positions:
-        matched_key = key
-    else:
-        for pos_key in open_positions:
-            if pos_key[0] == notif.symbol:
-                matched_key = pos_key
-                break
+    matched_key = _resolve_position_key(
+        notif.symbol,
+        notif.account or "",
+        context="screenshot",
+    )
 
     if matched_key and Path(notif.file_path).exists():
         open_positions[matched_key]["screenshots"].append(
@@ -412,21 +519,20 @@ def _handle_file_event(event_data: dict):
         key = (event_data.get("symbol", ""), event_data.get("account", ""))
         if key not in open_positions:
             side = event_data.get("side", "")
-            open_positions[key] = {
-                "symbol": event_data.get("symbol", ""),
-                "direction": "long" if side.lower() in ("buy", "long") else "short",
-                "fills": [],
-                "first_fill_time": event_data.get("local_time") or event_data.get("timestamp", ""),
-                "account": event_data.get("account", ""),
-                "stop_prices": [],
-                "screenshots": [],
-            }
-        open_positions[key]["fills"].append({
-            "price": event_data.get("price", 0),
-            "qty": event_data.get("quantity", 0),
-            "time": event_data.get("local_time") or event_data.get("timestamp", ""),
-            "trade_id": event_data.get("trade_id"),
-        })
+            open_positions[key] = _new_position(
+                symbol=event_data.get("symbol", ""),
+                account=event_data.get("account", ""),
+                direction=_side_to_direction(side),
+                first_fill_time=event_data.get("local_time") or event_data.get("timestamp", ""),
+            )
+        _apply_trade_to_position(
+            open_positions[key],
+            price=event_data.get("price", 0),
+            quantity=event_data.get("quantity", 0),
+            trade_time=event_data.get("local_time") or event_data.get("timestamp", ""),
+            trade_id=event_data.get("trade_id"),
+            side=event_data.get("side", ""),
+        )
 
     elif event_type == "position_closed":
         key = (event_data.get("symbol", ""), event_data.get("account", ""))
@@ -440,6 +546,7 @@ def _handle_file_event(event_data: dict):
                 "account": event_data.get("account", ""),
                 "stop_prices": [],
                 "screenshots": [],
+                "remaining_qty": 0.0,
             }
         config = get_config()
 
@@ -460,9 +567,13 @@ def _handle_file_event(event_data: dict):
         )
 
     elif event_type == "stop_order_update":
-        key = (event_data.get("symbol", ""), event_data.get("account", ""))
-        if key in open_positions and event_data.get("stop_price", 0) > 0:
-            open_positions[key]["stop_prices"].append({
+        resolved_key = _resolve_position_key(
+            event_data.get("symbol", ""),
+            event_data.get("account", ""),
+            context="file-watcher-stop-update",
+        )
+        if resolved_key and event_data.get("stop_price", 0) > 0:
+            open_positions[resolved_key]["stop_prices"].append({
                 "price": event_data["stop_price"],
                 "time": event_data.get("timestamp", ""),
                 "type": event_data.get("order_type", ""),

@@ -20,6 +20,51 @@ from typing import Optional
 logger = logging.getLogger("sigma-relay.persistence")
 
 
+def _side_to_direction(side: str) -> str:
+    return "long" if str(side).lower() in ("buy", "long") else "short"
+
+
+def _is_opening_fill(direction: str, side: str) -> bool:
+    normalized_side = str(side).lower()
+    if direction == "long":
+        return normalized_side in ("buy", "long")
+    if direction == "short":
+        return normalized_side in ("sell", "short")
+    return True
+
+
+def _new_position(symbol: str, account: str, direction: str, first_fill_time: str) -> dict:
+    return {
+        "symbol": symbol,
+        "direction": direction,
+        "fills": [],
+        "first_fill_time": first_fill_time,
+        "account": account,
+        "stop_prices": [],
+        "screenshots": [],
+        "remaining_qty": 0.0,
+    }
+
+
+def _apply_trade_to_position(position: dict, event: dict) -> None:
+    qty = float(event.get("quantity", 0) or 0)
+    if qty <= 0:
+        return
+
+    if _is_opening_fill(position["direction"], event.get("side", "")):
+        position["fills"].append({
+            "price": event.get("price", 0),
+            "qty": qty,
+            "time": event.get("local_time") or event.get("timestamp", ""),
+            "trade_id": event.get("trade_id"),
+        })
+        position["remaining_qty"] = float(position.get("remaining_qty", 0.0)) + qty
+        return
+
+    remaining_qty = float(position.get("remaining_qty", 0.0))
+    position["remaining_qty"] = max(0.0, remaining_qty - qty)
+
+
 class EventStore:
     """Append-only event log with daily rotation."""
 
@@ -106,22 +151,13 @@ class EventStore:
                     closed_keys.discard(key)
 
                 if key not in positions:
-                    side = ev.get("side", "")
-                    positions[key] = {
-                        "symbol": symbol,
-                        "direction": "long" if side.lower() in ("buy", "long") else "short",
-                        "fills": [],
-                        "first_fill_time": ev.get("local_time") or ev.get("timestamp", ""),
-                        "account": account,
-                        "stop_prices": [],
-                        "screenshots": [],
-                    }
-                positions[key]["fills"].append({
-                    "price": ev.get("price", 0),
-                    "qty": ev.get("quantity", 0),
-                    "time": ev.get("local_time") or ev.get("timestamp", ""),
-                    "trade_id": ev.get("trade_id"),
-                })
+                    positions[key] = _new_position(
+                        symbol=symbol,
+                        account=account,
+                        direction=_side_to_direction(ev.get("side", "")),
+                        first_fill_time=ev.get("local_time") or ev.get("timestamp", ""),
+                    )
+                _apply_trade_to_position(positions[key], ev)
 
             elif event_type == "position_closed":
                 closed_keys.add(key)

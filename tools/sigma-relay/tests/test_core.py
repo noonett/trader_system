@@ -157,8 +157,26 @@ class TestPersistence:
             pos = positions[("MGC", "A1")]
             assert len(pos["fills"]) == 2
             assert pos["direction"] == "short"
+            assert pos["remaining_qty"] == 2
             assert len(pos["stop_prices"]) == 1
             assert pos["stop_prices"][0]["price"] == 4710
+
+    def test_rebuild_ignores_reducing_fills_in_entry_metrics(self):
+        from persistence import EventStore
+
+        with tempfile.TemporaryDirectory() as td:
+            store = EventStore(data_dir=Path(td))
+
+            # Open long 1, then reduce 1 (without explicit position_closed event).
+            store.append({"event_type": "new_trade", "symbol": "MGC", "price": 4700, "quantity": 1, "side": "Buy", "account": "A1"})
+            store.append({"event_type": "new_trade", "symbol": "MGC", "price": 4710, "quantity": 1, "side": "Sell", "account": "A1"})
+
+            positions = store.rebuild_open_positions()
+            assert ("MGC", "A1") in positions
+            pos = positions[("MGC", "A1")]
+            assert len(pos["fills"]) == 1
+            assert pos["fills"][0]["price"] == 4700
+            assert pos["remaining_qty"] == 0
 
     def test_rebuild_excludes_closed(self):
         from persistence import EventStore
@@ -212,3 +230,68 @@ class TestOrderKeyConsistency:
             account="S50K",
         )
         assert ou.account == "S50K"
+
+
+class TestServerSafetyHelpers:
+    """Test key safety helpers in server.py."""
+
+    def test_apply_trade_to_position_excludes_reducing_fill_from_entry(self):
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        import server
+
+        pos = server._new_position(
+            symbol="MGC",
+            account="A1",
+            direction="long",
+            first_fill_time="2026-05-08T10:00:00Z",
+        )
+
+        assert server._apply_trade_to_position(
+            pos,
+            price=4700,
+            quantity=1,
+            trade_time="2026-05-08T10:00:00Z",
+            trade_id="t1",
+            side="Buy",
+        )
+        assert not server._apply_trade_to_position(
+            pos,
+            price=4710,
+            quantity=1,
+            trade_time="2026-05-08T10:05:00Z",
+            trade_id="t2",
+            side="Sell",
+        )
+
+        assert len(pos["fills"]) == 1
+        assert sum(f["qty"] for f in pos["fills"]) == 1
+        assert pos["remaining_qty"] == 0
+
+    def test_symbol_only_fallback_requires_unique_match(self):
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        import server
+
+        server.open_positions.clear()
+        try:
+            server.open_positions[("MGC", "A1")] = server._new_position(
+                symbol="MGC",
+                account="A1",
+                direction="long",
+                first_fill_time="2026-05-08T10:00:00Z",
+            )
+            server.open_positions[("MGC", "A2")] = server._new_position(
+                symbol="MGC",
+                account="A2",
+                direction="short",
+                first_fill_time="2026-05-08T10:01:00Z",
+            )
+
+            assert server._resolve_position_key("MGC", "A1", context="test") == ("MGC", "A1")
+            assert server._resolve_position_key("MGC", "", context="test") is None
+
+            server.open_positions.pop(("MGC", "A2"))
+            assert server._resolve_position_key("MGC", "", context="test") == ("MGC", "A1")
+        finally:
+            server.open_positions.clear()

@@ -28,7 +28,7 @@ namespace SigmaBridge
 
         // Static: shared across all indicator instances (multi-chart scenario).
         // Lock protects concurrent access from different chart threads.
-        private static readonly object Dedupelock = new();
+        private static readonly object DedupeLock = new();
         private static readonly LinkedList<string> RecentTradeIds = new();
         private static readonly HashSet<string> RecentTradeIdSet = new();
 
@@ -47,9 +47,12 @@ namespace SigmaBridge
 
         protected override void OnNewMyTrade(MyTrade trade)
         {
-            var tradeId = $"{trade.Time:yyyyMMddHHmmssfff}_{trade.Price}_{trade.Quantity}";
+            var symbol = TradingInfo?.Security?.Symbol ?? "UNKNOWN";
+            var account = TradingInfo?.Portfolio?.AccountId ?? "";
+            var timeTicksUtc = trade.Time.ToUniversalTime().Ticks;
+            var tradeId = $"{symbol}|{account}|{trade.Direction}|{timeTicksUtc}|{trade.Price}|{trade.Quantity}";
 
-            lock (Dedupelock)
+            lock (DedupeLock)
             {
                 if (RecentTradeIdSet.Contains(tradeId)) return;
 
@@ -68,11 +71,11 @@ namespace SigmaBridge
                 event_type = "new_trade",
                 timestamp = DateTime.UtcNow.ToString("o"),
                 local_time = trade.Time.ToString("o"),
-                symbol = TradingInfo?.Security?.Symbol ?? "UNKNOWN",
+                symbol = symbol,
                 price = trade.Price,
                 quantity = trade.Quantity,
                 side = trade.Direction.ToString(),
-                account = TradingInfo?.Portfolio?.AccountId ?? "",
+                account = account,
                 trade_id = tradeId
             };
 
