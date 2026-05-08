@@ -1,26 +1,42 @@
 # sigma-relay 配置文件
-# 环境变量可覆盖此文件中的值（前缀 SIGMA_）
+# 环境变量可覆盖（前缀 SIGMA_）
 
 port: 9733
 
 # 项目根目录（sigma-relay 需要知道 trades/ 在哪）
-# workspace_root: /path/to/your/workspace
+# 默认自动检测（相对于本文件 ../../）
+# workspace_root: "C:\\Users\\you\\path\\to\\trader_system"
 
-# 交易员 ID
 trader_id: default
 
-# 通知通道：log / telegram / webhook
-notify_channel: log
+# ─── 通知配置 ────────────────────────────────────────────────────────────────
 
-# Telegram 配置（notify_channel = telegram 时需要）
-# telegram_bot_token: "your-bot-token"
-# telegram_chat_id: "your-chat-id"
+# 通知通道列表（同时支持多通道）
+notify_channels:
+  - toast           # Windows 系统弹窗
+  - wechat_work     # 企业微信群机器人
 
-# Webhook 配置（notify_channel = webhook 时需要）
-# webhook_url: "https://your-webhook-endpoint"
+# 企业微信群机器人 Webhook URL
+# 获取方式：群设置 → 群机器人 → 添加 → 复制 Webhook 地址
+# wechat_work_webhook_url: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=YOUR_KEY"
 
-# 截图监控目录（可选 — 如果使用文件监控模式而非 HTTP 推送）
-# screenshot_watch_dir: "C:\\Users\\you\\Documents\\sigma-screenshots"
+# 如果不用企业微信，可以用 PushPlus 推送到个人微信
+# 获取方式：https://www.pushplus.plus/ 注册后在"一对一推送"拿 token
+# pushplus_token: "your_pushplus_token"
+
+# 或者 Server酱
+# serverchan_key: "your_sendkey"
+
+# ─── 截图配置 ────────────────────────────────────────────────────────────────
+
+# 成交时自动截图
+auto_screenshot: true
+
+# 截图的显示器序号（0=全部显示器合并, 1=主显示器, 2=副显示器...）
+# 建议设为 ATAS 窗口所在的显示器编号
+screenshot_monitor: 1
+
+# ─── 高级 ────────────────────────────────────────────────────────────────────
 
 # Partial fill 超时（秒）：多久没有新 fill 视为一笔开仓完成
 partial_fill_timeout_seconds: 60

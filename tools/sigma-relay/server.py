@@ -24,6 +24,8 @@ from pydantic import BaseModel
 
 from draft_generator import generate_draft_markdown
 from config import get_config
+from screenshot import capture_screen, move_to_trade_screenshots
+from notify import send_notification
 
 logging.basicConfig(
     level=logging.INFO,
@@ -102,6 +104,7 @@ async def handle_trade(event: TradeEvent):
             "first_fill_time": event.local_time or event.timestamp,
             "account": event.account or "",
             "stop_prices": [],
+            "screenshots": [],
         }
 
     open_positions[key]["fills"].append(
@@ -116,6 +119,19 @@ async def handle_trade(event: TradeEvent):
     fill_count = len(open_positions[key]["fills"])
     total_qty = sum(f["qty"] for f in open_positions[key]["fills"])
     logger.info(f"  Aggregated: {fill_count} fills, total qty={total_qty}")
+
+    config = get_config()
+    if config.get("auto_screenshot", True):
+        capture_type = "entry" if fill_count == 1 else "context"
+        screenshot_path = capture_screen(
+            symbol=event.symbol,
+            capture_type=capture_type,
+            monitor_index=config.get("screenshot_monitor", 0),
+        )
+        if screenshot_path:
+            open_positions[key]["screenshots"].append(
+                {"path": str(screenshot_path), "type": capture_type}
+            )
 
     return {"status": "aggregating", "fills": fill_count, "total_qty": total_qty}
 
@@ -141,13 +157,35 @@ async def handle_close(event: PositionClosed):
             "first_fill_time": event.timestamp,
             "account": event.account or "",
             "stop_prices": [],
+            "screenshots": [],
         }
 
     config = get_config()
+
+    if config.get("auto_screenshot", True):
+        exit_screenshot = capture_screen(
+            symbol=event.symbol,
+            capture_type="exit",
+            monitor_index=config.get("screenshot_monitor", 0),
+        )
+        if exit_screenshot:
+            pos["screenshots"].append({"path": str(exit_screenshot), "type": "exit"})
+
     draft_path = generate_draft_markdown(pos, event, config)
 
     git_commit_draft(draft_path, event.symbol, pos["direction"])
-    notify_user(draft_path, event.symbol, event.realized_pnl)
+
+    pnl_str = f"+{event.realized_pnl}" if event.realized_pnl >= 0 else str(event.realized_pnl)
+    send_notification(
+        title=f"σ Draft: {event.symbol} {pos['direction']}",
+        message=(
+            f"PnL: {pnl_str} | Entry: {event.avg_entry_price}\n"
+            f"Draft: {draft_path.name}\n"
+            f"待补填：决策链 5 问 + 盘后 EMA"
+        ),
+        config=config,
+        urgency="high" if event.realized_pnl < 0 else "normal",
+    )
 
     return {"status": "draft_created", "path": str(draft_path)}
 
@@ -205,54 +243,6 @@ def git_commit_draft(draft_path: Path, symbol: str, direction: str):
         logger.info(f"Git committed: {draft_path.name}")
     except subprocess.CalledProcessError as e:
         logger.error(f"Git commit failed: {e.stderr.decode()}")
-
-
-def notify_user(draft_path: Path, symbol: str, pnl: float):
-    """Send notification that a draft is ready for review."""
-    config = get_config()
-    channel = config.get("notify_channel", "log")
-    pnl_str = f"+{pnl}" if pnl >= 0 else str(pnl)
-    message = f"📝 Draft ready: {symbol} (PnL: {pnl_str}) → {draft_path.name}"
-
-    if channel == "log":
-        logger.info(f"NOTIFY: {message}")
-    elif channel == "telegram":
-        _send_telegram(message, config)
-    elif channel == "webhook":
-        _send_webhook(message, config)
-
-
-def _send_telegram(message: str, config: dict):
-    """Send via Telegram Bot API."""
-    import httpx
-
-    bot_token = config.get("telegram_bot_token", "")
-    chat_id = config.get("telegram_chat_id", "")
-    if not bot_token or not chat_id:
-        logger.warning("Telegram not configured")
-        return
-    try:
-        httpx.post(
-            f"https://api.telegram.org/bot{bot_token}/sendMessage",
-            json={"chat_id": chat_id, "text": message},
-            timeout=5,
-        )
-    except Exception as e:
-        logger.error(f"Telegram send failed: {e}")
-
-
-def _send_webhook(message: str, config: dict):
-    """Send to arbitrary webhook URL."""
-    import httpx
-
-    url = config.get("webhook_url", "")
-    if not url:
-        logger.warning("Webhook URL not configured")
-        return
-    try:
-        httpx.post(url, json={"text": message}, timeout=5)
-    except Exception as e:
-        logger.error(f"Webhook send failed: {e}")
 
 
 if __name__ == "__main__":

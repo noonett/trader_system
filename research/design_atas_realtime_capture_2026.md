@@ -514,23 +514,77 @@ private void TriggerScreenCapture()
 
 ---
 
-## 九、开放问题（需要你确认）
+## 九、用户确认（2026-05-08）
 
-1. **ATAS 版本**：你用的是 ATAS 正式版还是评估版？评估版可能限制自定义指标（xlsx 导出中有 "Evaluation Warning" sheet）
-2. **C# 开发环境**：你的 Windows 机器上是否已装 Visual Studio 或 .NET SDK？
-3. **数据馈送源（datafeed）**：你通过哪个 connector 连 CME（CQG / Rithmic / 其他）？这影响 `MyTrade` 对象的字段完整度
-4. **热力图/Footprint 截图需求**：你是否需要在成交时自动截图？还是手动截就够？
-5. **通知偏好**：draft 生成后你希望怎么知道？Telegram / 微信 / 系统弹窗 / WebUI badge？
+| # | 问题 | 回答 | 含义 |
+|---|------|------|------|
+| 1 | ATAS 版本 | **正式版** | 自定义指标无限制，xlsx 中 "Evaluation Warning" sheet 可忽略 |
+| 2 | C# 开发环境 | **都没有（VS / .NET SDK）** | 需要最轻量的编译路径——选 .NET SDK CLI（无需 Visual Studio） |
+| 3 | 数据馈送源 | **dxfeed** | dxfeed 是 ATAS 一级支持的 connector；`MyTrade` 字段完整度高；需注意时间戳可能为 exchange time |
+| 4 | 截图需求 | **需要自动截图** | SigmaBridge 成交时触发截图 + sigma-relay 侧管理文件归档 |
+| 5 | 通知偏好 | **系统弹窗 + 微信** | Windows Toast Notification + 企业微信 Webhook（或个人微信 via PushPlus/Server酱） |
 
 ---
 
-## 十、下一步
+## 十、下一步（基于用户确认更新）
 
-如果你确认要走这条路（方案 A/E），我的建议是：
+### Phase 0：环境准备（你的 Windows 机器上，约 15 分钟）
 
-1. **立刻做**：Phase 1 验证（最小 C# 指标 + HTTP POST）—— 这是整条链的最大未知数
-2. **同步做**：我可以先把 sigma-relay 的 Python 代码骨架写出来（不依赖 Phase 1 结果）
-3. **决策点**：Phase 1 如果发现 ATAS 沙箱阻止 HTTP，则退化到"写文件 + watchdog"路径（仍可实时，只是多一层间接）
+#### .NET SDK 安装（轻量，无需 Visual Studio）
+
+只需 .NET SDK CLI，**不需要 Visual Studio**（省 ~40GB）：
+
+```powershell
+# 方法 1：winget（最快）
+winget install Microsoft.DotNet.SDK.8
+
+# 方法 2：手动下载 (~200MB)
+# https://dotnet.microsoft.com/download/dotnet/8.0
+# 选 "SDK x64" → 安装 → 重启终端
+
+# 验证
+dotnet --version
+```
+
+#### NirCmd 安装（截图工具，~100KB）
+
+```powershell
+# 下载 https://www.nirsoft.net/utils/nircmd.html
+# 解压 nircmd.exe 到 C:\Tools\ 或任意 PATH 目录
+```
+
+#### 替代截图方案（无需第三方工具）
+
+如果不想装 NirCmd，sigma-relay 侧用 Python `mss` 库截图（已在新代码中实现）。
+
+---
+
+### Phase 1：验证 ATAS HTTP 发送（最高风险，先做）
+
+1. 编译最小 SigmaBridge（只打印日志 + 尝试 HTTP POST）
+2. 挂到 dxfeed 连接的图表上
+3. 在模拟盘下一笔单 → 看 sigma-relay 是否收到
+
+```powershell
+# 在你的项目目录（已 clone 本仓库）
+cd atas-plugin\SigmaBridge
+dotnet build -c Release
+# 复制 DLL
+copy bin\Release\net8.0\SigmaBridge.dll ^
+  "%USERPROFILE%\Documents\Advanced Time And Sales\Indicators\"
+```
+
+### Phase 2：sigma-relay 完整服务
+
+```powershell
+cd tools\sigma-relay
+pip install -r requirements.txt
+python server.py
+```
+
+### Phase 3：端到端测试
+
+ATAS 模拟盘下单 → SigmaBridge 捕获 → relay 生成 draft → Windows 弹窗 + 微信通知 → 你补填决策链
 
 ---
 
