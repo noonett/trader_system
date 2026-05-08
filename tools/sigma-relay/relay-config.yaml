@@ -40,3 +40,9 @@ screenshot_monitor: 1
 
 # Partial fill 超时（秒）：多久没有新 fill 视为一笔开仓完成
 partial_fill_timeout_seconds: 60
+
+# ─── 退化模式：文件监控（ATAS 沙箱阻止 HTTP 时使用）───────────────────────────
+# 如果 ATAS 自定义指标无法使用 System.Net.Http，改为写本地 JSONL 文件。
+# 设置此目录后，sigma-relay 启动时自动开启 file_watcher 监控。
+# SigmaBridge C# 侧需改为 File.AppendAllText 输出到此目录的 events.jsonl。
+# file_watcher_dir: "C:\\sigma-events"

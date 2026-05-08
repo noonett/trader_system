@@ -52,7 +52,9 @@ open_positions: dict[tuple[str, str], dict] = {}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Startup: recover open positions from recent event logs."""
+    """Startup: recover open positions from recent event logs.
+    Optionally start file watcher for ATAS sandbox fallback mode.
+    """
     global open_positions
     recovered = event_store.rebuild_open_positions()
     if recovered:
@@ -61,6 +63,20 @@ async def lifespan(app: FastAPI):
             f"Recovered {len(recovered)} open position(s) from event log "
             f"(lookback: 3 days)"
         )
+
+    # Start file watcher if configured (fallback for ATAS sandbox blocking HTTP)
+    config = get_config()
+    watcher_thread = None
+    watch_dir = config.get("file_watcher_dir", "")
+    if watch_dir:
+        from file_watcher import start_file_watcher
+        watcher_thread = start_file_watcher(
+            watch_dir=watch_dir,
+            callback=_handle_file_event,
+        )
+        if watcher_thread:
+            logger.info(f"File watcher active: {watch_dir}")
+
     yield
 
 
@@ -299,9 +315,27 @@ async def handle_order(event: OrderUpdate):
 
 @app.post("/screenshot")
 async def handle_screenshot(notif: ScreenshotNotification):
+    """Receive screenshot notification and associate with current open position."""
     logger.info(f"Screenshot: {notif.symbol} type={notif.capture_type} path={notif.file_path}")
-    # TODO: move/copy screenshot to trades/YYYY/MM/screenshots/ and link to draft
-    return {"status": "noted", "file_path": notif.file_path}
+
+    key = (notif.symbol, "")
+    # Try exact match, then symbol-only fallback
+    matched_key = None
+    if key in open_positions:
+        matched_key = key
+    else:
+        for pos_key in open_positions:
+            if pos_key[0] == notif.symbol:
+                matched_key = pos_key
+                break
+
+    if matched_key and Path(notif.file_path).exists():
+        open_positions[matched_key]["screenshots"].append(
+            {"path": notif.file_path, "type": notif.capture_type}
+        )
+        return {"status": "associated", "position": matched_key[0]}
+
+    return {"status": "noted_no_position", "file_path": notif.file_path}
 
 
 def git_commit_draft(draft_path: Path, symbol: str, direction: str, screenshot_paths: list[Path] = None):
@@ -363,6 +397,76 @@ def git_commit_draft(draft_path: Path, symbol: str, direction: str, screenshot_p
         logger.info(f"Git committed: {draft_path.name}")
     except subprocess.CalledProcessError as e:
         logger.error(f"Git commit failed: {e.stderr.decode() if e.stderr else str(e)}")
+
+
+def _handle_file_event(event_data: dict):
+    """Callback for file_watcher: injects events into the same pipeline as HTTP."""
+    import asyncio
+
+    event_type = event_data.get("event_type", "")
+    logger.info(f"File watcher event: {event_type} {event_data.get('symbol', '?')}")
+
+    event_store.append(event_data)
+
+    if event_type == "new_trade":
+        key = (event_data.get("symbol", ""), event_data.get("account", ""))
+        if key not in open_positions:
+            side = event_data.get("side", "")
+            open_positions[key] = {
+                "symbol": event_data.get("symbol", ""),
+                "direction": "long" if side.lower() in ("buy", "long") else "short",
+                "fills": [],
+                "first_fill_time": event_data.get("local_time") or event_data.get("timestamp", ""),
+                "account": event_data.get("account", ""),
+                "stop_prices": [],
+                "screenshots": [],
+            }
+        open_positions[key]["fills"].append({
+            "price": event_data.get("price", 0),
+            "qty": event_data.get("quantity", 0),
+            "time": event_data.get("local_time") or event_data.get("timestamp", ""),
+            "trade_id": event_data.get("trade_id"),
+        })
+
+    elif event_type == "position_closed":
+        key = (event_data.get("symbol", ""), event_data.get("account", ""))
+        pos = open_positions.pop(key, None)
+        if pos is None:
+            pos = {
+                "symbol": event_data.get("symbol", ""),
+                "direction": "unknown",
+                "fills": [],
+                "first_fill_time": event_data.get("timestamp", ""),
+                "account": event_data.get("account", ""),
+                "stop_prices": [],
+                "screenshots": [],
+            }
+        config = get_config()
+
+        class _CloseMock:
+            realized_pnl = event_data.get("realized_pnl", 0)
+            avg_entry_price = event_data.get("avg_entry_price", 0)
+            timestamp = event_data.get("timestamp", "")
+            account = event_data.get("account", "")
+
+        draft_path = generate_draft_markdown(pos, _CloseMock(), config)
+        git_commit_draft(draft_path, event_data.get("symbol", ""), pos["direction"])
+        pnl = event_data.get("realized_pnl", 0)
+        pnl_str = f"+{pnl}" if pnl >= 0 else str(pnl)
+        send_notification(
+            title=f"σ Draft: {event_data.get('symbol', '?')} {pos['direction']}",
+            message=f"PnL: {pnl_str}\nDraft: {draft_path.name}\n待补填：决策链 5 问 + 盘后 EMA",
+            config=config,
+        )
+
+    elif event_type == "stop_order_update":
+        key = (event_data.get("symbol", ""), event_data.get("account", ""))
+        if key in open_positions and event_data.get("stop_price", 0) > 0:
+            open_positions[key]["stop_prices"].append({
+                "price": event_data["stop_price"],
+                "time": event_data.get("timestamp", ""),
+                "type": event_data.get("order_type", ""),
+            })
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using ATAS.Indicators;
 
@@ -12,6 +13,7 @@ namespace SigmaBridge
     /// σ 系统桥接指标 — 捕获交易事件并推送到 sigma-relay 本地服务。
     /// 安装：编译为 DLL 后放入 Documents/Advanced Time And Sales/Indicators/
     /// 需要挂载到你正在交易的图表上才能接收事件。
+    /// 多图表挂载安全：去重集合为 static，所有实例共享。
     /// </summary>
     [DisplayName("σ SigmaBridge")]
     public class SigmaBridge : ExtendedIndicator
@@ -24,6 +26,12 @@ namespace SigmaBridge
         private const string DefaultRelayUrl = "http://127.0.0.1:9733";
         private const int DedupeWindowSize = 50;
 
+        // Static: shared across all indicator instances (multi-chart scenario).
+        // Lock protects concurrent access from different chart threads.
+        private static readonly object Dedupelock = new();
+        private static readonly LinkedList<string> RecentTradeIds = new();
+        private static readonly HashSet<string> RecentTradeIdSet = new();
+
         [Display(Name = "Relay URL", GroupName = "σ Config")]
         public string RelayUrl { get; set; } = DefaultRelayUrl;
 
@@ -33,26 +41,26 @@ namespace SigmaBridge
         [Display(Name = "Screenshot Tool Path", GroupName = "σ Config")]
         public string ScreenshotToolPath { get; set; } = "nircmd.exe";
 
-        private readonly LinkedList<string> _recentTradeIds = new();
-        private readonly HashSet<string> _recentTradeIdSet = new();
-
         protected override void OnCalculate(int bar, decimal value)
         {
-            // 指标主计算循环 — SigmaBridge 不绘图，仅监听事件
         }
 
         protected override void OnNewMyTrade(MyTrade trade)
         {
             var tradeId = $"{trade.Time:yyyyMMddHHmmssfff}_{trade.Price}_{trade.Quantity}";
-            if (_recentTradeIdSet.Contains(tradeId)) return;
 
-            _recentTradeIdSet.Add(tradeId);
-            _recentTradeIds.AddLast(tradeId);
-            while (_recentTradeIds.Count > DedupeWindowSize)
+            lock (Dedupelock)
             {
-                var oldest = _recentTradeIds.First.Value;
-                _recentTradeIds.RemoveFirst();
-                _recentTradeIdSet.Remove(oldest);
+                if (RecentTradeIdSet.Contains(tradeId)) return;
+
+                RecentTradeIdSet.Add(tradeId);
+                RecentTradeIds.AddLast(tradeId);
+                while (RecentTradeIds.Count > DedupeWindowSize)
+                {
+                    var oldest = RecentTradeIds.First.Value;
+                    RecentTradeIds.RemoveFirst();
+                    RecentTradeIdSet.Remove(oldest);
+                }
             }
 
             var payload = new
@@ -68,7 +76,7 @@ namespace SigmaBridge
                 trade_id = tradeId
             };
 
-            _ = PostAsync("/trade-event", payload);
+            FireAndForget(PostAsync("/trade-event", payload));
 
             if (EnableScreenshot)
             {
@@ -78,7 +86,7 @@ namespace SigmaBridge
 
         protected override void OnPositionChanged(Position position)
         {
-            if (position.CurrentVolume != 0) return; // 仅关注完全平仓
+            if (position.CurrentVolume != 0) return;
 
             var payload = new
             {
@@ -90,7 +98,7 @@ namespace SigmaBridge
                 account = TradingInfo?.Portfolio?.AccountId ?? ""
             };
 
-            _ = PostAsync("/position-closed", payload);
+            FireAndForget(PostAsync("/position-closed", payload));
         }
 
         protected override void OnOrderChanged(Order order)
@@ -109,23 +117,34 @@ namespace SigmaBridge
                     account = TradingInfo?.Portfolio?.AccountId ?? ""
                 };
 
-                _ = PostAsync("/order-update", payload);
+                FireAndForget(PostAsync("/order-update", payload));
             }
         }
 
         private async Task PostAsync(string endpoint, object payload)
         {
-            try
+            var json = JsonSerializer.Serialize(payload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            using var response = await Http.PostAsync($"{RelayUrl}{endpoint}", content);
+            response.EnsureSuccessStatusCode();
+        }
+
+        /// <summary>
+        /// Safely observes a Task without awaiting it in synchronous event handlers.
+        /// Logs any exceptions rather than letting them go unobserved.
+        /// </summary>
+        private void FireAndForget(Task task)
+        {
+            task.ContinueWith(t =>
             {
-                var json = JsonSerializer.Serialize(payload);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                using var response = await Http.PostAsync($"{RelayUrl}{endpoint}", content);
-                response.EnsureSuccessStatusCode();
-            }
-            catch (Exception ex)
-            {
-                LogError($"SigmaBridge POST {endpoint} failed: {ex.Message}");
-            }
+                if (t.IsFaulted && t.Exception != null)
+                {
+                    foreach (var ex in t.Exception.InnerExceptions)
+                    {
+                        LogError($"SigmaBridge async error: {ex.Message}");
+                    }
+                }
+            }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
         private void TriggerScreenCapture(string symbol)
@@ -154,7 +173,6 @@ namespace SigmaBridge
 
         private void LogError(string message)
         {
-            // ATAS 内建日志 — 具体 API 需查文档确认
             System.Diagnostics.Debug.WriteLine($"[SigmaBridge] {message}");
         }
     }
