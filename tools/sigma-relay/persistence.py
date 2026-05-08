@@ -70,23 +70,41 @@ class EventStore:
                         continue
         return events
 
-    def rebuild_open_positions(self) -> dict[tuple[str, str], dict]:
-        """Rebuild in-memory open_positions from today's events.
+    def rebuild_open_positions(self, lookback_days: int = 3) -> dict[tuple[str, str], dict]:
+        """Rebuild in-memory open_positions from recent event logs.
 
-        Used after service restart to recover state.
-        Logic: replay all trade events, remove those that had position_closed.
+        Replays the last `lookback_days` of events to handle:
+        - Cross-day positions (opened yesterday, still held today)
+        - UTC/local timezone day boundary differences
+        - Relay restart after multi-day downtime
+
+        Logic: replay all trade events across recent files, remove those
+        that had position_closed.
         """
-        events = self.load_today()
+        from datetime import timedelta
+
+        all_events = []
+        today = datetime.now(timezone.utc)
+        for offset in range(lookback_days, -1, -1):
+            day = (today - timedelta(days=offset)).strftime("%Y-%m-%d")
+            all_events.extend(self.load_date(day))
+
         positions: dict[tuple[str, str], dict] = {}
         closed_keys: set[tuple[str, str]] = set()
 
-        for ev in events:
+        for ev in all_events:
             event_type = ev.get("event_type", "")
             symbol = ev.get("symbol", "")
             account = ev.get("account", "")
             key = (symbol, account)
 
             if event_type == "new_trade":
+                if key in closed_keys:
+                    # This trade was for a position that already closed;
+                    # could be a new position opened after the close.
+                    # Reset if we see new trades after a close.
+                    closed_keys.discard(key)
+
                 if key not in positions:
                     side = ev.get("side", "")
                     positions[key] = {
@@ -107,6 +125,7 @@ class EventStore:
 
             elif event_type == "position_closed":
                 closed_keys.add(key)
+                positions.pop(key, None)
 
             elif event_type == "stop_order_update":
                 if key in positions and ev.get("stop_price", 0) > 0:
@@ -115,8 +134,5 @@ class EventStore:
                         "time": ev.get("timestamp", ""),
                         "type": ev.get("order_type", ""),
                     })
-
-        for k in closed_keys:
-            positions.pop(k, None)
 
         return positions

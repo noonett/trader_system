@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -21,6 +22,7 @@ namespace SigmaBridge
         };
 
         private const string DefaultRelayUrl = "http://127.0.0.1:9733";
+        private const int DedupeWindowSize = 50;
 
         [Display(Name = "Relay URL", GroupName = "σ Config")]
         public string RelayUrl { get; set; } = DefaultRelayUrl;
@@ -31,7 +33,8 @@ namespace SigmaBridge
         [Display(Name = "Screenshot Tool Path", GroupName = "σ Config")]
         public string ScreenshotToolPath { get; set; } = "nircmd.exe";
 
-        private string _lastTradeId = "";
+        private readonly LinkedList<string> _recentTradeIds = new();
+        private readonly HashSet<string> _recentTradeIdSet = new();
 
         protected override void OnCalculate(int bar, decimal value)
         {
@@ -41,8 +44,16 @@ namespace SigmaBridge
         protected override void OnNewMyTrade(MyTrade trade)
         {
             var tradeId = $"{trade.Time:yyyyMMddHHmmssfff}_{trade.Price}_{trade.Quantity}";
-            if (tradeId == _lastTradeId) return; // 去重（多图表挂载场景）
-            _lastTradeId = tradeId;
+            if (_recentTradeIdSet.Contains(tradeId)) return;
+
+            _recentTradeIdSet.Add(tradeId);
+            _recentTradeIds.AddLast(tradeId);
+            while (_recentTradeIds.Count > DedupeWindowSize)
+            {
+                var oldest = _recentTradeIds.First.Value;
+                _recentTradeIds.RemoveFirst();
+                _recentTradeIdSet.Remove(oldest);
+            }
 
             var payload = new
             {
@@ -84,7 +95,6 @@ namespace SigmaBridge
 
         protected override void OnOrderChanged(Order order)
         {
-            // 可选：跟踪挂单/止损变更
             if (order.Type == OrderType.Stop || order.Type == OrderType.StopLimit)
             {
                 var payload = new
@@ -95,7 +105,8 @@ namespace SigmaBridge
                     order_state = order.State.ToString(),
                     stop_price = order.StopPrice,
                     order_type = order.Type.ToString(),
-                    side = order.Direction.ToString()
+                    side = order.Direction.ToString(),
+                    account = TradingInfo?.Portfolio?.AccountId ?? ""
                 };
 
                 _ = PostAsync("/order-update", payload);
@@ -108,13 +119,12 @@ namespace SigmaBridge
             {
                 var json = JsonSerializer.Serialize(payload);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-                await Http.PostAsync($"{RelayUrl}{endpoint}", content);
+                using var response = await Http.PostAsync($"{RelayUrl}{endpoint}", content);
+                response.EnsureSuccessStatusCode();
             }
             catch (Exception ex)
             {
-                // 静默失败 — relay 可能未启动，不应影响交易
-                // 可选：写入 ATAS 日志
-                LogError($"SigmaBridge POST failed: {ex.Message}");
+                LogError($"SigmaBridge POST {endpoint} failed: {ex.Message}");
             }
         }
 

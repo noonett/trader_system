@@ -9,12 +9,13 @@ DEFAULT_CONFIG = {
     "port": 9733,
     "workspace_root": str(Path(__file__).resolve().parent.parent.parent),
     "trader_id": "default",
-    "notify_channel": "log",  # log / telegram / webhook
-    "telegram_bot_token": "",
-    "telegram_chat_id": "",
-    "webhook_url": "",
-    "screenshot_watch_dir": "",  # 如果启用文件监控截图
-    "partial_fill_timeout_seconds": 60,  # 多久没有新 fill 视为开仓完成
+    "notify_channels": ["toast"],  # list: toast / wechat_work / pushplus / serverchan
+    "wechat_work_webhook_url": "",
+    "pushplus_token": "",
+    "serverchan_key": "",
+    "auto_screenshot": True,
+    "screenshot_monitor": 1,
+    "partial_fill_timeout_seconds": 60,
 }
 
 
@@ -32,15 +33,18 @@ def get_config() -> dict:
         "SIGMA_RELAY_PORT": ("port", int),
         "SIGMA_WORKSPACE_ROOT": ("workspace_root", str),
         "SIGMA_TRADER_ID": ("trader_id", str),
-        "SIGMA_NOTIFY_CHANNEL": ("notify_channel", str),
-        "SIGMA_TELEGRAM_BOT_TOKEN": ("telegram_bot_token", str),
-        "SIGMA_TELEGRAM_CHAT_ID": ("telegram_chat_id", str),
-        "SIGMA_WEBHOOK_URL": ("webhook_url", str),
+        "SIGMA_WECHAT_WORK_WEBHOOK_URL": ("wechat_work_webhook_url", str),
+        "SIGMA_PUSHPLUS_TOKEN": ("pushplus_token", str),
+        "SIGMA_SERVERCHAN_KEY": ("serverchan_key", str),
     }
 
     for env_var, (key, cast) in env_overrides.items():
         val = os.environ.get(env_var)
         if val is not None:
             config[key] = cast(val)
+
+    # Normalize: accept legacy singular key
+    if "notify_channel" in config and "notify_channels" not in config:
+        config["notify_channels"] = [config.pop("notify_channel")]
 
     return config

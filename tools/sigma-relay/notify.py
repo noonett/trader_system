@@ -141,7 +141,7 @@ def _send_pushplus(title: str, message: str, config: dict) -> None:
         "template": "markdown",
     }
 
-    resp = httpx.post("http://www.pushplus.plus/send", json=payload, timeout=10)
+    resp = httpx.post("https://www.pushplus.plus/send", json=payload, timeout=10)
     if resp.status_code == 200:
         result = resp.json()
         if result.get("code") == 200:

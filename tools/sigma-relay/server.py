@@ -10,11 +10,18 @@
 
 或使用 uvicorn：
     uvicorn server:app --host 127.0.0.1 --port 9733
+
+安全模型：
+    - 仅绑定 127.0.0.1（不接受外部连接）
+    - 无鉴权（威胁模型：信任本机所有进程）
+    - 如果需要暴露到网络（如内网穿透），必须添加 API Key 鉴权
+    - 事件日志存储在本地磁盘，不包含账户密码类敏感信息
 """
 
 import json
 import logging
 import subprocess
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -38,23 +45,26 @@ logging.basicConfig(
 )
 logger = logging.getLogger("sigma-relay")
 
-app = FastAPI(title="σ sigma-relay", version="0.1.0")
-
 event_store = EventStore()
 
 open_positions: dict[tuple[str, str], dict] = {}
 
 
-@app.on_event("startup")
-async def startup():
-    """Recover open positions from today's event log (handles restart)."""
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Startup: recover open positions from recent event logs."""
     global open_positions
     recovered = event_store.rebuild_open_positions()
     if recovered:
         open_positions.update(recovered)
         logger.info(
-            f"Recovered {len(recovered)} open position(s) from event log"
+            f"Recovered {len(recovered)} open position(s) from event log "
+            f"(lookback: 3 days)"
         )
+    yield
+
+
+app = FastAPI(title="σ sigma-relay", version="0.1.0", lifespan=lifespan)
 
 
 class TradeEvent(BaseModel):
@@ -86,6 +96,7 @@ class OrderUpdate(BaseModel):
     stop_price: float
     order_type: str
     side: str
+    account: Optional[str] = ""
 
 
 class ScreenshotNotification(BaseModel):
@@ -218,7 +229,24 @@ async def handle_close(event: PositionClosed):
 
     draft_path = generate_draft_markdown(pos, event, config)
 
-    git_commit_draft(draft_path, event.symbol, pos["direction"])
+    # Move screenshots to trade's screenshots/ dir and collect final paths
+    committed_screenshots = []
+    trades_dir = draft_path.parent
+    for ss in pos.get("screenshots", []):
+        ss_path = Path(ss["path"])
+        if ss_path.exists():
+            final_path = move_to_trade_screenshots(
+                screenshot_path=ss_path,
+                trades_dir=trades_dir,
+                trade_date=datetime.now().strftime("%Y-%m-%d"),
+                symbol=event.symbol.lower().replace("/", "").replace(" ", ""),
+                direction=pos["direction"],
+                capture_type=ss["type"],
+            )
+            if final_path:
+                committed_screenshots.append(final_path)
+
+    git_commit_draft(draft_path, event.symbol, pos["direction"], committed_screenshots)
 
     pnl_str = f"+{event.realized_pnl}" if event.realized_pnl >= 0 else str(event.realized_pnl)
     send_notification(
@@ -237,7 +265,7 @@ async def handle_close(event: PositionClosed):
 
 @app.post("/order-update")
 async def handle_order(event: OrderUpdate):
-    key = (event.symbol, "")
+    key = (event.symbol, event.account or "")
     logger.info(
         f"Order update: {event.symbol} {event.order_type} "
         f"stop={event.stop_price} state={event.order_state}"
@@ -253,6 +281,18 @@ async def handle_order(event: OrderUpdate):
                 "type": event.order_type,
             }
         )
+    elif event.stop_price > 0:
+        # Fallback: try matching by symbol only (account might differ)
+        for pos_key, pos in open_positions.items():
+            if pos_key[0] == event.symbol:
+                pos["stop_prices"].append(
+                    {
+                        "price": event.stop_price,
+                        "time": event.timestamp,
+                        "type": event.order_type,
+                    }
+                )
+                break
 
     return {"status": "recorded"}
 
@@ -264,32 +304,65 @@ async def handle_screenshot(notif: ScreenshotNotification):
     return {"status": "noted", "file_path": notif.file_path}
 
 
-def git_commit_draft(draft_path: Path, symbol: str, direction: str):
-    """Stage and commit the draft file."""
+def git_commit_draft(draft_path: Path, symbol: str, direction: str, screenshot_paths: list[Path] = None):
+    """Stage and commit only the draft file (+ screenshots), nothing else.
+
+    Uses a temporary index to avoid committing unrelated staged changes.
+    """
     config = get_config()
     workspace = Path(config["workspace_root"])
+    paths_to_commit = [str(draft_path)]
+    if screenshot_paths:
+        paths_to_commit.extend(str(p) for p in screenshot_paths)
 
     try:
+        # Reset index for target files only, then commit with -- pathspec
+        # This ensures only our files go in, even if other things are staged.
         subprocess.run(
-            ["git", "add", str(draft_path)],
+            ["git", "add", "--"] + paths_to_commit,
             cwd=workspace,
             check=True,
             capture_output=True,
         )
-        subprocess.run(
-            [
-                "git",
-                "commit",
-                "-m",
-                f"draft({symbol}): auto-captured {direction} position closed",
-            ],
+
+        # Verify only our files are being committed
+        result = subprocess.run(
+            ["git", "diff", "--cached", "--name-only"],
             cwd=workspace,
-            check=True,
             capture_output=True,
+            text=True,
         )
+        staged = set(result.stdout.strip().splitlines()) if result.stdout.strip() else set()
+        our_files = set(
+            str(Path(p).relative_to(workspace)) for p in paths_to_commit
+            if Path(p).is_relative_to(workspace)
+        )
+        extra_staged = staged - our_files
+        if extra_staged:
+            logger.warning(
+                f"Extra staged files detected (won't be committed): {extra_staged}"
+            )
+            # Use pathspec to commit only our files
+            subprocess.run(
+                ["git", "commit", "-m",
+                 f"draft({symbol}): auto-captured {direction} position closed",
+                 "--"] + paths_to_commit,
+                cwd=workspace,
+                check=True,
+                capture_output=True,
+            )
+        else:
+            subprocess.run(
+                ["git", "commit", "-m",
+                 f"draft({symbol}): auto-captured {direction} position closed"],
+                cwd=workspace,
+                check=True,
+                capture_output=True,
+            )
+
         logger.info(f"Git committed: {draft_path.name}")
     except subprocess.CalledProcessError as e:
-        logger.error(f"Git commit failed: {e.stderr.decode()}")
+        logger.error(f"Git commit failed: {e.stderr.decode() if e.stderr else str(e)}")
 
 
 if __name__ == "__main__":
